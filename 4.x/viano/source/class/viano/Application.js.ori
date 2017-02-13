@@ -1,0 +1,183 @@
+/* ************************************************************************
+
+   Copyright:
+
+   License:
+
+   Authors:
+
+************************************************************************ */
+
+/**
+ * This is the main application class of your custom application "viano"
+ *
+ * @asset(viano/*)
+ */
+qx.Class.define("viano.Application",
+{
+  extend : qx.application.Standalone,
+
+
+
+  /*
+  *****************************************************************************
+     MEMBERS
+  *****************************************************************************
+  */
+
+  members :
+  {
+    /**
+     * This method contains the initial application code and gets called 
+     * during startup of the application
+     * 
+     * @lint ignoreDeprecated(alert)
+     */
+    main : function()
+    {
+      // Call super class
+      this.base(arguments);
+
+      // Enable logging in debug variant
+      if (qx.core.Environment.get("qx.debug"))
+      {
+        // support native logging capabilities, e.g. Firebug for Firefox
+        qx.log.appender.Native;
+        // support additional cross-browser console. Press F7 to toggle visibility
+        qx.log.appender.Console;
+      }
+
+      /*
+      -------------------------------------------------------------------------
+        Below is your actual application code...
+      -------------------------------------------------------------------------
+      */
+
+
+      
+      
+      
+      
+     var doc = this.getRoot();
+     doc.set({blockerColor: '#bfbfbf', blockerOpacity: 0.4});
+     
+   
+     
+    var pageIngreso = null;
+    var pageEntrega = null;
+     
+
+	var mnuArchivo = new qx.ui.menu.Menu();
+	var btnAcercaDe = new qx.ui.menu.Button("Acerca de...");
+	btnAcercaDe.addListener("execute", function(){
+
+	});
+	mnuArchivo.add(btnAcercaDe);
+	
+	
+	  
+	var mnuEdicion = new qx.ui.menu.Menu();
+	var mnuVer = new qx.ui.menu.Menu();
+	
+	
+	
+	var btnIngreso = new qx.ui.menu.Button("Ingreso");
+	btnIngreso.addListener("execute", function(e){
+		var win = new viano.comp.windowIngreso();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuEdicion.add(btnIngreso);
+	
+	var btnEntrega = new qx.ui.menu.Button("Entrega");
+	btnEntrega.addListener("execute", function(e){
+		var win = new viano.comp.windowEntrega();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuEdicion.add(btnEntrega);
+	mnuEdicion.addSeparator();
+	
+	var btnProducto = new qx.ui.menu.Button("Productos");
+	btnProducto.addListener("execute", function(e){
+		var win = new viano.comp.windowProductos();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuEdicion.add(btnProducto);
+	
+	
+	var btnListado = new qx.ui.menu.Button("Listado");
+	btnListado.addListener("execute", function(e){
+		var win = new viano.comp.windowListado();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuVer.add(btnListado);
+	
+	var btnIngreso = new qx.ui.menu.Button("Ingreso");
+	btnIngreso.addListener("execute", function(e){
+		if (pageIngreso == null) {
+			pageIngreso = new viano.comp.pageIngreso();
+			pageIngreso.addListener("close", function(e){
+				pageIngreso = null;
+			})
+			tabviewMain.add(pageIngreso);
+		}
+		
+		tabviewMain.setSelection([pageIngreso]);
+	});
+	mnuVer.add(btnIngreso);
+	
+	var btnEntrega = new qx.ui.menu.Button("Entrega");
+	btnEntrega.addListener("execute", function(e){
+		if (pageEntrega == null) {
+			pageEntrega = new viano.comp.pageEntrega();
+			pageEntrega.addListener("close", function(e){
+				pageEntrega = null;
+			})
+			tabviewMain.add(pageEntrega);
+		}
+		
+		tabviewMain.setSelection([pageEntrega]);
+	});
+	mnuVer.add(btnEntrega);
+	
+	
+
+	
+	
+	var mnubtnArchivo = new qx.ui.toolbar.MenuButton('Archivo');
+	var mnubtnEdicion = new qx.ui.toolbar.MenuButton('Edición');
+	var mnubtnVer = new qx.ui.toolbar.MenuButton('Ver');
+	
+	mnubtnArchivo.setMenu(mnuArchivo);
+	mnubtnEdicion.setMenu(mnuEdicion);
+	mnubtnVer.setMenu(mnuVer);
+	  
+	
+	var toolbarMain = new qx.ui.toolbar.ToolBar();
+	toolbarMain.add(mnubtnArchivo);
+	toolbarMain.add(mnubtnEdicion);
+	toolbarMain.add(mnubtnVer);
+	
+	doc.add(toolbarMain, {left: 5, top: 0, right: 5});
+	
+	var contenedorMain = new qx.ui.container.Composite(new qx.ui.layout.Grow());
+	var tabviewMain = this._tabviewMain = new qx.ui.tabview.TabView();
+	
+	contenedorMain.add(tabviewMain);
+	doc.add(contenedorMain, {left: 0, top: 33, right: 0, bottom: 0});
+	
+	
+    }
+  }
+});

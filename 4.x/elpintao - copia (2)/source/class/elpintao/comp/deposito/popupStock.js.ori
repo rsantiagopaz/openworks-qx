@@ -1,0 +1,168 @@
+qx.Class.define("elpintao.comp.deposito.popupStock",
+{
+	extend : componente.comp.ui.ramon.popup.Popup,
+	construct : function (rowDataAcumulado)
+	{
+	this.base(arguments);
+	
+	this.set({
+		width: 400,
+		height: 200
+	});
+	
+	this.setLayout(new qx.ui.layout.Canvas());
+	
+	this.addListenerOnce("appear", function(e){
+		if (rowDataAcumulado.stock.length > 0) {
+			qx.event.Timer.once(function(){
+				tblDetalle.setFocusedCell(2, 0, true);
+				tblDetalle.startEditing();
+			}, this, 30);
+		}		
+	});
+	this.addListenerOnce("disappear", function(e){
+		var data = tableModelDetalle.getDataAsMapArray();
+		for (var x in data) {
+			tableModelDetalle.getRowData(x).enviar = data[x].enviar;
+		}
+		rowDataAcumulado.enviar = total;		
+	});
+	
+	var contexto = this;
+	var total = rowDataAcumulado.enviar;
+	
+	var sumar = function() {
+		var data = tableModelDetalle.getDataAsMapArray();
+		total = 0;
+		for (var x in data) {
+			total = total + data[x].enviar;
+		}
+		tblDetalle.setAdditionalStatusBarText("Total a enviar: " + total);
+	}
+
+
+	//Menu de contexto Detalle
+	
+	var menutblDetalle = new componente.comp.ui.ramon.menu.Menu();
+	var btnEditar = new qx.ui.menu.Button("Editar");
+	btnEditar.setEnabled(false);
+	btnEditar.addListener("execute", function(e){
+
+	});
+	menutblDetalle.add(btnEditar);
+	menutblDetalle.memorizar();
+	
+
+	//Tabla
+
+	var tableModelDetalle = this.tableModelDetalle = new qx.ui.table.model.Simple();
+	tableModelDetalle.setColumns(["Sucursal", "Stock", "Enviar"], ["sucursal_descrip", "stock", "enviar"]);
+	tableModelDetalle.setColumnEditable(2, true);
+	
+	//tableModelDetalle.setEditable(true);
+	//tableModelDetalle.setColumnEditable(4, true);
+
+	var custom = {tableColumnModel : function(obj) {
+		return new qx.ui.table.columnmodel.Resize(obj);
+	}};
+	
+	var tblDetalle = new componente.comp.ui.ramon.table.Table(tableModelDetalle, custom);
+	tblDetalle.getSelectionModel().setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+	//tblDetalle.toggleColumnVisibilityButtonVisible();
+	tblDetalle.setShowCellFocusIndicator(true);
+	tblDetalle.toggleColumnVisibilityButtonVisible();
+	tblDetalle.edicion = "edicion_vertical";
+	//tblDetalle.toggleStatusBarVisible();
+	
+	tblDetalle.addListener("dataEdited", function(e){
+		var data = e.getData();
+		var value = data.value;
+		
+		if (isNaN(value) || value < 0) value = data.oldValue;
+		if (value > tableModelDetalle.getValueById("stock", data.row)) {
+			// anulado temporalmente el control de stock en los envios hasta que den el ok
+			//tableModelDetalle.setValueById("enviar", data.row, 0);
+		}
+		
+		tableModelDetalle.setValueById("enviar", data.row, value);
+		
+		sumar();
+	});
+	
+	var tableColumnModelDetalle = tblDetalle.getTableColumnModel();
+	//tableColumnModelDetalle.setColumnVisible(7, false);
+	
+
+	
+
+
+      // Obtain the behavior object to manipulate
+
+		var resizeBehavior = tableColumnModelDetalle.getBehavior();
+		//resizeBehavior.set(0, {width:"7%", minWidth:100});
+		//resizeBehavior.set(1, {width:"47%", minWidth:100});
+		//resizeBehavior.set(2, {width:"7%", minWidth:100});
+
+
+		
+	tblDetalle.setContextMenu(menutblDetalle);
+	
+	var selectionModelDetalle = tblDetalle.getSelectionModel();
+	selectionModelDetalle.addListener("changeSelection", function(e){
+		btnEditar.setEnabled(! selectionModelDetalle.isSelectionEmpty());
+		menutblDetalle.memorizar([btnEditar]);
+	});
+	
+	
+	this.add(tblDetalle, {left: 3, top: 3, right: 3, bottom: 3});
+	
+	tblDetalle.setAdditionalStatusBarText("Total a enviar: " + total);
+	
+	//this.add(tblPedido, {left:0 , top: 20, right: 0, height: "40%"});
+	
+	//this.add(new qx.ui.basic.Label("Detalle:"), {left: 0, top: "47%"});
+	
+	
+	
+	var btnAceptar = new qx.ui.form.Button("Aceptar");
+	btnAceptar.addListener("execute", function(e){
+		var data = tableModelDetalle.getDataAsMapArray();
+		for (var x in data) {
+			tableModelDetalle.getRowData(x).enviar = data[x].enviar;
+		}
+		rowDataAcumulado.enviar = total;
+
+		this.fireDataEvent("aceptado");
+		btnCancelar.fireEvent("execute");
+	}, this);
+	//this.add(btnAceptar, {left: 70, bottom: 0})
+	
+	var btnCancelar = new qx.ui.form.Button("Cancelar");
+	btnCancelar.addListener("execute", function(e){
+		this.destroy();
+	}, this);
+	//this.add(btnCancelar, {left: 270, bottom: 0})
+	
+	tableModelDetalle.setDataAsMapArray(rowDataAcumulado.stock, true);
+	
+	
+	var commandEsc = new qx.ui.core.Command("Esc");
+	commandEsc.addListener("execute", function(e){
+		if (tblDetalle.isEditing()) {
+			tblDetalle.cancelEditing();
+			tblDetalle.focus();
+		} else this.hide();
+	}, this);
+	this.registrarCommand(commandEsc);
+
+	
+	},
+	members : 
+	{
+
+	},
+	events : 
+	{
+		"aceptado": "qx.event.type.Event"
+	}
+});

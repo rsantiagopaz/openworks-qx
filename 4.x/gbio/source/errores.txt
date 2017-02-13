@@ -1,0 +1,17 @@
+privilege, en la descripcion de la tabla esta mal definidas las opciones, 0 usuario, 1 enroller, 2 admin, 3 superadmin
+
+cuando se lee empleado existente, el ultimo reloj define/sobreescribe los datos.
+
+cuando se lee empleado nuevo, no tiene asignado lugar de trabajo.
+
+con password en blanco, vulnerable
+
+en alta de empleado, no controla legajo existente
+
+cuando se cambia lugar de trabajo, se borram permisos y turnos
+
+
+
+
+
+http://defensorsgo.no-ip.org:8188/

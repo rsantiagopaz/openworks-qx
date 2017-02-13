@@ -1,0 +1,285 @@
+qx.Class.define("elpintao_mob.comp.navpageNuevoPE",
+{
+  extend : qx.ui.mobile.page.NavigationPage,
+  construct : function (pageBack)
+  {
+	this.base(arguments);
+
+	this.setTitle("Nuevo pedido externo");
+	this.setShowBackButton(true);
+	this.setBackButtonText("Atras");
+	this.addListenerOnce("appear", function() {
+		var rpc = new qx.io.remote.Rpc("services/", "elpintao_mob.PedidosExt");
+		rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id){
+			if (resultado != null) {
+				for (var x in this.fabrica) {
+					if (this.fabrica[x].id_fabrica == resultado.id_fabrica) {
+						this.slbFabrica.setSelection(parseInt(x));
+						break;
+					}
+				}
+				this.ingresos = resultado.ingresos;
+				
+				var p = {descrip: "", id_fabrica: resultado.id_fabrica};
+				this.functionLeer_producto(p);
+			}
+		}, this), "leer_backup");
+	}, this);
+	this.addListener("appear", function() {
+		this.application.apilarHashChange(this, qx.lang.Function.bind(function(){
+			this.dialogMenu.hide();
+			pageBack.show({reverse:true});
+		}, this));
+	}, this);
+
+	this.addListener("back", function() {
+		this.application.desapilarHashChange(this);
+	}, this);
+	
+	this.application = qx.core.Init.getApplication();
+	this.ingresos = {};
+  },
+  members : 
+  {
+    _initialize : function()
+	{
+  	 	this.base(arguments);
+  	 	
+ 	 	
+	var contexto = this;
+	var bandera_cod_barra = false;
+	var id_fabrica;
+	var busquedaActual = null;
+	var busquedaSiguiente = null;
+	
+	this.functionLeer_producto = qx.lang.Function.bind(function(p) {
+		if (busquedaActual == null) {
+			var busyIndicator = new qx.ui.mobile.dialog.BusyIndicator("Cargando...");
+			var busypopup = new qx.ui.mobile.dialog.Popup(busyIndicator);
+			busypopup.show();
+			
+			if (p.descrip.length < 3) p.descrip = "";
+			
+			var rpc = new qx.io.remote.Rpc("services/", "elpintao_mob.PedidosExt");
+			rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id){
+				var ingreso;
+				for (var x in resultado) {
+					qx.core.Init.getApplication().functionCalcularImportes(resultado[x]);
+					ingreso = this.ingresos[resultado[x].id_producto_item];
+					if (ingreso != null) resultado[x].mobile.subtitle = "Cantidad: " + ingreso.cantidad;
+				}
+				list.setModel(new qx.data.Array(resultado));
+				
+				busypopup.destroy();
+				
+				busquedaActual = null;
+				if (busquedaSiguiente != null) {
+					var aux = busquedaSiguiente;
+					busquedaSiguiente = null;
+					this.functionLeer_producto(aux);
+				}
+			}, this), "leer_internos", p);
+		} else busquedaSiguiente = p;
+	}, this);
+
+	
+	
+	
+	
+    var btnOpciones = new qx.ui.mobile.form.Button("Opciones");
+    btnOpciones.addListener("tap", function() {
+		dialogMenu.show();
+    });
+    
+    this.getContent().add(new qx.ui.mobile.form.Group([btnOpciones]));
+    
+    var dialogMenu = this.dialogMenu = new qx.ui.mobile.dialog.Menu(new qx.data.Array(["Resumen pedido..."]), btnOpciones);
+    dialogMenu.setTitle("Opciones");
+    dialogMenu.addListener("changeSelection", function(e){
+    	var data = e.getData();
+    	dialogMenu.hide();
+    	dialogMenu.setSelectedIndex(null);
+    	if (data.index==0) {
+			if (qx.lang.Json.stringify(this.ingresos) == "{}") {
+				var dialogAlert = qx.ui.mobile.dialog.Manager.getInstance().alert("Atención", "Debe ingresar pedido en algún item.", function(index){
+					this.application.desapilarHashChange(dialogAlert);
+				}, this, "Aceptar");
+				this.application.apilarHashChange(dialogAlert, qx.lang.Function.bind(function(){
+					this.hide();
+				}, dialogAlert));
+				
+				/*
+				var dialogDialog = new qx.ui.mobile.dialog.Popup(new qx.ui.mobile.basic.Label());
+				dialogDialog.setModal(true);
+				dialogDialog.setTitle("No se ingresó ningun pedido.");
+				
+			    dialogDialog.addListener("appear", function(e){
+					this.application.apilarHashChange(dialogDialog, qx.lang.Function.bind(function(){
+						this.hide();
+						this.destroy();
+					}, dialogDialog));
+				}, this);
+				dialogDialog.show();
+				*/
+			} else {
+				var npGenerado = new elpintao_mob.comp.navpageGenerado(this.ingresos, this);
+				this.application.manager.addDetail(npGenerado);
+				npGenerado.show();
+			}    		
+    	}
+	}, this);
+	
+	
+	
+	 	var form = new qx.ui.mobile.form.Form();
+		var slbFabrica = this.slbFabrica = new qx.ui.mobile.form.SelectBox();
+		slbFabrica.addListener("changeSelection", function(e){
+			var data = e.getData();
+
+			this.ingresos = {};
+			
+			id_fabrica = this.fabrica[data.index].id_fabrica;
+	
+			var p = {descrip: txtFiltrar.getValue().trim(), id_fabrica: id_fabrica};
+		
+			this.functionLeer_producto(p);
+		}, this);
+		form.add(slbFabrica, "Fábrica:");
+		
+		
+		
+		var txtFiltrar = new qx.ui.mobile.form.TextField("");
+		txtFiltrar.setLiveUpdate(true);
+		txtFiltrar.addListener("keypress", function(e){
+			var keyIdentifier = e.getKeyIdentifier();
+			if (keyIdentifier == "Enter") {
+				bandera_cod_barra = true;
+				txtFiltrar.fireDataEvent("changeValue");
+			}
+		});
+		txtFiltrar.addListener("changeValue", function(e){
+			var texto = txtFiltrar.getValue().trim();
+
+			if (texto.length >= 3 || texto.length == 0) {
+				var p = {id_fabrica: id_fabrica};
+				if (bandera_cod_barra) {
+					p.cod_barra = texto;
+				} else {
+					p.descrip = texto;
+				}
+				
+				this.functionLeer_producto(p);
+			}
+
+			bandera_cod_barra = false;
+		}, this);
+		form.add(txtFiltrar, "Filtrar:");
+		
+		var r = new qx.ui.mobile.form.renderer.Single(form);
+		r.addCssClass("group");
+	
+		this.getContent().add(r);
+		this.getContent().add(new qx.ui.mobile.form.Title("Productos"));
+		
+		var list = this.list = new qx.ui.mobile.list.List({
+			configureItem : function(item, data, row) {
+				item.setTitle(data.mobile.title);
+				item.setSubtitle(data.mobile.subtitle);
+				item.setSelectable(true);
+				item.setShowArrow(true);
+			}
+		});
+		list.addListener("changeSelection", function(e) {
+			var data = e.getData();
+			var item = list.getModel().getItem(data);
+			
+			var composite = new qx.ui.mobile.container.Composite();
+			
+			var composite2 = new qx.ui.mobile.container.Composite(new qx.ui.mobile.layout.HBox());
+			
+			var html;
+			html = 'Detalle ped.int.<br><table border="1" width="100%" cellpadding="40"><tr><th>Sucursal</th><th>Cantidad</th></tr>';
+			for (var x in item.detallePedInt) {
+				html += '<tr><td>' + item.detallePedInt[x].descrip + '</td><td align="right">' + item.detallePedInt[x].cantidad + '</td></tr>';
+			}
+			html += '</table>';
+			composite2.add(new qx.ui.mobile.embed.Html(html), {flex:1});
+			
+			composite2.add(new qx.ui.mobile.basic.Label(""), {flex:1});
+			
+			html = 'Detalle stock<br><table border="1" width="100%" cellpadding="40"><tr><th>Sucursal</th><th>Stock</th></tr>';
+			for (var x in item.detalleStock) {
+				html += '<tr><td>' + item.detalleStock[x].descrip + '</td><td align="right">' + item.detalleStock[x].stock + '</td></tr>';
+			}
+			html += '</table>';
+			composite2.add(new qx.ui.mobile.embed.Html(html), {flex:1});
+			
+			var groupDetalle = new qx.ui.mobile.form.Group([composite2], false);
+			composite.add(groupDetalle);
+			
+			
+			var form = new qx.ui.mobile.form.Form();
+			var txtCantidad = new qx.ui.mobile.form.NumberField((this.ingresos[item.id_producto_item]==null ? "" : this.ingresos[item.id_producto_item].cantidad));
+			form.add(txtCantidad, "Cantidad:", null, "cantidad");
+			var r = new qx.ui.mobile.form.renderer.Single(form);
+			r.addCssClass("group");
+			qx.bom.element.Style.set(r.getContentElement(),"color","black");
+			composite.add(r);
+			
+			var btnAceptar = new qx.ui.mobile.form.Button("Aceptar");
+			btnAceptar.addListener("tap", function(e){
+				var value = txtCantidad.getValue().trim();
+				if (value == "") {
+					item.mobile.subtitle = "";
+					delete this.ingresos[item.id_producto_item];
+				} else {
+					item.cantidad = parseInt(value);
+					this.ingresos[item.id_producto_item] = item;
+
+					item.mobile.subtitle = "Cantidad: " + item.cantidad;
+				}
+				list.getModel().removeAt(data);
+				list.getModel().insertAt(data, item);
+				
+				var p = {id_fabrica: id_fabrica, ingresos: this.ingresos};
+				
+				var rpc = new qx.io.remote.Rpc("services/", "elpintao_mob.PedidosExt");
+				rpc.callAsync(function(resultado, error, id){
+
+				}, "escribir_backup", p);
+				
+				this.application.desapilarHashChange(dialog);
+			}, this);
+			composite.add(btnAceptar);
+			
+			var dialog = new qx.ui.mobile.dialog.Popup(composite);
+			dialog.setModal(true);
+			dialog.setTitle(" " + item.fabrica + ", " + item.mobile.title + " ");
+			dialog.addListenerOnce("appear", function(e){
+				txtCantidad.focus();
+			})
+			dialog.show();
+			this.application.apilarHashChange(dialog, qx.lang.Function.bind(function(){
+				this.hide();
+				this.destroy();
+			}, dialog));
+		}, this);
+		
+		
+		this.getContent().add(list);
+		
+		var rpc = new qx.io.remote.Rpc("services/", "elpintao_mob.Parametros");
+		try {
+			var resultado = rpc.callSync("leer_fabrica");
+		} catch (ex) {
+			alert("Sync exception: " + ex);
+		}
+		
+		this.fabrica = resultado;
+		var aux = [];
+		for (var x in resultado) aux.push(resultado[x].descrip);
+		slbFabrica.setModel(new qx.data.Array(aux));
+
+    }
+  }
+});

@@ -1,0 +1,374 @@
+qx.Class.define("turismo.comp.windowAsignarPresupuesto",
+{
+	extend : componente.comp.ui.ramon.window.Window,
+	construct : function (id_proforma, json)
+	{
+	this.base(arguments);
+	
+		this.set({
+			caption: "Asignar presupuesto",
+			width: 850,
+			height: 640,
+			showMinimize: false,
+			showMaximize: false
+		});
+		
+		this.setLayout(new qx.ui.layout.Canvas());
+		this.setResizable(false, false, false, false);
+
+	this.addListenerOnce("appear", function(e){
+		cboUsuario.focus();
+	});
+	
+	this.addListenerOnce("close", function(e){
+		application.windowAsignarPresupuesto = null;
+	});
+	
+	
+	var application = qx.core.Init.getApplication();
+	var tblFocus;
+	var numberformatMonto = new qx.util.format.NumberFormat("es");
+	numberformatMonto.setMaximumFractionDigits(2);
+	numberformatMonto.setMinimumFractionDigits(2);
+	
+	
+	
+	var gpbNueva = new qx.ui.groupbox.GroupBox(" Códigos ");
+	gpbNueva.setLayout(new qx.ui.layout.Grow());
+	this.add(gpbNueva, {left: 0, top: 90, right: 0, bottom: 0});
+	
+	var containerScroll = new qx.ui.container.Scroll();
+	gpbNueva.add(containerScroll);
+	
+	var containerCodigos = new qx.ui.container.Composite(new qx.ui.layout.Grid(6, 6));
+	containerScroll.add(containerCodigos);
+	
+	
+	var form = new qx.ui.form.Form();
+	
+	var cboUsuario = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Proforma", "autocompletarUsuario");
+	cboUsuario.setRequired(true);
+	form.add(cboUsuario, "Usuario", function(value) {
+		if (lstUsuario.isSelectionEmpty()) throw new qx.core.ValidationError("Validation Error", "Debe seleccionar usuario");
+	}, "usuario", null, {grupo: 1, item: {row: 0, column: 1, colSpan: 4}});
+	var lstUsuario = cboUsuario.getChildControl("list");
+	form.add(lstUsuario, "", null, "id_usuario");
+	
+	var txtContrasena = new qx.ui.form.PasswordField("");
+	txtContrasena.setRequired(true);
+	txtContrasena.addListener("blur", function(e){
+		txtContrasena.setValue(txtContrasena.getValue().trim());
+	});
+	form.add(txtContrasena, "Contraseña", function(value) {
+		if (lstUsuario.isSelectionEmpty()) {
+			if (txtContrasena.getValue() == "") throw new qx.core.ValidationError("Validation Error", "Este cuadro es obligatorio"); 
+		} else {
+			if (txtContrasena.getValue() != lstUsuario.getSelection()[0].getUserData("datos").password) throw new qx.core.ValidationError("Validation Error", "Contraseña incorrecta");
+		}
+	}, "password", null, {grupo: 1, item: {row: 0, column: 6, colSpan: 4}});
+	
+	var txtPFDolar = new qx.ui.form.Spinner();
+	txtPFDolar.setNumberFormat(numberformatMonto);
+	txtPFDolar.getChildControl("upbutton").setVisibility("excluded");
+	txtPFDolar.getChildControl("downbutton").setVisibility("excluded");
+	txtPFDolar.setSingleStep(0);
+	txtPFDolar.setPageStep(0);
+	form.add(txtPFDolar, "P.F.Dolar", null, "pfdolar", null, {grupo: 1, item: {row: 1, column: 1, colSpan: 4}});
+	
+	var txtCotdolar = new qx.ui.form.Spinner();
+	txtCotdolar.setNumberFormat(numberformatMonto);
+	txtCotdolar.getChildControl("upbutton").setVisibility("excluded");
+	txtCotdolar.getChildControl("downbutton").setVisibility("excluded");
+	txtCotdolar.setSingleStep(0);
+	txtCotdolar.setPageStep(0);
+	form.add(txtCotdolar, "Cotiza.", null, "cotdolar", null, {grupo: 1, item: {row: 1, column: 6, colSpan: 4}});
+	
+	var txtPresupuesto = new qx.ui.form.TextField("");
+	txtPresupuesto.setRequired(true);
+	txtPresupuesto.setReadOnly(true);
+	form.add(txtPresupuesto, "Presupuesto", null, "archivo", null, {grupo: 1, item: {row: 2, column: 1, colSpan: 9}});
+	
+
+	
+	
+	
+	var fileSelector = document.createElement('input');
+	fileSelector.setAttribute('type', 'file');
+	fileSelector.addEventListener("change", function(e){
+		txtPresupuesto.setValue(fileSelector.files[0].name);
+	});
+	
+	var btnSeleccionarPresupuesto = new qx.ui.form.Button("Seleccionar...");
+	btnSeleccionarPresupuesto.addListener("execute", function(e){
+ 		fileSelector.click();
+	})
+	this.add(btnSeleccionarPresupuesto, {left: 370, top: 54});
+	
+	
+	
+	
+	
+		// Menu de contexto
+	
+	var menuContactar = new componente.comp.ui.ramon.menu.Menu();
+	
+	var commandNuevoContactar = new qx.ui.core.Command("Insert");
+	commandNuevoContactar.addListener("execute", function(e) {
+		var tableModel = tblFocus.getTableModel();
+		tableModel.addRowsAsMapArray([{codigo: "", descrip: "", precio: 0, cotiza: 0}], null, true);
+		tblFocus.setFocusedCell(0, tableModel.getRowCount() - 1, true);
+		tblFocus.startEditing();
+	}, this);
+	
+	var btnNuevoContactar = new qx.ui.menu.Button("Insertar", null, commandNuevoContactar);
+	
+	var btnEliminarContactar = new qx.ui.menu.Button("Eliminar");
+	btnEliminarContactar.setEnabled(false);
+	btnEliminarContactar.addListener("execute", function(e) {
+		tblContactar.blur();
+		var focusedRow = tblContactar.getFocusedRow();
+		tblContactar.setFocusedCell();
+		tableModelContactar.removeRows(focusedRow, 1);
+		var rowCount = tableModelContactar.getRowCount();
+		if (rowCount > 0) tblContactar.setFocusedCell(0, ((focusedRow > rowCount - 1) ? rowCount - 1 : focusedRow), true);
+		tblContactar.focus();
+	}, this);
+	
+	menuContactar.add(btnNuevoContactar);
+	menuContactar.add(btnEliminarContactar);
+	//menuContactar.memorizar();
+	
+	
+	
+	var txt;
+	var producto = {
+				aereo : {label: "Aéreo", index: 0},
+				hoteles : {label: "Hoteles", index: 1},
+				alquiler : {label: "Alquiler", index: 2},
+				seguros : {label: "Seguros", index: 3},
+				cruceros : {label: "Cruceros", index: 4},
+				paquetes : {label: "Paquetes", index: 5},
+				trenes : {label: "Trenes", index: 6},
+				traslado : {label: "Traslado", index: 7},
+				excursiones : {label: "Excursiones", index: 8},
+				servicios : {label: "Servicios", index: 9}
+	};
+	var contador = 0;
+	for (var x in json.producto) {
+		var txt = new qx.ui.form.TextArea(decodeURIComponent(json.producto[x].txt));
+		txt.setWidth(250);
+		txt.setReadOnly(true);
+		containerCodigos.add(new qx.ui.basic.Label(producto[x].label + ":"), {row: contador, column: 0});
+		containerCodigos.add(txt, {row: contador, column: 1});
+		//form.add(txt, producto[x].label, null, "dummy", null, {grupo: 2, item: {row: contador + 3, column: 1, colSpan: 11}});
+		producto[x].txt = txt;
+		
+		/*
+		var txt = new qx.ui.form.TextArea("");
+		txt.setMaxHeight(60);
+		txt.addListener("blur", function(e){
+			var target = e.getTarget();
+			target.setValue(target.getValue().trim());
+		});
+		form.add(txt, "", null, null, null, {grupo: 2, item: {row: contador + 3, column: 13, colSpan: 11}});
+		producto[x].cod = txt;
+		*/
+		
+		
+		
+		
+		
+
+	
+	
+	
+		
+		//Tabla
+
+		var tableModelContactar = new qx.ui.table.model.Simple();
+		tableModelContactar.setColumns(["Código", "Descripción", "Precio", "Cotiza"], ["codigo", "descrip", "precio", "cotiza"]);
+		tableModelContactar.setEditable(true);
+
+		var custom = {tableColumnModel : function(obj) {
+			return new qx.ui.table.columnmodel.Resize(obj);
+		}};
+		var tblContactar = new componente.comp.ui.ramon.table.Table(tableModelContactar, custom);
+		tblContactar.setWidth(450);
+		tblContactar.setHeight(150);
+		tblContactar.setShowCellFocusIndicator(true);
+		tblContactar.toggleColumnVisibilityButtonVisible();
+		tblContactar.toggleStatusBarVisible();
+		tblContactar.setContextMenu(menuContactar);
+		//tblContactar.edicion="";
+		//tblContactar.edicion = "desplazamiento_vertical";
+		
+		
+		tblContactar.addListener("focus", function(e){
+			tblFocus = this;
+		});
+		
+		tblContactar.addListener("dataEdited", function(e){
+			/*
+			var data = e.getData();
+			if (data.col == 1) {
+				var rowData = tableModelContactar.getRowDataAsMap(data.row);
+				rowData.descrip = rowData.descrip.trim();
+				tableModelContactar.setRowsAsMapArray([rowData], data.row, true);
+			}
+			*/
+		});
+
+		
+		var tableColumnModelContactar = tblContactar.getTableColumnModel();
+		var resizeBehavior = tableColumnModelContactar.getBehavior();
+		resizeBehavior.set(0, {width:"20%", minWidth:100});
+		resizeBehavior.set(1, {width:"40%", minWidth:100});
+		resizeBehavior.set(2, {width:"20%", minWidth:100});
+		resizeBehavior.set(3, {width:"20%", minWidth:100});
+		
+		
+		
+		
+		
+		
+		var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
+		cellrendererNumber.setNumberFormat(numberformatMonto);
+		tableColumnModelContactar.setDataCellRenderer(2, cellrendererNumber);
+		tableColumnModelContactar.setDataCellRenderer(3, cellrendererNumber);
+
+		
+		
+		var celleditorString = new qx.ui.table.celleditor.TextField();
+		celleditorString.setValidationFunction(function(newValue, oldValue){
+			return newValue.trim();
+		});
+		tableColumnModelContactar.setCellEditorFactory(0, celleditorString);
+		tableColumnModelContactar.setCellEditorFactory(1, celleditorString);
+
+		
+		
+		var celleditorNumber = new qx.ui.table.celleditor.TextField();
+		celleditorNumber.setValidationFunction(function(newValue, oldValue){
+			newValue = newValue.trim();
+			if (newValue == "") return oldValue;
+			else if (isNaN(newValue)) return oldValue; else return newValue;
+		});
+
+		tableColumnModelContactar.setCellEditorFactory(2, celleditorNumber);
+		tableColumnModelContactar.setCellEditorFactory(3, celleditorNumber);
+		
+		
+		
+
+		
+
+		var selectionModelContactar = tblContactar.getSelectionModel();
+		selectionModelContactar.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+		selectionModelContactar.addListener("changeSelection", function(){
+			selectionModelContactar = tblFocus.getSelectionModel();
+			var bool = ! selectionModelContactar.isSelectionEmpty();
+			btnEliminarContactar.setEnabled(bool);
+			//menuContactar.memorizar([btnEliminarContactar]);
+		});
+		
+		
+
+		//gpbNueva.add(new qx.ui.basic.Label("Contactar por:"), {left: 0, top: 420});
+		containerCodigos.add(tblContactar, {row: contador, column: 3});
+		
+		producto[x].cod = tblContactar;
+		
+		
+		
+		
+		
+		
+		
+		contador = contador + 1;
+	}
+	
+	var btnAceptar = new qx.ui.form.Button("Asignar presupuesto");
+	btnAceptar.addListener("execute", function(e){
+		if (form.validate()) {
+			for (var x in json.producto) {
+				//json.producto[x].cod = encodeURIComponent(producto[x].cod.getValue());
+				json.producto[x].cod = producto[x].cod.getTableModel().getDataAsMapArray();
+			}
+			
+			var p = {};
+			p.id_proforma = id_proforma;
+			p.model = qx.util.Serializer.toNativeObject(modelForm);
+			p.model.json = json;
+			
+			var rpc = new qx.io.remote.Rpc("services/", "comp.Proforma");
+			try {
+				var resultado = rpc.callSync("asignar_presupuesto", p);
+			} catch (ex) {
+				alert("Sync exception: " + ex);
+			}
+			
+			this.fireDataEvent("aceptado", id_proforma);
+
+			application.windowAsignarPresupuesto = null;
+			
+			this.destroy();
+		} else {
+			var items = form.getItems();
+			for (var item in items) {
+				if (!items[item].isValid()) {
+					try {
+						items[item].focus();
+					} catch (ex) {
+						btnSeleccionarPresupuesto.focus();
+					}
+					
+					break;
+				}
+			}
+		}
+	}, this);
+
+	//form.addButton(btnAceptar, {grupo: 2, item: {row: 12, column: 1, colSpan: 3}});
+	this.add(btnAceptar, {right: 0, top: 0});
+	
+	var controllerForm = new qx.data.controller.Form(null, form);
+	var modelForm = controllerForm.createModel();
+	
+	
+	var formView = new componente.comp.ui.ramon.abstractrenderer.Grid(form, 12, 25, 1);
+	this.add(formView, {left: 0, top: 0});
+	//var formView = new componente.comp.ui.ramon.abstractrenderer.Grid(form, 12, 25, 2);
+	//this.add(formView, {left: 0, top: 90});
+	//this.add(new qx.ui.basic.Label("Códigos:"), {left: 370, top: 90});
+	
+	
+	cboUsuario.setTabIndex(1);
+	txtContrasena.setTabIndex(2);
+	txtPFDolar.setTabIndex(3);
+	txtCotdolar.setTabIndex(4);
+	txtPresupuesto.setTabIndex(5);
+	btnSeleccionarPresupuesto.setTabIndex(6);
+	
+	
+
+	var contador = 0;
+	for (var x in json.producto) {
+		producto[x].txt.setTabIndex(contador + 7);
+		producto[x].cod.setTabIndex(contador + 8);
+		
+		contador = contador + 2
+	}
+	
+	btnAceptar.setTabIndex(40);
+	
+	
+	},
+	members : 
+	{
+
+	},
+	events : 
+	{
+		"aceptado": "qx.event.type.Event"
+	}
+});

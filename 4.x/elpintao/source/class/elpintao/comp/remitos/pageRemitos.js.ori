@@ -1,0 +1,85 @@
+qx.Class.define("elpintao.comp.remitos.pageRemitos",
+{
+	extend : qx.ui.tabview.Page,
+	construct : function (emitir)
+	{
+		this.base(arguments);
+		
+	
+	var layout = new qx.ui.layout.Grid(6, 6);
+    for (var i = 0; i < 15; i++) {
+    	layout.setColumnAlign(i, "left", "middle");
+    }
+    layout.setRowHeight(0, 24);
+    
+	var composite = new qx.ui.container.Composite(layout);
+	
+	composite.add(new qx.ui.basic.Label("Estado:"), {row: 0, column: 0});
+	
+	var slbEstado = this.slbEstado = new qx.ui.form.SelectBox();
+	slbEstado.setWidth(90);
+	slbEstado.add(new qx.ui.form.ListItem("Registrado"));
+	slbEstado.add(new qx.ui.form.ListItem("Autorizado"));
+	slbEstado.add(new qx.ui.form.ListItem("Todo"));
+	slbEstado.addListener("changeSelection", function(e){
+		this.functionActualizar();
+	}, this);
+	composite.add(slbEstado, {row: 0, column: 1});
+	
+	var aux = new Date;
+	var dtfDesde = this.dtfDesde = new qx.ui.form.DateField();
+	dtfDesde.setWidth(90);
+	var dtfHasta = this.dtfHasta = new qx.ui.form.DateField();
+	dtfHasta.setWidth(90);
+	dtfHasta.setValue(aux);
+	aux.setFullYear(aux.getFullYear() - 1);
+	dtfDesde.setValue(aux);
+	
+	composite.add(new qx.ui.basic.Label("Desde:"), {row: 0, column: 3});
+	composite.add(dtfDesde, {row: 0, column: 4});
+	composite.add(new qx.ui.basic.Label("Hasta:"), {row: 0, column: 5});
+	composite.add(dtfHasta, {row: 0, column: 6});
+	
+	
+	var cboSucursal = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Reparacion", "autocompletarFabrica");
+	cboSucursal.setWidth(100);
+	var lstSucursal = this.lstSucursal = cboSucursal.getChildControl("list");
+	lstSucursal.addListener("changeSelection", function(e){
+		this.functionActualizar();
+	}, this);
+	composite.add(new qx.ui.basic.Label("Sucursal:"), {row: 0, column: 8});
+	composite.add(cboSucursal, {row: 0, column: 9});
+	
+
+	
+	
+	var cboFabrica = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Reparacion", "autocompletarFabrica");
+	cboFabrica.setWidth(100);
+	var lstFabrica = this.lstFabrica = cboFabrica.getChildControl("list");
+	lstFabrica.addListener("changeSelection", function(e){
+		this.functionActualizar();
+	}, this);
+	composite.add(new qx.ui.basic.Label("Fábrica:"), {row: 0, column: 11});
+	composite.add(cboFabrica, {row: 0, column: 12});
+	
+
+	
+	var txtBuscar = this.txtBuscar = new qx.ui.form.TextField("");
+	txtBuscar.setLiveUpdate(true);
+	txtBuscar.addListener("changeValue", function(e){
+		var value = txtBuscar.getValue();
+		if (value == "" || value.trim().length >= 3) this.functionActualizar();
+	}, this);
+	composite.add(new qx.ui.basic.Label("Filtro:"), {row: 0, column: 14});
+	composite.add(txtBuscar, {row: 0, column: 15});
+	
+	this.add(composite, {left: 0, top: 0});
+	
+		
+		
+	},
+	members : 
+	{
+
+	}
+});
