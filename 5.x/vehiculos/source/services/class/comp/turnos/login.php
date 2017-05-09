@@ -19,8 +19,7 @@ class class_login
 		$this->_version = $VERSION;
 		$this->_db = new DataBase($servidor,$usuario,$password,$base);
 		mysql_query("SET NAMES utf8");
-		$this->_perfil_id = '037001';
-		//$this->_perfil_id = '063001';
+		$this->_perfil_id = '063001';
 	}
 	
 	function method_Login($params, $error)

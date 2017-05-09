@@ -42,16 +42,16 @@ qx.Class.define("componente.comp.ui.ramon.abstractrenderer.Grid",
      * @param names {String[]} An array of names for the form items.
      * @param title {String?} A title of the group you are adding.
      */
-    addItems : function(items, names, title, options) {
+    addItems : function(items, names, title, options, headerOptions) {
       // add the header
-	/*
+
       if (title != null) {
         this._add(
-          this._createHeader(title), {row: this._row, column: 0, colSpan: 4}
+          this._createHeader(title), headerOptions.item
         );
         this._row++;
       }
-	*/
+
 
       // add the items
       for (var i = 0; i < items.length; i++) {

@@ -13,14 +13,24 @@ class class_Parametros extends class_Base
   public function method_editar_parametro($params, $error) {
   	$p = $params[0];
   	
-  	$sql = "SELECT id_" . $p->tabla . " FROM " . $p->tabla . " WHERE descrip='" . $p->model->descrip . "' AND id_" . $p->tabla . " <> " . $p->model->{"id_" . $p->tabla};
+  	$sql = "SELECT id_" . $p->tabla . " FROM " . $p->tabla . " WHERE UPPER(descrip)='" . strtoupper($p->model->descrip) . "' AND id_" . $p->tabla . " <> " . $p->model->{"id_" . $p->tabla};
   	$rs = mysql_query($sql);
   	if (mysql_num_rows($rs) > 0) {
   		$error->SetError(0, "duplicado");
   		return $error;
   	} else {
-		$sql = "UPDATE " . $p->tabla . " SET descrip='" . $p->model->descrip . "' WHERE id_" . $p->tabla . "=" . $p->model->{"id_" . $p->tabla};
-		mysql_query($sql);
+  		$insert_id = $p->model->{"id_" . $p->tabla};
+  		
+  		if ($insert_id == "0") {
+  			$sql = "INSERT " . $p->tabla . " SET descrip='" . $p->model->descrip . "'";
+  			mysql_query($sql);
+  			$insert_id = mysql_insert_id();
+  		} else {
+			$sql = "UPDATE " . $p->tabla . " SET descrip='" . $p->model->descrip . "' WHERE id_" . $p->tabla . "=" . $p->model->{"id_" . $p->tabla};
+			mysql_query($sql);
+  		}
+  		
+  		return $insert_id;
   	}
   }
   
@@ -72,13 +82,23 @@ class class_Parametros extends class_Base
 		$sql.= " WHERE proveedores.cuit LIKE '" . $p->texto . "%'";
 		$sql.= " ORDER BY label";
 	} else {
-		$sql = "SELECT";
-		$sql.= "  razones_sociales.cod_razon_social AS model";
-		$sql.= ", CONCAT(razones_sociales.razon_social, ' (', proveedores.cuit, ')') AS label";
-		$sql.= ", proveedores.cuit";
-		$sql.= ", razones_sociales.razon_social";
-		$sql.= " FROM (`019`.proveedores INNER JOIN `019`.razones_sociales USING(cod_proveedor)) INNER JOIN taller USING(cod_razon_social)";
-		$sql.= " WHERE razones_sociales.razon_social LIKE '%" . $p->texto . "%'";
+		$sql = "SELECT * FROM (";
+			$sql.= "(";
+				$sql.= "SELECT";
+				$sql.= "  razones_sociales.cod_razon_social AS model";
+				$sql.= ", CONCAT(razones_sociales.razon_social, ' (', proveedores.cuit, ')') AS label";
+				$sql.= ", proveedores.cuit";
+				$sql.= ", razones_sociales.razon_social";
+				$sql.= " FROM (`019`.proveedores INNER JOIN `019`.razones_sociales USING(cod_proveedor)) INNER JOIN taller USING(cod_razon_social)";
+			$sql.= ") UNION (";
+				$sql.= "SELECT";
+				$sql.= "  0 AS model";
+				$sql.= ", 'Parque Automotor' AS label";
+				$sql.= ", '' AS cuit";
+				$sql.= ", 'Parque Automotor' AS razon_social";
+			$sql.= ")";
+		$sql.= ") AS temporal";
+		$sql.= " WHERE razon_social LIKE '%" . $p->texto . "%'";
 		$sql.= " ORDER BY label";
 	}
 	

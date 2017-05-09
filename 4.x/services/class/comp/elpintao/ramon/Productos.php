@@ -362,6 +362,7 @@ class class_Productos extends class_Base
 		$reg->desc_mayorista = (float) $reg->desc_mayorista;
 		$reg->bonif_final = (float) $reg->bonif_final;
 		$reg->bonif_mayorista = (float) $reg->bonif_mayorista;
+		$reg->desc_lista = (float) $reg->desc_lista;
 		$reg->comision_vendedor = (float) $reg->comision_vendedor;
 		
 		$resultado->producto_item[] = $reg;
@@ -430,7 +431,7 @@ class class_Productos extends class_Base
 
 
   public function method_leer_producto($params, $error) {
-  	set_time_limit(60);
+  	set_time_limit(0);
   	$p = $params[0];
   	
 	$todos = is_null($p->id_producto);
@@ -490,6 +491,7 @@ class class_Productos extends class_Base
 			$sql.=" WHERE producto_item.activo AND id_arbol=" . $p->id_arbol;
 		}
 		
+
 		
 		$rs = mysql_query($sql);
 		while ($row = mysql_fetch_object($rs)) {
@@ -512,6 +514,7 @@ class class_Productos extends class_Base
 					$row->desc_mayorista = (float) $row->desc_mayorista;
 					$row->bonif_final = (float) $row->bonif_final;
 					$row->bonif_mayorista = (float) $row->bonif_mayorista;
+					$row->desc_lista = (float) $row->desc_lista;
 					$row->comision_vendedor = (float) $row->comision_vendedor;
 					
 					$sql = "SELECT stock FROM stock WHERE id_sucursal='" . $this->rowParamet->id_sucursal . "' AND id_producto_item='" . $row->id_producto_item . "'";
@@ -606,6 +609,7 @@ class class_Productos extends class_Base
 			$row->desc_mayorista = (float) $row->desc_mayorista;
 			$row->bonif_final = (float) $row->bonif_final;
 			$row->bonif_mayorista = (float) $row->bonif_mayorista;
+			$row->desc_lista = (float) $row->desc_lista;
 			$row->comision_vendedor = (float) $row->comision_vendedor;
 			
 			$resultado->items[] = $row;

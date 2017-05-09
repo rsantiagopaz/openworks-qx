@@ -88,20 +88,53 @@ class class_Empleados extends class_Base
   public function method_asignar_permiso($params, $error) {
 	$p = $params[0];
 	
+	$p->fecha = substr($p->fecha, 0, 10);
+	
+	$resultado = new stdClass;
+	$resultado->primer_aviso = array();
+	$resultado->segundo_aviso = array();
+	
+	$sql = "SELECT * FROM permiso WHERE id_permiso=" . $p->id_permiso;
+	$rsPermiso = $this->sql_query($sql);
+	$rowPermiso = mysql_fetch_object($rsPermiso);
+	$rowPermiso->primer_aviso = (int) $rowPermiso->primer_aviso;
+	$rowPermiso->segundo_aviso = (int) $rowPermiso->segundo_aviso;
+	
+	$resultado->permiso = $rowPermiso;
+	
 	foreach ($p->id_empleado_turno as $id_empleado_turno) {
 		$sql = "SELECT id_empleado_permiso FROM empleado_permiso WHERE id_empleado_turno=" . $id_empleado_turno . " AND id_permiso=" . $p->id_permiso . " AND fecha='" . substr($p->fecha, 0, 10) . "'";
 		$rs = $this->sql_query($sql);
 		if (mysql_num_rows($rs) == 0) {
+			$sql = "SELECT empleado.id_empleado, CONCAT(empleado.apellido, ', ', empleado.nombre) AS apenom FROM empleado_turno INNER JOIN empleado USING(id_empleado) WHERE id_empleado_turno=" . $id_empleado_turno;
+			$rsEmpleado = $this->sql_query($sql);
+			$rowEmpleado = mysql_fetch_object($rsEmpleado);
+			
+			
 			$sql = "INSERT empleado_permiso SET id_empleado_turno=" . $id_empleado_turno . ", id_permiso=" . $p->id_permiso . ", fecha='" . $p->fecha . "'";
 			$this->sql_query($sql);
+			$insert_id = mysql_insert_id();
+			
+			$json = new stdClass;
+			$json->permiso = $rowPermiso;
+			$json->empleado = $rowEmpleado;
+			
+			$this->auditoria($sql, "Asignar permiso", "asignar_permiso", $insert_id, $json);
+ 			
+
+			
+			$sql = "SELECT id_empleado_permiso FROM empleado_permiso INNER JOIN empleado_turno USING(id_empleado_turno) WHERE id_empleado=" . $rowEmpleado->id_empleado . " AND id_permiso=" . $p->id_permiso . " AND YEAR(empleado_permiso.fecha)=" . substr($p->fecha, 0, 4);
+			$rs = $this->sql_query($sql);
+
+			if (mysql_num_rows($rs) == $rowPermiso->primer_aviso) {
+				$resultado->primer_aviso[] = $rowEmpleado;
+			} else if (mysql_num_rows($rs) == $rowPermiso->segundo_aviso) {
+				$resultado->segundo_aviso[] = $rowEmpleado;
+			}
 		}		
 	}
 	
-
-	//$set = $this->prepararCampos($p);
-	//$sql = "INSERT empleado_permiso SET " . $set . "";
-	//$this->sql_query($sql);
-	//return mysql_insert_id();
+	if (count($resultado->primer_aviso) > 0 || count($resultado->segundo_aviso) > 0) return $resultado;
   }
   
   

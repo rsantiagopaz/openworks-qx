@@ -535,7 +535,7 @@ qx.Class.define("gbio.comp.empleados.pageAsignaciones",
 			if (application.usuario.tipo == "A" || resultado.hora < row.hora_asignacion_limite){
 				var p = qx.util.Serializer.toNativeObject(controllerFormPermisos.getModel());
 				
-				alert(qx.lang.Json.stringify(p, null, 2));
+				//alert(qx.lang.Json.stringify(p, null, 2));
 				
 				var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Empleados");
 				try {
@@ -544,11 +544,47 @@ qx.Class.define("gbio.comp.empleados.pageAsignaciones",
 					alert("Sync exception: " + ex);
 				}
 				
+				//alert(qx.lang.Json.stringify(resultado, null, 2));
+				
+				if (resultado) {
+					var m = "";
+					
+					if (resultado.primer_aviso.length > 0) {
+						//m+= "Primer aviso";
+						//m+= "<br/>";
+						m+= resultado.permiso.primer_mensaje;
+						m+= "<br/><br/>";
+						m+= '<table border="0" rules="none" cellpadding="2" cellspacing="2" width="99%" align="center">';
+						m+= '<tr><th>Empleado</th></tr>';
+						for (var x in resultado.primer_aviso) {
+							m+= '<tr><td>' + resultado.primer_aviso[x].apenom + '</td></tr>';
+						}
+						m+= '</table>';
+						m+= "<br/><br/>";
+					}
+					
+					if (resultado.segundo_aviso.length > 0) {
+						//m+= "Segundo aviso";
+						//m+= "<br/>";
+						m+= resultado.permiso.segundo_mensaje;
+						m+= "<br/><br/>";
+						m+= '<table border="0" rules="none" cellpadding="1" cellspacing="1" width="99%" align="center">';
+						m+= '<tr><th>Empleado</th></tr>';
+						for (var x in resultado.segundo_aviso) {
+							m+= '<tr><td>' + resultado.segundo_aviso[x].apenom + '</td></tr>';
+						}
+						m+= '</table>';
+						m+= "<br/><br/>";
+					}
+					
+					dialog.Dialog.warning(m, function(e){
+	
+					});
+				}
+				
 				functionActualizar([slbLugarTrabajo.getModelSelection().getItem(0)]);
 				form2.reset();
 			} else {
-				//alert("hora pasada");
-				
 				dialog.Dialog.warning("Ya venció la hora límite permitida para asignar el permiso.", function(e){
 
 				});

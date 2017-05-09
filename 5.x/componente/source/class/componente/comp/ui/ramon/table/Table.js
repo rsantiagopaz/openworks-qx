@@ -127,6 +127,13 @@ qx.Class.define("componente.comp.ui.ramon.table.Table",
 			return rowData;
 		},
 		
+    cancelEditing : function()
+    {
+    	this.base(arguments);
+
+    	this.fireDataEvent("dataCanceled");
+    },
+		
     _updateStatusBar : function()
     {
       if (this.getStatusBarVisible())
@@ -295,6 +302,12 @@ qx.Class.define("componente.comp.ui.ramon.table.Table",
 
     
 	},
+	
+	events : 
+	{
+		"dataCanceled": "qx.event.type.Event"
+	},
+	
 	destruct : function ()
 	{
 		for (var i in this._listeners) this._listeners[i].objeto.removeListenerById(this._listeners[i].listenerId);

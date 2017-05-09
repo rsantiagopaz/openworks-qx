@@ -7,23 +7,27 @@ qx.Class.define("vehiculos.comp.pageParticular",
 
 	this.setLabel('Particular');
 	this.setLayout(new qx.ui.layout.Grow());
-	//this.toggleShowCloseButton();
 	
 	this.addListenerOnce("appear", function(e){
-		//cgb.setValue(false);
+		cboVehiculo.focus();
 	});
+	
+	this.addListener("appear", function(e){
+		this.setShowCloseButton(true);
+	}, this);
+	this.addListener("disappear", function(e){
+		this.setShowCloseButton(false);
+	}, this);
+	
 	
 	
 	var application = qx.core.Init.getApplication();
 	
-	var desktop = new qx.ui.window.Desktop();
-	this.add(desktop);
-	
-	var compositeGral = new qx.ui.container.Composite(new qx.ui.layout.Canvas());
-	desktop.add(compositeGral, {edge: 0});
-	
-	var blocker = new qx.ui.core.Blocker(compositeGral);
-	blocker.set({color: '#bfbfbf', opacity: 0.4});
+	var vehiculo;
+	var rowDataEntSal;
+	var rowDataMovimiento;
+	var rowDataSal;
+	var popupInfo = new vehiculos.comp.popupInfo();
 	
 	var buscar_id_movimiento;
 	
@@ -33,20 +37,24 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		tableModelMovimiento.setDataAsMapArray([], true);
 		tableModelSal.setDataAsMapArray([], true);
 		
-		lstReparacion1.removeAll();
+		controllerFormInfoVehiculo.resetModel();
 		controllerFormInfoEntsal.resetModel();
 		controllerFormInfoMovimiento.resetModel();
 		controllerFormInfoSal.resetModel();
 		
-		btnEnt.setEnabled(false);
-		btnSal.setEnabled(false);
-		btnEntTaller.setEnabled(false);
-		btnSalTaller.setEnabled(false);
-		btnAsunto.setEnabled(false);
-		btnEliminarEntTaller.setEnabled(false);
-		
 		btnInfoVehiculo.setEnabled(false);
 		btnHistorial.setEnabled(false);
+		btnAnularEnt.setEnabled(false);
+		btnImprimirSal.setEnabled(false);
+		btnEnt.setEnabled(false);
+		btnSal.setEnabled(false);
+		
+		btnAsunto.setEnabled(false);
+		btnAnularEntTaller.setEnabled(false);
+		btnImprimirEntTaller.setEnabled(false);
+		btnEntTaller.setEnabled(false);
+		btnSalTaller.setEnabled(false);
+		
 		
 		if (id_vehiculo != null) {
 			var p = {};
@@ -54,12 +62,12 @@ qx.Class.define("vehiculos.comp.pageParticular",
 			
 			var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
 			rpc.callAsync(function(resultado, error, id) {
-				application.vehiculo = resultado;
-				controllerFormInfoVehiculo.setModel(qx.data.marshal.Json.createModel(application.vehiculo));
+				vehiculo = resultado;
+				controllerFormInfoVehiculo.setModel(qx.data.marshal.Json.createModel(vehiculo));
 				
 				btnInfoVehiculo.setEnabled(true);
 				btnHistorial.setEnabled(true);
-				btnEnt.setEnabled(application.vehiculo.estado == "S");
+				btnEnt.setEnabled(vehiculo.estado == "S");
 				
 				functionActualizarEntSal(id_entsal, id_movimiento);
 			
@@ -70,13 +78,14 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	var functionActualizarEntSal = function(id_entsal, id_movimiento){
 		
 		application.pageGeneral.functionActualizarGral();
-		lstReparacion1.removeAll();
 		controllerFormInfoEntsal.resetModel();
-				
+		controllerFormInfoMovimiento.resetModel();
+		controllerFormInfoSal.resetModel();
+		
 		buscar_id_movimiento = id_movimiento;
 		
 		var p = {};
-		p.id_vehiculo = application.vehiculo.id_vehiculo;
+		p.id_vehiculo = vehiculo.id_vehiculo;
 		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
 		rpc.callAsync(function(resultado, error, id) {
@@ -102,6 +111,15 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
 		rpc.callAsync(function(resultado, error, id) {
+			var bandera = true;
+			for (var x in resultado) {
+				if (resultado[x].estado == "S" || resultado[x].estado == "D") {
+					bandera = false;
+					break;
+				}
+			}
+			btnAnularEnt.setEnabled(bandera && (rowDataEntSal.estado == "E" || rowDataEntSal.estado == "T"));
+			
 			tblMovimiento.setFocusedCell();
 			tableModelMovimiento.setDataAsMapArray(resultado, true);
 				
@@ -113,32 +131,63 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	};
 	
 	
+	var functionActualizar = function(id_vehiculo, id_entsal, id_movimiento) {
+		dialog.Dialog.alert("Los datos presentados inicialmente fueron modificados desde otra terminal.<br/><br/>Se cancela la operación, se actualizarán los datos en pantalla.<br/><br/>", function(){
+			if (id_movimiento) {
+				functionActualizarVehiculo(id_vehiculo, id_entsal, id_movimiento);
+			} else if (id_entsal) {
+				functionActualizarVehiculo(id_vehiculo, id_entsal);
+			} else {
+				functionActualizarVehiculo(id_vehiculo);
+			}
+		});
+	}
 	
-	var rowDataEntSal;
-	var rowDataMovimiento;
-	var popupInfo = new vehiculos.comp.popupInfo();
+	
+
+
+	var desktop = new qx.ui.window.Desktop();
+	this.add(desktop);
+	
+	var pane = new qx.ui.splitpane.Pane("horizontal");
+	pane.setDecorator(null);
+	var composite1 = new qx.ui.container.Composite(new qx.ui.layout.Canvas());
+	var composite2 = new qx.ui.container.Composite(new qx.ui.layout.Canvas());
+	composite1.setPaddingRight(3);
+	composite2.setPaddingLeft(3);
+	pane.add(composite1, 1);
+	pane.add(composite2, 0);
+	
+	desktop.add(pane, {edge: 0});
+	
+	var blocker = new qx.ui.core.Blocker(pane);
+	blocker.set({color: '#bfbfbf', opacity: 0.4});
+	
+	
 	
 
 	
 	
 
-	var gbxEntsal = new qx.ui.groupbox.GroupBox("");
+	var gbxEntsal = new qx.ui.groupbox.GroupBox();
 	gbxEntsal.setLayout(new qx.ui.layout.Canvas());
-	compositeGral.add(gbxEntsal, {left: 0, top: 0, right: "16%", bottom: "66.5%"});
+	composite1.add(gbxEntsal, {left: 0, top: 0, right: 0, bottom: "66.5%"});
 	
 	var composite = new qx.ui.container.Composite(new qx.ui.layout.HBox(6).set({alignY: "middle"}));
 	gbxEntsal.add(composite, {left: 0, top: 0});
 	
-	var cboVehiculo = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarVehiculo"});
+	var cboVehiculo = this.cboVehiculo = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarVehiculo"});
 	cboVehiculo.setWidth(175);
-	var lstVehiculo = cboVehiculo.getChildControl("list");
+	var lstVehiculo = this.lstVehiculo = cboVehiculo.getChildControl("list");
 	lstVehiculo.addListener("changeSelection", function(e){
 		if (lstVehiculo.isSelectionEmpty()) {
+			this.setLabel('Particular');
 			functionActualizarVehiculo();
 		} else {
+			this.setLabel(lstVehiculo.getSelection()[0].getLabel());
 			functionActualizarVehiculo(lstVehiculo.getModelSelection().getItem(0));
 		}
-	});
+	}, this);
 	
 	composite.add(new qx.ui.basic.Label(("Vehículo:")));
 	composite.add(cboVehiculo);
@@ -156,7 +205,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	var btnHistorial = new qx.ui.form.Button("Historial...");
 	btnHistorial.setEnabled(false);
 	btnHistorial.addListener("execute", function(e){
-		window.open("services/class/comp/Impresion.php?rutina=historial&id_vehiculo=" + application.vehiculo.id_vehiculo);
+		window.open("services/class/comp/Impresion.php?rutina=historial&id_vehiculo=" + vehiculo.id_vehiculo);
 	});
 	composite.add(btnHistorial);
 	
@@ -166,14 +215,52 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	var composite = new qx.ui.container.Composite(new qx.ui.layout.HBox(6));
 	gbxEntsal.add(composite, {top: 0, right: 0});
 	
+	
+	var btnAnularEnt = new qx.ui.form.Button("Anular...");
+	btnAnularEnt.setEnabled(false);
+	btnAnularEnt.addListener("execute", function(e){
+		(new dialog.Confirm({
+		        "message"   : "Desea anular la entrada seleccionada y todos los movimientos relacionados?",
+		        "callback"  : function(e){
+		        					if (e) {
+										var p = {};
+										p.id_entsal = rowDataEntSal.id_entsal;
+										p.entsal_estado = rowDataEntSal.estado;
+										
+										var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
+										rpc.addListener("completed", function(e){
+											functionActualizarVehiculo(vehiculo.id_vehiculo, rowDataEntSal.id_entsal);
+										});
+										rpc.addListener("failed", function(e){
+											functionActualizar(vehiculo.id_vehiculo, rowDataEntSal.id_entsal);
+										});
+										rpc.callAsyncListeners(true, "anular_entrada_vehiculo", p);
+		        					}
+		        				},
+		        "context"   : this,
+		        "image"     : "icon/48/status/dialog-warning.png"
+		})).show();
+	});
+	gbxEntsal.add(btnAnularEnt, {left: "40%", top: 0});
+	
+	var btnImprimirSal = new qx.ui.form.Button("Imprimir...");
+	btnImprimirSal.setEnabled(false);
+	btnImprimirSal.addListener("execute", function(e){
+		window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
+	});
+	gbxEntsal.add(btnImprimirSal, {right: "30%", top: 0});
+	
 	var btnEnt = new qx.ui.form.Button("Entrada...");
 	btnEnt.setEnabled(false);
 	btnEnt.addListener("execute", function(e){
-		var win = new vehiculos.comp.windowEnt();
+		var win = new vehiculos.comp.windowEnt(vehiculo);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 			
-			functionActualizarVehiculo(lstVehiculo.getModelSelection().getItem(0), data);
+			functionActualizarVehiculo(vehiculo.id_vehiculo, data);
+		});
+		win.addListener("estado", function(e){
+			functionActualizar(vehiculo.id_vehiculo);
 		});
 		win.addListener("close", function(e){
 			blocker.unblock();
@@ -189,9 +276,14 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	var btnSal = new qx.ui.form.Button("Salida...");
 	btnSal.setEnabled(false);
 	btnSal.addListener("execute", function(e){
-		var win = new vehiculos.comp.windowSal(rowDataEntSal.id_entsal);
+		var win = new vehiculos.comp.windowSal(vehiculo, rowDataEntSal);
 		win.addListener("aceptado", function(e){
-			functionActualizarVehiculo(lstVehiculo.getModelSelection().getItem(0), rowDataEntSal.id_entsal);
+			functionActualizarVehiculo(vehiculo.id_vehiculo, rowDataEntSal.id_entsal);
+			
+			window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
+		});
+		win.addListener("estado", function(e){
+			functionActualizar(vehiculo.id_vehiculo, rowDataEntSal.id_entsal);
 		});
 		win.addListener("close", function(e){
 			blocker.unblock();
@@ -210,10 +302,11 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	//Tabla
 
 	var tableModelEntsal = new qx.ui.table.model.Simple();
-	tableModelEntsal.setColumns(["Entrada", "Salida", "Total"], ["f_ent", "f_sal", "total"]);
+	tableModelEntsal.setColumns(["Entrada", "Salida", "Km", "Total", "bandera_estado"], ["f_ent", "f_sal", "kilo", "total", "bandera_estado"]);
 	tableModelEntsal.setColumnSortable(0, false);
 	tableModelEntsal.setColumnSortable(1, false);
 	tableModelEntsal.setColumnSortable(2, false);
+	tableModelEntsal.setColumnSortable(3, false);
 
 	var custom = {tableColumnModel : function(obj) {
 		return new qx.ui.table.columnmodel.Resize(obj);
@@ -226,10 +319,24 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	tblEntsal.toggleStatusBarVisible();
 	
 	var tableColumnModelEntsal = tblEntsal.getTableColumnModel();
+	tableColumnModelEntsal.setColumnVisible(4, false);
 	
-	var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
-	cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
-	tableColumnModelEntsal.setDataCellRenderer(2, cellrendererNumber);
+	var cellrendererString = new qx.ui.table.cellrenderer.String();
+	cellrendererString.addNumericCondition("==", -1, "center", "#FF0000", null, null, "bandera_estado");
+	tableColumnModelEntsal.setDataCellRenderer(1, cellrendererString);
+	
+	var cellrendererDynamic = new qx.ui.table.cellrenderer.Dynamic(function(cellInfo) {
+		if (typeof cellInfo.value == "string") {
+			var cellrendererString = new qx.ui.table.cellrenderer.String();
+			cellrendererString.addNumericCondition("==", -1, "center", "#FF0000", null, null, "bandera_estado");
+			return cellrendererString;
+		} else {
+			var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
+			cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
+			return cellrendererNumber;
+		}
+	});
+	tableColumnModelEntsal.setDataCellRenderer(3, cellrendererDynamic);
 	
 	var selectionModelEntsal = tblEntsal.getSelectionModel();
 	selectionModelEntsal.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
@@ -237,19 +344,23 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		if (! selectionModelEntsal.isSelectionEmpty()) {
 			rowDataEntSal = tableModelEntsal.getRowData(tblEntsal.getFocusedRow());
 			
+			btnAnularEnt.setEnabled(false);
+			btnImprimirSal.setEnabled(rowDataEntSal.estado == "S");
 			btnSal.setEnabled(rowDataEntSal.estado == "E");
-			btnEntTaller.setEnabled(rowDataEntSal.estado != "S");
 			
-			lstReparacion1.removeAll();
-			var tipo_reparacion = rowDataEntSal.tipo_reparacion
-			for (var x in tipo_reparacion) {
-				lstReparacion1.add(new qx.ui.form.ListItem(tipo_reparacion[x].descrip, null, tipo_reparacion[x].id_tipo_reparacion));
-			}
-			
+			btnAsunto.setEnabled(false);
+			btnAnularEntTaller.setEnabled(false);
+			btnImprimirEntTaller.setEnabled(false);
+			btnEntTaller.setEnabled(rowDataEntSal.estado != "S" && rowDataEntSal.estado != "A");
+			btnSalTaller.setEnabled(false);
+		
 			controllerFormInfoEntsal.setModel(qx.data.marshal.Json.createModel(rowDataEntSal));
+			controllerFormInfoMovimiento.resetModel();
+			controllerFormInfoSal.resetModel();
 
 			tblMovimiento.setFocusedCell();
 			tableModelSal.setDataAsMapArray([], true);
+			
 			functionActualizarMovimiento(buscar_id_movimiento);
 			
 			buscar_id_movimiento = null;
@@ -342,41 +453,35 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	
 	var formInfoEntsal = new qx.ui.form.Form();
 	
-	var lstReparacion1 = new qx.ui.form.List();
-	lstReparacion1.setMaxHeight(75);
-	lstReparacion1.setDecorator("main");
-	lstReparacion1.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(lstReparacion1, "Reparac.", null, "reparaciones");
-	
-	aux = new qx.ui.form.TextArea();
-	aux.setReadOnly(true);
-	aux.setDecorator("main");
-	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Obs.", null, "observa");
+	var txtObserva = new qx.ui.form.TextArea("");
+	txtObserva.setReadOnly(true);
+	txtObserva.setDecorator("main");
+	txtObserva.setBackgroundColor("#ffffc0");
+	formInfoEntsal.add(txtObserva, "Observa.", null, "observa");
 	
 	aux = new qx.ui.form.TextField();
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Us. ent.", null, "id_usuario_ent");
+	formInfoEntsal.add(aux, "Usuario ent.", null, "id_usuario_ent");
 	
 	aux = new qx.ui.form.TextField();
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Resp. ent.", null, "resp_ent");
+	formInfoEntsal.add(aux, "Resp.ent.", null, "resp_ent");
 	
 	aux = new qx.ui.form.TextField();
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Us. sal.", null, "id_usuario_sal");
+	formInfoEntsal.add(aux, "Usuario sal.", null, "id_usuario_sal");
 	
 	aux = new qx.ui.form.TextField();
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Resp. sal.", null, "resp_sal");
+	formInfoEntsal.add(aux, "Resp.sal.", null, "resp_sal");
 	
 	var controllerFormInfoEntsal = new qx.data.controller.Form(null, formInfoEntsal);
 	//modelForm = controllerFormInfoVehiculo.createModel(true);
@@ -384,11 +489,12 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	var formViewEntsal = new qx.ui.form.renderer.Single(formInfoEntsal);
 	
 	
-	var gbxInfoEntsal = new qx.ui.groupbox.GroupBox("");
+	var gbxInfoEntsal = new qx.ui.groupbox.GroupBox();
 	gbxInfoEntsal.setLayout(new qx.ui.layout.Grow());
 	aux = new qx.ui.container.Scroll(formViewEntsal);
+	aux.setScrollbarX("off");
 	gbxInfoEntsal.add(aux);
-	compositeGral.add(gbxInfoEntsal, {left: "84.5%", top: 0, right: 0, bottom: "66.5%"});
+	composite2.add(gbxInfoEntsal, {left: 0, top: 0, right: 0, bottom: "66.5%"});
 	
 	
 	
@@ -400,7 +506,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoMovimiento.add(aux, "Observaciones", null, "observa");
+	formInfoMovimiento.add(aux, "Observa.", null, "observa");
 	
 	aux = new qx.ui.form.TextField();
 	aux.setReadOnly(true);
@@ -421,10 +527,11 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	
 	
 	var gbxInfoMovimiento = new qx.ui.groupbox.GroupBox("");
-	gbxInfoMovimiento.setLayout(new qx.ui.layout.Basic());
-	gbxInfoMovimiento.add(formViewMovimiento);
-	//compositeGral.add(gbxMovimiento, {left: 0, top: "33.5%", right: "16%", bottom: "33.5%"});
-	compositeGral.add(gbxInfoMovimiento, {left: "84.5%", top: "33.5%", right: 0, bottom: "33.5%"});
+	gbxInfoMovimiento.setLayout(new qx.ui.layout.Grow());
+	aux = new qx.ui.container.Scroll(formViewMovimiento);
+	aux.setScrollbarX("off");
+	gbxInfoMovimiento.add(aux);
+	composite2.add(gbxInfoMovimiento, {left: 0, top: "33.5%", right: 0, bottom: "33.5%"});
 	
 	
 	
@@ -436,7 +543,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoSal.add(aux, "Observaciones", null, "observa");
+	formInfoSal.add(aux, "Observa.", null, "observa");
 	
 	var controllerFormInfoSal = new qx.data.controller.Form(null, formInfoSal);
 	//modelForm = controllerFormInfoVehiculo.createModel(true);
@@ -445,10 +552,9 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	
 	
 	var gbxInfoSal = new qx.ui.groupbox.GroupBox("");
-	gbxInfoSal.setLayout(new qx.ui.layout.Basic());
-	gbxInfoSal.add(formViewSal);
-	//compositeGral.add(gbxMovimiento, {left: 0, top: "33.5%", right: "16%", bottom: "33.5%"});
-	compositeGral.add(gbxInfoSal, {left: "84.5%", top: "66.5%", right: 0, bottom: 0});
+	gbxInfoSal.setLayout(new qx.ui.layout.Canvas());
+	gbxInfoSal.add(formViewSal, {right: 0});
+	composite2.add(gbxInfoSal, {left: 0, top: "66.5%", right: 0, bottom: 0});
 	
 	
 	
@@ -459,18 +565,20 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	
 	var gbxMovimiento = new qx.ui.groupbox.GroupBox("Movimientos");
 	gbxMovimiento.setLayout(new qx.ui.layout.Canvas());
-	compositeGral.add(gbxMovimiento, {left: 0, top: "33.5%", right: "16%", bottom: "33.5%"});
+	composite1.add(gbxMovimiento, {left: 0, top: "33.5%", right: 0, bottom: "33.5%"});
 	
 	
 	//Tabla
 
 	var tableModelMovimiento = new qx.ui.table.model.Simple();
-	tableModelMovimiento.setColumns(["Taller", "Entrada", "Salida", "Asunto", "Total"], ["taller", "f_ent", "f_sal", "documentacion_id", "total"]);
+	tableModelMovimiento.setColumns(["#", "Taller", "Entrada", "Salida", "Km", "Asunto", "Total", "bandera_estado"], ["id_movimiento", "taller", "f_ent", "f_sal", "kilo", "documentacion_id", "total", "bandera_estado"]);
 	tableModelMovimiento.setColumnSortable(0, false);
 	tableModelMovimiento.setColumnSortable(1, false);
 	tableModelMovimiento.setColumnSortable(2, false);
 	tableModelMovimiento.setColumnSortable(3, false);
 	tableModelMovimiento.setColumnSortable(4, false);
+	tableModelMovimiento.setColumnSortable(5, false);
+	tableModelMovimiento.setColumnSortable(6, false);
 
 	var custom = {tableColumnModel : function(obj) {
 		return new qx.ui.table.columnmodel.Resize(obj);
@@ -484,17 +592,35 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	tblMovimiento.toggleStatusBarVisible();
 	
 	var tableColumnModelMovimiento = tblMovimiento.getTableColumnModel();
+	tableColumnModelMovimiento.setColumnVisible(7, false);
 	
-	var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
-	cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
-	tableColumnModelMovimiento.setDataCellRenderer(4, cellrendererNumber);
+	var cellrendererString = new qx.ui.table.cellrenderer.String();
+	cellrendererString.addNumericCondition("==", -1, "center", "#FF0000", null, null, "bandera_estado");
+	tableColumnModelMovimiento.setDataCellRenderer(3, cellrendererString);
+	
+	var cellrendererDynamic = new qx.ui.table.cellrenderer.Dynamic(function(cellInfo) {
+		if (typeof cellInfo.value == "string") {
+			var cellrendererString = new qx.ui.table.cellrenderer.String();
+			cellrendererString.addNumericCondition("==", -1, "center", "#FF0000", null, null, "bandera_estado");
+			return cellrendererString;
+		} else {
+			var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
+			cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
+			return cellrendererNumber;
+		}
+	});
+	tableColumnModelMovimiento.setDataCellRenderer(6, cellrendererDynamic);
+	
+
 	
 	var resizeBehavior = tableColumnModelMovimiento.getBehavior();
-	resizeBehavior.set(0, {width:"38%", minWidth:100});
-	resizeBehavior.set(1, {width:"20%", minWidth:100});
-	resizeBehavior.set(2, {width:"20%", minWidth:100});
-	resizeBehavior.set(3, {width:"10%", minWidth:100});
-	resizeBehavior.set(4, {width:"12%", minWidth:100});
+	resizeBehavior.set(0, {width:"4%", minWidth:100});
+	resizeBehavior.set(1, {width:"38%", minWidth:100});
+	resizeBehavior.set(2, {width:"15%", minWidth:100});
+	resizeBehavior.set(3, {width:"15%", minWidth:100});
+	resizeBehavior.set(4, {width:"9%", minWidth:100});
+	resizeBehavior.set(5, {width:"9%", minWidth:100});
+	resizeBehavior.set(6, {width:"10%", minWidth:100});
 	
 	var selectionModelMovimiento = tblMovimiento.getSelectionModel();
 	selectionModelMovimiento.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
@@ -503,11 +629,11 @@ qx.Class.define("vehiculos.comp.pageParticular",
 			rowDataMovimiento = tableModelMovimiento.getRowData(tblMovimiento.getFocusedRow());
 			
 			btnAsunto.setEnabled(rowDataMovimiento.estado == "S" && rowDataMovimiento.documentacion_id == null);
-			btnEliminarEntTaller.setEnabled(rowDataMovimiento.documentacion_id == null);
-			btnSalTaller.setEnabled(rowDataMovimiento.estado == "E");
+			btnAnularEntTaller.setEnabled(rowDataMovimiento.estado == "E");
+			btnImprimirEntTaller.setEnabled(rowDataMovimiento.estado != "A");
+			btnSalTaller.setEnabled(rowDataMovimiento.estado != "A" && rowDataMovimiento.documentacion_id == null && rowDataEntSal.estado != "A");
 			
 			controllerFormInfoMovimiento.setModel(qx.data.marshal.Json.createModel(rowDataMovimiento));
-			
 			controllerFormInfoSal.resetModel();
 			
 			var p = {};
@@ -531,9 +657,12 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	var btnAsunto = new qx.ui.form.Button("Asunto...");
 	btnAsunto.setEnabled(false);
 	btnAsunto.addListener("execute", function(e){
-		var win = new vehiculos.comp.windowAsunto(rowDataMovimiento.id_movimiento);
+		var win = new vehiculos.comp.windowAsunto(rowDataMovimiento);
 		win.addListener("aceptado", function(e){
 			functionActualizarMovimiento(rowDataMovimiento.id_movimiento);
+		});
+		win.addListener("estado", function(e){
+			functionActualizar(vehiculo.id_vehiculo, rowDataEntSal.id_entsal, rowDataMovimiento.id_movimiento);
 		});
 		win.addListener("close", function(e){
 			blocker.unblock();
@@ -545,41 +674,63 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	});
 	gbxMovimiento.add(btnAsunto, {left: 0, top: 0});
 	
-	var btnEliminarEntTaller = new qx.ui.form.Button("Eliminar...");
-	btnEliminarEntTaller.setEnabled(false);
-	btnEliminarEntTaller.addListener("execute", function(e){
-		/*
-		dialog.Dialog.confirm("¿Desea eliminar el movimiento seleccionado?", qx.lang.Function.bind(function(e){
-			if (e) {
-
-			}
-		}, this));
-		*/
-		
+	var btnAnularEntTaller = new qx.ui.form.Button("Anular...");
+	btnAnularEntTaller.setEnabled(false);
+	btnAnularEntTaller.addListener("execute", function(e){
 		(new dialog.Confirm({
-		        "message"   : "Desea eliminar el movimiento seleccionado?",
+		        "message"   : "Desea anular el movimiento seleccionado?",
 		        "callback"  : function(e){
-		        
+		        					if (e) {
+										var p = {};
+										p.id_movimiento = rowDataMovimiento.id_movimiento;
+										p.movimiento_estado = rowDataMovimiento.estado;
+										
+										var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
+										rpc.addListener("completed", function(e){
+											functionActualizarVehiculo(vehiculo.id_vehiculo, rowDataEntSal.id_entsal, rowDataMovimiento.id_movimiento);
+										});
+										rpc.addListener("failed", function(e){
+											functionActualizar(vehiculo.id_vehiculo, rowDataEntSal.id_entsal, rowDataMovimiento.id_movimiento);
+										});
+										rpc.callAsyncListeners(true, "anular_entrada_taller", p);
+		        					}
 		        				},
 		        "context"   : this,
 		        "image"     : "icon/48/status/dialog-warning.png"
 		})).show();
 	}, this);
-	gbxMovimiento.add(btnEliminarEntTaller, {left: "15%", top: 0});
+	gbxMovimiento.add(btnAnularEntTaller, {left: "40%", top: 0});
+	
+	var btnImprimirEntTaller = new qx.ui.form.Button("Imprimir...");
+	btnImprimirEntTaller.setEnabled(false);
+	btnImprimirEntTaller.addListener("execute", function(e){
+		window.open("services/class/comp/Impresion.php?rutina=entrada_taller&id_entsal=" + rowDataEntSal.id_entsal + "&id_movimiento=" + rowDataMovimiento.id_movimiento);
+	});
+	gbxMovimiento.add(btnImprimirEntTaller, {right: "30%", top: 0});
 	
 	var btnEntTaller = new qx.ui.form.Button("Entrada a taller...");
 	btnEntTaller.setEnabled(false);
 	btnEntTaller.addListener("execute", function(e){
-		var win = new vehiculos.comp.windowEntTaller(rowDataEntSal.id_entsal);
+		application.txtClipboard.setFocusable(true);
+		application.txtClipboard.setValue(txtObserva.getValue());
+		application.txtClipboard.focus();
+		application.txtClipboard.selectAllText();
+		document.execCommand("copy");
+		application.txtClipboard.setFocusable(false);
+		
+		var win = new vehiculos.comp.windowEntTaller(vehiculo, rowDataEntSal);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 			
-			functionActualizarEntSal(rowDataEntSal.id_entsal, data);
+			functionActualizarVehiculo(vehiculo.id_vehiculo, rowDataEntSal.id_entsal, data);
 			
 			window.setTimeout(function(){
 				window.open("services/class/comp/Impresion.php?rutina=entrada_taller&id_entsal=" + rowDataEntSal.id_entsal + "&id_movimiento=" + data);
 			}, 200)
 		})
+		win.addListener("estado", function(e){
+			functionActualizar(vehiculo.id_vehiculo, rowDataEntSal.id_entsal);
+		});
 		win.addListener("close", function(e){
 			blocker.unblock();
 		});
@@ -594,9 +745,12 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	var btnSalTaller = new qx.ui.form.Button("Salida de taller...");
 	btnSalTaller.setEnabled(false);
 	btnSalTaller.addListener("execute", function(e){
-		var win = new vehiculos.comp.windowSalTaller(rowDataMovimiento.id_movimiento);
+		var win = new vehiculos.comp.windowSalTaller(vehiculo, rowDataMovimiento);
 		win.addListener("aceptado", function(e){
-			functionActualizarVehiculo(lstVehiculo.getModelSelection().getItem(0), rowDataEntSal.id_entsal, rowDataMovimiento.id_movimiento);
+			functionActualizarVehiculo(vehiculo.id_vehiculo, rowDataEntSal.id_entsal, rowDataMovimiento.id_movimiento);
+		});
+		win.addListener("estado", function(e){
+			functionActualizar(vehiculo.id_vehiculo, rowDataEntSal.id_entsal, rowDataMovimiento.id_movimiento);
 		});
 		win.addListener("close", function(e){
 			blocker.unblock();
@@ -613,9 +767,12 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	
 	var gbxSal = new qx.ui.groupbox.GroupBox(" Reparaciones ");
 	gbxSal.setLayout(new qx.ui.layout.Canvas());
-	compositeGral.add(gbxSal, {left: 0, top: "66.5%", right: "16%", bottom: 0});
+	composite1.add(gbxSal, {left: 0, top: "66.5%", right: 0, bottom: 0});
 	
 	
+	
+	
+
 	
 	//Tabla
 
@@ -635,6 +792,18 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	tblSal.setShowCellFocusIndicator(false);
 	tblSal.toggleColumnVisibilityButtonVisible();
 	tblSal.toggleStatusBarVisible();
+	
+	tblSal.addListener("cellTap", function(e){
+		var value = tableModelSal.getValue(e.getColumn(), e.getRow());
+		
+		application.txtClipboard.setFocusable(true);
+		application.txtClipboard.setValue(String(value));
+		application.txtClipboard.focus();
+		application.txtClipboard.selectAllText();
+		document.execCommand("copy");
+		application.txtClipboard.setFocusable(false);
+		tblSal.focus();
+	});
 	
 	var tableColumnModelSal = tblSal.getTableColumnModel();
 	

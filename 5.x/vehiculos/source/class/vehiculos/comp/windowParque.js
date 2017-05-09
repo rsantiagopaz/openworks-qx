@@ -25,12 +25,12 @@ qx.Class.define("vehiculos.comp.windowParque",
 	var numberformatMontoEs2 = new qx.util.format.NumberFormat("es").set({groupingUsed: true});
 	
 	
-	var functionActualizarTaller = function(cod_razon_social) {
+	var functionActualizarTaller = function(id_parque) {
 		var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Parametros");
 		rpc.callAsync(function(resultado, error, id) {
 			tableModelTaller.setDataAsMapArray(resultado, true);
 			
-			if (cod_razon_social != null) tblTaller.buscar("id_parque", cod_razon_social);
+			if (id_parque != null) tblTaller.buscar("id_parque", id_parque);
 		}, "leer_parque");
 	};
 	

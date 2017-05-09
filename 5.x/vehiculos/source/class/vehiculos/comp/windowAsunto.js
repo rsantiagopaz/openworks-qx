@@ -1,7 +1,7 @@
 qx.Class.define("vehiculos.comp.windowAsunto",
 {
 	extend : componente.comp.ui.ramon.window.Window,
-	construct : function (id_movimiento)
+	construct : function (rowDataMovimiento)
 	{
 	this.base(arguments);
 	
@@ -92,26 +92,33 @@ qx.Class.define("vehiculos.comp.windowAsunto",
 	btnAceptar.addListener("execute", function(e){
 		if (txtDocumento.getValue() != "") {
 			var p = {};
-			p.id_movimiento = id_movimiento;
+			p.id_movimiento = rowDataMovimiento.id_movimiento;
 			p.documentacion_id = txtAsunto.getValue();
 			
 			var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
-			rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id) {
-				if (error == null) {
+			rpc.addListener("completed", function(e){
+				btnCancelar.execute();
+				
+				this.fireDataEvent("aceptado");
+			}, this);
+			rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				if (data.message = "documentacion_id") {
+					txtAsunto.setValid(false);
+					txtAsunto.focus();
+					
+					sharedErrorTooltip.setLabel("Asunto inválido");
+					sharedErrorTooltip.placeToWidget(txtAsunto);
+					sharedErrorTooltip.show();
+				} else {
 					btnCancelar.execute();
 					
-					this.fireDataEvent("aceptado");
-				} else {
-					if (error.message = "documentacion_id") {
-						txtAsunto.setValid(false);
-						txtAsunto.focus();
-						
-						sharedErrorTooltip.setLabel("Asunto inválido");
-						sharedErrorTooltip.placeToWidget(txtAsunto);
-						sharedErrorTooltip.show();
-					}
+					this.fireDataEvent("estado");
 				}
-			}, this), "asignar_asunto", p);
+			}, this);
+			rpc.callAsyncListeners(true, "asignar_asunto", p);
+
 		} else {
 			txtAsunto.focus();
 		}
@@ -134,6 +141,7 @@ qx.Class.define("vehiculos.comp.windowAsunto",
 	},
 	events : 
 	{
-		"aceptado": "qx.event.type.Event"
+		"aceptado": "qx.event.type.Event",
+		"estado": "qx.event.type.Event"
 	}
 });

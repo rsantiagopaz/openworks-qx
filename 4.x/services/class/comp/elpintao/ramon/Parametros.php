@@ -239,6 +239,9 @@ class class_Parametros extends class_Base
 			$insert_id = mysql_insert_id();
 			$sql="INSERT fabrica SET id_fabrica=" . $insert_id . ", descrip='" . $item->descrip . "', desc_fabrica='" . $item->desc_fabrica . "'";
 			$this->transmitir($sql);
+			
+			$sql="INSERT usuario_fabrica SELECT id_usuario, '" . $insert_id . "' AS id_fabrica FROM usuario";
+			mysql_query($sql);
 		}
 	
 		foreach ($cambios->modificados as $item) {

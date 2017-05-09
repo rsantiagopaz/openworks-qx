@@ -12,6 +12,7 @@
  * This is the main application class of your custom application "vehiculos"
  *
  * @asset(vehiculos/*)
+ * @asset(qx/decoration/Simple/arrows/down.gif) 
  */
 qx.Class.define("vehiculos.Application",
 {
@@ -56,14 +57,12 @@ qx.Class.define("vehiculos.Application",
 
 
       // Document is the application root
-      var doc = this.getRoot();
-      
+	var doc = this.getRoot();
+	
 	doc.set({blockerColor: '#bfbfbf', blockerOpacity: 0.4});
 	
-	this.perfil = "037001";
-	//this.perfil = "063001";
-	
-	//qx.locale.Manager.getInstance().addLocale("es", {"cldr_date_format_medium": "d/M/yyyy"});
+	this.perfil = "063001";
+
 	
 	var rpc = new qx.io.remote.Rpc();
 	rpc.setTimeout(10000);
@@ -128,6 +127,11 @@ qx.Class.define("vehiculos.Application",
 	numberformatMontoEn.setGroupingUsed(false);
 	numberformatMontoEn.setMaximumFractionDigits(2);
 	numberformatMontoEn.setMinimumFractionDigits(2);
+	
+	var numberformatEntero = this.numberformatEntero = new qx.util.format.NumberFormat("en");
+	numberformatEntero.setGroupingUsed(false);
+	numberformatEntero.setMaximumFractionDigits(0);
+	numberformatEntero.setMinimumFractionDigits(0);
       
 
 	var contenedorMain = new qx.ui.container.Composite(new qx.ui.layout.Grow());
@@ -162,6 +166,28 @@ qx.Class.define("vehiculos.Application",
 	});
 	mnuEdicion.add(btnNuevoVehiculo);
 	
+	var btnNuevoChofer = new qx.ui.menu.Button("Choferes...");
+	//btnNuevoChofer.setEnabled(false);
+	btnNuevoChofer.addListener("execute", function(){
+		var win = new vehiculos.comp.windowChofer();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuEdicion.add(btnNuevoChofer);
+	
+	var btnIncidentes = new qx.ui.menu.Button("Incidentes...");
+	//btnIncidentes.setEnabled(false);
+	btnIncidentes.addListener("execute", function(){
+		var win = new vehiculos.comp.windowIncidentes();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
+	});
+	mnuEdicion.add(btnIncidentes);
+	
 	var btnParamet = new qx.ui.menu.Button("Parámetros...");
 	btnParamet.addListener("execute", function(){
 		var win = new vehiculos.comp.windowParametro();
@@ -187,11 +213,17 @@ qx.Class.define("vehiculos.Application",
 
 	var mnuVer = new qx.ui.menu.Menu();
 	
-	var btnImpGral = new qx.ui.menu.Button("Imprimir general...");
-	btnImpGral.addListener("execute", function(){
-		window.open("services/class/comp/Impresion.php?rutina=general");
+	var btnListado = new qx.ui.menu.Button("Listado...");
+	btnListado.addListener("execute", function(){
+		var win = new vehiculos.comp.windowListado();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
 	});
-	mnuVer.add(btnImpGral);
+	mnuVer.add(btnListado);
+	
+
 	
 
 	var mnuSesion = new qx.ui.menu.Menu();
@@ -231,6 +263,12 @@ qx.Class.define("vehiculos.Application",
 	doc.add(new qx.ui.basic.Label("Org/Area: " + this.rowOrganismo_area.label), {left: "51%", top: 5});
 	doc.add(new qx.ui.basic.Label("Usuario: " + this._SYSusuario), {left: "51%", top: 25});
 	
+	
+	var txtClipboard = this.txtClipboard = new qx.ui.form.TextArea("");
+	txtClipboard.setFocusable(false);
+	doc.add(txtClipboard, {left: 10, top: 80});
+	
+	
 	//doc.add(contenedorMain, {left: 0, top: 33, right: 0, bottom: 0});
 	doc.add(tabviewMain, {left: 0, top: 33, right: 0, bottom: 0});
 	
@@ -238,8 +276,20 @@ qx.Class.define("vehiculos.Application",
 	tabviewMain.add(pageGeneral);
 	tabviewMain.setSelection([pageGeneral]);
 	
-	var pageParticular = new vehiculos.comp.pageParticular();
-	tabviewMain.add(pageParticular);
+	//var pageParticular = new vehiculos.comp.pageParticular();
+	//tabviewMain.add(pageParticular);
+	
+	var pageMas = new qx.ui.tabview.Page("+");
+	pageMas.addListener("appear", function(e){
+		tabviewMain.setSelection([pageGeneral]);
+	});
+	var button = pageMas.getChildControl("button");
+	button.addListener("execute", function(e){
+		var pageParticular = new vehiculos.comp.pageParticular();
+		tabviewMain.addAt(pageParticular, tabviewMain.getChildren().length - 1);
+		tabviewMain.setSelection([pageParticular]);
+	});	
+	tabviewMain.add(pageMas);
 	
 	var timer = qx.util.TimerManager.getInstance();
 	timer.start(pageGeneral.functionActualizarGral, 30000);

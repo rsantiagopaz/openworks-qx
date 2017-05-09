@@ -11,11 +11,11 @@ qx.Class.define("vehiculos.comp.windowVehiculo",
 		height: 450,
 		showMinimize: false,
 		showMaximize: false,
-		allowMaximize: false
+		allowMaximize: false,
+		resizable: false
 	});
 		
 	this.setLayout(new qx.ui.layout.Canvas());
-	this.setResizable(false, false, false, false);
 
 	this.addListenerOnce("appear", function(e){
 		lstVehiculo.fireDataEvent("changeSelection", []);
@@ -158,7 +158,7 @@ qx.Class.define("vehiculos.comp.windowVehiculo",
 			var p = {};
 			p.model = qx.util.Serializer.toNativeObject(controllerFormInfoVehiculo.getModel());
 
-			var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
+			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Vehiculo");
 			rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id) {
 				if (error == null) {
 					if (p.model.id_vehiculo == "0") {

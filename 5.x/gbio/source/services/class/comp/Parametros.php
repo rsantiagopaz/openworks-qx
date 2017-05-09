@@ -34,6 +34,9 @@ class class_Parametros extends class_Base
 	if (mysql_num_rows($rs) > 0) {
 		$row = mysql_fetch_object($rs);
 		if ($row->password == md5($p->password)) {
+			
+			unset($row->password);
+			
 			$row->lugar_trabajo = array();
 			$row->id_lugar_trabajo = array();
 			
@@ -43,6 +46,9 @@ class class_Parametros extends class_Base
 				$row->lugar_trabajo[] = $rowLugar_trabajo;
 				$row->id_lugar_trabajo[] = $rowLugar_trabajo->id_lugar_trabajo;
 			}
+			
+			$_SESSION['usuario'] = $row;
+			
 			return $row;
 		} else {
 			$error->SetError(0, "password");

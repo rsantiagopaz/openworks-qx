@@ -1,6 +1,5 @@
 <?php
 
-
 $servidor = "localhost";
 $usuario = "root";
 $password = "";
@@ -13,6 +12,5 @@ $usuario = "root";
 $password = "sum4mp4iea!";
 $base = "vehiculos";
 */
-
 
 ?>

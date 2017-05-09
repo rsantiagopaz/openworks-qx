@@ -68,7 +68,7 @@
         },
         {
           "manifest" : "../componente/Manifest.json"
-        },
+        }
       ]
     }
 

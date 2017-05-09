@@ -53,47 +53,19 @@ qx.Class.define("prueba.Application",
       -------------------------------------------------------------------------
       */
 
+      // Create a button
+      var button1 = new qx.ui.form.Button("First Button", "prueba/test.png");
 
+      // Document is the application root
+      var doc = this.getRoot();
 
+      // Add button to document at fixed coordinates
+      doc.add(button1, {left: 100, top: 50});
 
-      
-
-
-
-// Document is the application root
-var doc = this.getRoot();
-
-
-	var tableModel = new qx.ui.table.model.Simple();
-	tableModel.setColumns(["Reparación", "Costo", "Cantidad", "Total"], ["reparacion", "costo", "cantidad", "total"]);
-	tableModel.setEditable(true);
-
-	var tbl = new prueba.comp.TableModified(tableModel);
-	//var tbl = new qx.ui.table.Table(tableModel);
-
-
-	doc.add(tbl, {left: 10, top: 10});
-	
-	
-	var a = [
-		{reparacion: "repa 01", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 02", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 03", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 04", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 05", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 06", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 07", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 08", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 09", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 10", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 11", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 12", costo: 0.0, cantidad: 0, total: 0.0},
-		{reparacion: "repa 13", costo: 0.0, cantidad: 0, total: 0.0}
-	];
-	
-	tableModel.setDataAsMapArray(a, true);
-
-
+      // Add an event listener
+      button1.addListener("execute", function(e) {
+        alert("Hello World!");
+      });
     }
   }
 });

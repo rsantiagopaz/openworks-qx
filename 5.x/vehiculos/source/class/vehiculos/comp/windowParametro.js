@@ -10,11 +10,9 @@ qx.Class.define("vehiculos.comp.windowParametro",
 			width: 800,
 			height: 600,
 			showMinimize: false
-			//showMaximize: false
 		});
 		
 		this.setLayout(new qx.ui.layout.Canvas());
-		this.setResizable(false, false, false, false);
 
 	this.addListenerOnce("appear", function(e){
 		cboProveed.focus();
@@ -122,6 +120,22 @@ qx.Class.define("vehiculos.comp.windowParametro",
 	gbxTipo_vehiculo.add(tblTipo_vehiculo);
 	
 	
+	var gbxTipo_incidente = new qx.ui.groupbox.GroupBox("Tipo de incidente");
+	gbxTipo_incidente.setWidth(350);
+	gbxTipo_incidente.setHeight(261);
+	gbxTipo_incidente.setLayout(new qx.ui.layout.Grow());
+	this.add(gbxTipo_incidente, {left: 0, top: "51.5%", right: "51.5%", bottom: 0});
+	
+	var tableModelTipo_incidente = new qx.ui.table.model.Simple();
+	tableModelTipo_incidente.setColumns(["Descripción"], ["descrip"]);
+	tableModelTipo_incidente.setEditable(true);
+	tableModelTipo_incidente.setColumnSortable(0, false);
+
+	var tblTipo_incidente = new vehiculos.comp.tableParametro(tableModelTipo_incidente, "tipo_incidente");
+	
+	gbxTipo_incidente.add(tblTipo_incidente);
+	
+	
 	var gbxTipo_reparacion = new qx.ui.groupbox.GroupBox("Tipo de reparación");
 	gbxTipo_reparacion.setWidth(350);
 	gbxTipo_reparacion.setHeight(261);
@@ -143,7 +157,8 @@ qx.Class.define("vehiculos.comp.windowParametro",
 	btnAgregarTaller.setTabIndex(2);
 	tblTaller.setTabIndex(3);
 	tblTipo_vehiculo.setTabIndex(4);
-	tblTipo_reparacion.setTabIndex(5);
+	tblTipo_incidente.setTabIndex(5);
+	tblTipo_reparacion.setTabIndex(6);
 	
 	
 	},

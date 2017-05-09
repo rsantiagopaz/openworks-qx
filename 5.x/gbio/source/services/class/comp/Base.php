@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 class class_Base
 {
 	protected $link1;
@@ -101,6 +103,25 @@ class class_Base
 		}
 	}
 	return implode(", ", $set);
+  }
+  
+  
+  public function auditoria($sqltext, $descrip = null, $tags = null, $id_registro = null, $json = null) {
+  	
+  	if (is_null($json)) $json = new stdClass;
+  	$json->usuario = $_SESSION['usuario'];
+
+  	
+	if (! empty($_SERVER['HTTP_CLIENT_IP'])) 
+		$ip = $_SERVER['HTTP_CLIENT_IP'];
+	else if (! empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	else 
+		$ip = $_SERVER['REMOTE_ADDR'];
+
+
+	$sql = "INSERT _auditoria SET usuario='" . $_SESSION['usuario']->usuario . "', tags='" . $tags . "', id_registro=" . ((is_null($id_registro)) ? "NULL" : $id_registro) . ", mysql_query='" . mysql_real_escape_string($sqltext) . "', descrip='" . $descrip . "', fecha_hora=NOW(), ip='" . $ip . "', json=" . ((is_null($json)) ? "NULL" : "'" . json_encode($json) . "'");
+	mysql_query($sql);
   }
 }
 

@@ -5,6 +5,12 @@ $usuario = "root";
 $password = "";
 
 
+/*
+$servidor = "localhost";
+$usuario = "root";
+$password = "sum4mp4iea!";
+*/
+
 
 /*
 $servidor = "200.43.126.130";
@@ -12,11 +18,7 @@ $usuario = "viaticos";
 $password = "plata!salud!";
 */
 
-/*
-$servidor = "localhost";
-$usuario = "viaticos";
-$password = "plata!salud!";
-*/
+
 
 $base = "salud1";
 

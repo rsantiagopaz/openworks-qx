@@ -17,6 +17,13 @@ qx.Class.define("vehiculos.comp.tableParametro",
 	
 	var commandAgregar = new qx.ui.command.Command("Insert");
 	commandAgregar.addListener("execute", function(e){
+		var row = qx.lang.Json.parse('{"id_' + tabla + '": "0", "descrip": ""}');
+		
+		tableModel.addRowsAsMapArray([row], null, true);
+		this.setFocusedCell(0, tableModel.getRowCount() - 1, true);
+		this.startEditing();
+		
+		/*
 		var p = {};
 		p.tabla = tabla;
 		
@@ -34,12 +41,14 @@ qx.Class.define("vehiculos.comp.tableParametro",
 				}
 			}
 		}, "agregar_parametro", p);
-	});
+		*/
+	}, this);
+	
 	var commandEditar = new qx.ui.command.Command("F2");
 	commandEditar.setEnabled(false);
 	commandEditar.addListener("execute", function(e){
-		tbl.startEditing();
-	});
+		this.startEditing();
+	}, this);
 	
 	
 	var menu = new componente.comp.ui.ramon.menu.Menu();
@@ -49,65 +58,113 @@ qx.Class.define("vehiculos.comp.tableParametro",
 	menu.addSeparator();
 	menu.add(btnEditar);
 	menu.memorizar();
+	commandAgregar.setEnabled(false);
 	
 	
 	
-	tbl.setShowCellFocusIndicator(true);
-	tbl.toggleColumnVisibilityButtonVisible();
+	this.setShowCellFocusIndicator(true);
+	this.toggleColumnVisibilityButtonVisible();
 	//tbl.toggleStatusBarVisible();
-	tbl.setContextMenu(menu);
+	this.setContextMenu(menu);
 	
-	var tableColumnModel = tbl.getTableColumnModel();
+	var tableColumnModel = this.getTableColumnModel();
 	
-	var selectionModel = tbl.getSelectionModel();
+	var selectionModel = this.getSelectionModel();
 	selectionModel.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModel.addListener("changeSelection", function(){
 		var selectionEmpty = selectionModel.isSelectionEmpty();
+
 		commandEditar.setEnabled(! selectionEmpty);
 		menu.memorizar([commandEditar]);
 		sharedErrorTooltip.hide();
-	});
+	}, this);
 	
 	
-	tbl.addListener("dataEdited", function(e){
+	this.addListener("dataEdited", function(e){
 		var data = e.getData();
 		data.value = data.value.trim();
-		
+
 		var rowData = tableModel.getRowDataAsMap(data.row);
 		rowData.descrip = data.value;
 		
 		if (data.value == "") {
-			rowData.descrip = data.oldValue;
-			tableModel.setRowsAsMapArray([rowData], data.row, true);
-		} else {
+			if (rowData["id_" + tabla] == "0") {
+				qx.event.Timer.once(function(){
+					if (this.getFocusedRow() == data.row) {
+						this.startEditing();
+						
+						qx.event.Timer.once(function(){
+							sharedErrorTooltip.setLabel("Debe ingresar descripción");
+							sharedErrorTooltip.placeToWidget(this);
+							sharedErrorTooltip.show();					
+						}, this, 100);
+					} else {
+						tableModel.removeRows(data.row, 1);
+					}
+				}, this, 100);
+			} else {
+				rowData.descrip = data.oldValue;
+				tableModel.setRowsAsMapArray([rowData], data.row, true);
+			}
+
+		} else if (data.value != data.oldValue) {
 			var p = {};
 			p.tabla = tabla;
 			p.model = rowData;
 			
 			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
-			rpc.callAsync(function(resultado, error, id) {
+			rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id) {
 				if (error == null) {
+					if (rowData["id_" + tabla] == "0") rowData["id_" + tabla] = resultado;
+					
 					tableModel.setRowsAsMapArray([rowData], data.row, true);
 				} else {
 					if (error.message = "duplicado") {
 						rowData.descrip = data.oldValue;
 						tableModel.setRowsAsMapArray([rowData], data.row, true);
 						
-						sharedErrorTooltip.setLabel("Descripción duplicada");
-						sharedErrorTooltip.placeToWidget(tbl);
-						sharedErrorTooltip.show();
+						if (rowData["id_" + tabla] == "0") {
+							qx.event.Timer.once(function(){
+								if (this.getFocusedRow() == data.row) {
+									this.startEditing();
+								} else {
+									tableModel.removeRows(data.row, 1);
+								}
+								
+								qx.event.Timer.once(function(){
+									sharedErrorTooltip.setLabel("Descripción duplicada");
+									sharedErrorTooltip.placeToWidget(this);
+									sharedErrorTooltip.show();					
+								}, this, 100);
+							}, this, 100);
+						} else {
+							sharedErrorTooltip.setLabel("Descripción duplicada");
+							sharedErrorTooltip.placeToWidget(this);
+							sharedErrorTooltip.show();
+						}
 					}
 				}
-			}, "editar_parametro", p);
+			}, this), "editar_parametro", p);
 		}
-	});
+	}, this);
+	
+	
+	this.addListener("dataCanceled", function(e){
+		var focusedRow = this.getFocusedRow();
+		var rowData = tableModel.getRowData(focusedRow);
+		
+		if (rowData["id_" + tabla] == "0") {
+			if (tableModel.getRowCount() - 2 >= 0) this.setFocusedCell(0, focusedRow - 1, true);
+			tableModel.removeRows(focusedRow, 1);
+		}
+	}, this);
 	
 	
 	
 	tableModel.addListener("dataChanged", function(e){
 		var rowCount = tableModel.getRowCount();
-		if (rowCount > 0) tbl.setAdditionalStatusBarText(numberformatMontoEs2.format(rowCount) + " item/s"); else tbl.setAdditionalStatusBarText(" ");
-	});
+		if (rowCount > 0) this.setAdditionalStatusBarText(numberformatMontoEs2.format(rowCount) + " item/s"); else this.setAdditionalStatusBarText(" ");
+	}, this);
 	
 	
 	
@@ -115,10 +172,10 @@ qx.Class.define("vehiculos.comp.tableParametro",
 	p.tabla = tabla;
 	
 	var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
-	rpc.callAsync(function(resultado, error, id) {
+	rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id) {
 		tableModel.setDataAsMapArray(resultado, true);
-		if (resultado.length > 0) tbl.setFocusedCell(0, 0, true);
-	}, "leer_parametro", p);
+		if (resultado.length > 0) this.setFocusedCell(0, 0, true);
+	}, this), "leer_parametro", p);
 	
 	
 	},

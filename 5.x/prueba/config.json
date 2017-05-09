@@ -44,7 +44,7 @@
     "QOOXDOO_PATH" : "../../../qooxdoo-5.0.2-sdk",
     "QXTHEME"      : "prueba.theme.Theme",
     "API_EXCLUDE"  : ["qx.test.*", "${APPLICATION}.theme.*", "${APPLICATION}.test.*"],
-    "LOCALES"      : [ "es" ],
+    "LOCALES"      : [ "en" ],
     "CACHE"        : "${TMPDIR}/qx${QOOXDOO_VERSION}/cache",
     "ROOT"         : "."
   },
@@ -58,17 +58,17 @@
     // project; make sure to adapt the path to the Manifest.json; if you are
     // using a contrib: library, it will be downloaded into the path specified
     // by the 'cache/downloads' config key
-
+    /*
     "libraries" :
     {
       "library" :
       [
         {
-          "manifest" : "../componente/Manifest.json"
+          "manifest" : "contrib://SkeletonApplication/trunk/Manifest.json"
         }
       ]
     }
-
+    */
 
     // If you want to tweak a job setting, see the following sample where
     // the "format" feature of the "build-script" job is overridden.

@@ -21,6 +21,15 @@ $_SESSION['services_require'] = "../../../services/class/comp/elpintao/ramon/";
 
 
 
+/*
+$_SESSION['servidor'] = "pintaocentral.no-ip.org";
+$_SESSION['usuario'] = "elpintao";
+$_SESSION['password'] = "1qaz2wsx";
+$_SESSION['base'] = "deposito";
+$_SESSION['services_require'] = "../../../services/class/comp/elpintao/ramon/";
+*/
+
+
 
 /*
 $_SESSION['servidor'] = "localhost";

@@ -205,7 +205,7 @@ qx.Class.define("componente.comp.elpintao.ramon.productos.windowProducto",
 	commandAgregar.addListener("execute", function(e){
 		btnAceptar.setEnabled(true);
 		//tableModel.addRowsAsMapArray([{id_producto_item: 0, capacidad: 0, id_color: "1", id_unidad: "1", precio_lista: 0.00, remarc_final: 0.00, desc_final: txtDesc_fabrica.getValue(), bonif_final: 0.00, remarc_mayorista: 0.00, desc_mayorista: txtDesc_fabrica.getValue(), bonif_mayorista: 0.00, comision_vendedor: 0.00, cod_interno: "", cod_externo: "", cod_barra: "", duracion: 0, alta: true}], null, true);
-		tableModel.addRowsAsMapArray([{id_producto_item: 0, capacidad: 0, id_color: "1", id_unidad: "1", precio_lista: 0.00, remarc_final: 0.00, desc_final: 0.00, bonif_final: 0.00, remarc_mayorista: 0.00, desc_mayorista: 0, bonif_mayorista: 0.00, comision_vendedor: 0.00, cod_interno: "", cod_externo: "", cod_barra: "", duracion: 0, alta: true}], null, true);
+		tableModel.addRowsAsMapArray([{id_producto_item: 0, capacidad: 0, id_color: "1", id_unidad: "1", precio_lista: 0.00, remarc_final: 0.00, desc_final: 0.00, bonif_final: 0.00, remarc_mayorista: 0.00, desc_mayorista: 0, bonif_mayorista: 0.00, desc_lista: 0.00, comision_vendedor: 0.00, cod_interno: "", cod_externo: "", cod_barra: "", duracion: 0, alta: true}], null, true);
 		tbl.setFocusedCell(0, tableModel.getRowCount()-1, true);
 		tbl.startEditing();
 	});
@@ -483,6 +483,7 @@ qx.Class.define("componente.comp.elpintao.ramon.productos.windowProducto",
 									row.desc_mayorista = itemaux.desc_mayorista;
 									row.bonif_final = itemaux.bonif_final;
 									row.bonif_mayorista = itemaux.bonif_mayorista;
+									row.desc_lista = itemaux.desc_lista;
 									row.comision_vendedor = itemaux.comision_vendedor;
 									
 									break;

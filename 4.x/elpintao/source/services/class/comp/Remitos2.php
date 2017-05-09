@@ -102,6 +102,7 @@ class class_Remitos2 extends class_Base
 			$row->remarc_mayorista = (float) $row->remarc_mayorista;
 			$row->desc_mayorista = (float) $row->desc_mayorista;
 			$row->bonif_mayorista = (float) $row->bonif_mayorista;
+			$row->desc_lista = (float) $row->desc_lista;
 			$row->comision_vendedor = (float) $row->comision_vendedor;
 			
 			$this->functionCalcularImportes($row);

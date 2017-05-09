@@ -7,7 +7,7 @@
 		
 		this.set({
 			caption: "Edicion de Precios",
-			width: 990,
+			width: 1100,
 			height: 565,
 			showMinimize: false
 		});
@@ -244,7 +244,7 @@
 		//Tabla Datos
 
 		var tableModelDatos = new qx.ui.table.model.Simple();
-		tableModelDatos.setColumns(["", "Color", "Capac.", "U", "Precio lista", "Remarc.CF.", "Desc.CF.", "Bonif.CF.", "Remarc.may.", "Desc.may.", "Bonif.may.", "Comisión", "Cod.interno"], ["item", "color", "capacidad", "unidad", "precio_lista", "remarc_final", "desc_final", "bonif_final", "remarc_mayorista", "desc_mayorista", "bonif_mayorista", "comision_vendedor", "cod_interno"]);
+		tableModelDatos.setColumns(["", "Color", "Capac.", "U", "P.lista", "Rem.CF.", "Desc.CF.", "Bonif.CF.", "Rem.may.", "Desc.may.", "Bonif.may.", "Desc.lista", "Comisión", "Cod.interno"], ["item", "color", "capacidad", "unidad", "precio_lista", "remarc_final", "desc_final", "bonif_final", "remarc_mayorista", "desc_mayorista", "bonif_mayorista", "desc_lista", "comision_vendedor", "cod_interno"]);
 		//tableModelDatos.setEditable(true);
 		
 		tableModelDatos.setSortMethods(1, function(row1, row2) {
@@ -263,6 +263,7 @@
 		tableModelDatos.setColumnEditable(9, true);
 		tableModelDatos.setColumnEditable(10, true);
 		tableModelDatos.setColumnEditable(11, true);
+		tableModelDatos.setColumnEditable(12, true);
 
 		tableModelDatos.setColumnSortable(0, false);
 		tableModelDatos.setColumnSortable(1, false);
@@ -277,6 +278,7 @@
 		tableModelDatos.setColumnSortable(10, false);
 		tableModelDatos.setColumnSortable(11, false);
 		tableModelDatos.setColumnSortable(12, false);
+		tableModelDatos.setColumnSortable(13, false);
 		
 		
 		var custom = {tableColumnModel : function(obj) {
@@ -298,18 +300,19 @@
 		
 		var resizeBehavior = tableColumnModelDatos.getBehavior();
 		resizeBehavior.set(0, {width:"2.5%", minWidth:100});
-		resizeBehavior.set(1, {width:"24%", minWidth:100});
+		resizeBehavior.set(1, {width:"21%", minWidth:100});
 		resizeBehavior.set(2, {width:"6%", minWidth:100});
 		resizeBehavior.set(3, {width:"3.5%"});
 		resizeBehavior.set(4, {width:"7.5%", minWidth:100});
 		resizeBehavior.set(5, {width:"7.5%", minWidth:100});
-		resizeBehavior.set(6, {width:"7%", minWidth:100});
-		resizeBehavior.set(7, {width:"7%", minWidth:100});
-		resizeBehavior.set(8, {width:"8%", minWidth:100});
-		resizeBehavior.set(9, {width:"7%", minWidth:100});
-		resizeBehavior.set(10, {width:"7%", minWidth:100});
-		resizeBehavior.set(11, {width:"7%", minWidth:100});
-		resizeBehavior.set(12, {width:"6%", minWidth:100});
+		resizeBehavior.set(6, {width:"6.5%", minWidth:100});
+		resizeBehavior.set(7, {width:"6.5%", minWidth:100});
+		resizeBehavior.set(8, {width:"6.5%", minWidth:100});
+		resizeBehavior.set(9, {width:"6.5%", minWidth:100});
+		resizeBehavior.set(10, {width:"6.5%", minWidth:100});
+		resizeBehavior.set(11, {width:"6.5%", minWidth:100});
+		resizeBehavior.set(12, {width:"6.5%", minWidth:100});
+		resizeBehavior.set(13, {width:"6.5%", minWidth:100});
 		
 		
 /*		
@@ -355,6 +358,7 @@
 		tableColumnModelDatos.setDataCellRenderer(9, renderer);
 		tableColumnModelDatos.setDataCellRenderer(10, renderer);
 		tableColumnModelDatos.setDataCellRenderer(11, renderer);
+		tableColumnModelDatos.setDataCellRenderer(12, renderer);
 
 		
 		
@@ -382,6 +386,7 @@
 		tableColumnModelDatos.setCellEditorFactory(9, celleditorNumber);
 		tableColumnModelDatos.setCellEditorFactory(10, celleditorNumber);
 		tableColumnModelDatos.setCellEditorFactory(11, celleditorNumber);
+		tableColumnModelDatos.setCellEditorFactory(12, celleditorNumber);
 		
 		
 		

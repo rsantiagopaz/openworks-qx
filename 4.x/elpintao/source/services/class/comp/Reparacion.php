@@ -276,6 +276,7 @@ class class_Reparacion extends class_Base
 				$rowHistorico_precio->desc_mayorista = (float) $rowHistorico_precio->desc_mayorista;
 				$rowHistorico_precio->bonif_final = (float) $rowHistorico_precio->bonif_final;
 				$rowHistorico_precio->bonif_mayorista = (float) $rowHistorico_precio->bonif_mayorista;
+				$rowHistorico_precio->desc_lista = (float) $rowHistorico_precio->desc_lista;
 				$rowHistorico_precio->comision_vendedor = (float) $rowHistorico_precio->comision_vendedor;
 				
 				$bandera = true;

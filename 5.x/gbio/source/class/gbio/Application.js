@@ -106,8 +106,8 @@ qx.Class.define("gbio.Application",
 			callback    : finalCallback
 		});
 		
-		loginWidget._username.setValue("root");
-		loginWidget._password.setValue("root");
+		//loginWidget._username.setValue("root");
+		//loginWidget._password.setValue("root");
 		
 		loginWidget._username.getLayoutParent().getLayout().getCellWidget(0, 0).setValue("Usuario:");
 		loginWidget._username.getLayoutParent().getLayout().getCellWidget(1, 0).setValue("Contraseña:");
@@ -425,6 +425,15 @@ qx.Class.define("gbio.Application",
 		btnPermisos.setEnabled(data.tipo == "A");
 		btnOtros.setEnabled(data.tipo == "A");
 		mnubtnUsuario.setLabel("Usuario: " + data.usuario);
+		
+		var p = data;
+		
+		//alert(qx.lang.Json.stringify(p, null, 2));
+		
+		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+		rpc.callAsync(function(resultado, error, id){
+
+		}, "guardar_sesion", p);
 	});
 	
     }

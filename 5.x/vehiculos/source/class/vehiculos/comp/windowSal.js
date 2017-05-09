@@ -1,7 +1,7 @@
 qx.Class.define("vehiculos.comp.windowSal",
 {
 	extend : componente.comp.ui.ramon.window.Window,
-	construct : function (id_entsal)
+	construct : function (vehiculo, rowDataEntSal)
 	{
 	this.base(arguments);
 	
@@ -10,14 +10,15 @@ qx.Class.define("vehiculos.comp.windowSal",
 		width: 300,
 		height: 250,
 		showMinimize: false,
-		showMaximize: false
+		showMaximize: false,
+		allowMaximize: false,
+		resizable: false
 	});
 		
 	this.setLayout(new qx.ui.layout.Canvas());
-	this.setResizable(false, false, false, false);
 
 	this.addListenerOnce("appear", function(e){
-		this.setCaption("Salida, " + application.vehiculo.nro_patente + "  " + application.vehiculo.marca);
+		this.setCaption("Salida, " + vehiculo.nro_patente + "  " + vehiculo.marca);
 		txtResp_sal.focus();
 	}, this);
 	
@@ -27,6 +28,7 @@ qx.Class.define("vehiculos.comp.windowSal",
 	var form = new qx.ui.form.Form();
 	
 	var txtResp_sal = new qx.ui.form.TextField("");
+	txtResp_sal.setMinWidth(200);
 	form.add(txtResp_sal, "Responsable", null, "resp_sal");
 	
 	var controllerForm = new qx.data.controller.Form(null, form);
@@ -39,18 +41,24 @@ qx.Class.define("vehiculos.comp.windowSal",
 	var btnAceptar = new qx.ui.form.Button("Aceptar");
 	btnAceptar.addListener("execute", function(e){
 		var p = {};
-		p.id_vehiculo = application.vehiculo.id_vehiculo;
-		p.id_entsal = id_entsal;
+		p.id_vehiculo = vehiculo.id_vehiculo;
+		p.id_entsal = rowDataEntSal.id_entsal;
 		p.resp_sal = txtResp_sal.getValue();
+		p.entsal_estado = rowDataEntSal.estado;
 		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
-		rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id) {
-			this.fireDataEvent("aceptado");
-			
-			window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + id_entsal);
-			
+		rpc.addListener("completed", function(e){
 			btnCancelar.execute();
-		}, this), "salida_vehiculo", p);
+			
+			this.fireDataEvent("aceptado");
+		}, this);
+		rpc.addListener("failed", function(e){
+			btnCancelar.execute();
+			
+			this.fireDataEvent("estado");
+		}, this);
+		rpc.callAsyncListeners(true, "salida_vehiculo", p);
+
 	}, this);
 	
 	var btnCancelar = new qx.ui.form.Button("Cancelar");
@@ -70,6 +78,7 @@ qx.Class.define("vehiculos.comp.windowSal",
 	},
 	events : 
 	{
-		"aceptado": "qx.event.type.Event"
+		"aceptado": "qx.event.type.Event",
+		"estado": "qx.event.type.Event"
 	}
 });

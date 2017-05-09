@@ -1,24 +1,25 @@
 qx.Class.define("vehiculos.comp.windowSalTaller",
 {
 	extend : componente.comp.ui.ramon.window.Window,
-	construct : function (id_movimiento)
+	construct : function (vehiculo, rowDataMovimiento)
 	{
 	this.base(arguments);
 	
 	this.set({
 		caption: "Salida de taller",
 		width: 700,
-		height: 600,
+		height: 500,
 		showMinimize: false,
-		showMaximize: false
+		showMaximize: false,
+		allowMaximize: false,
+		resizable: false
 	});
 		
 	this.setLayout(new qx.ui.layout.Canvas());
-	this.setResizable(false, false, false, false);
 
 	this.addListenerOnce("appear", function(e){
-		this.setCaption("Salida de taller, " + application.vehiculo.nro_patente + "  " + application.vehiculo.marca);
-		cboReparacion.focus();
+		this.setCaption("Salida de taller, " + vehiculo.nro_patente + "  " + vehiculo.marca);
+		txtKilo.focus();
 	}, this);
 	
 	
@@ -28,9 +29,25 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 
 	
 	
+	var txtKilo = new componente.comp.ui.ramon.spinner.Spinner(0, 0, 10000000);
+	txtKilo.setRequired(true);
+	txtKilo.setWidth(80);
+	txtKilo.setNumberFormat(application.numberformatEntero);
+	txtKilo.getChildControl("upbutton").setVisibility("excluded");
+	txtKilo.getChildControl("downbutton").setVisibility("excluded");
+	txtKilo.setSingleStep(0);
+	txtKilo.setPageStep(0);
+	txtKilo.addListener("focus", function(e){
+		this.getChildControl("textfield").selectAllText();
+	});
+	
+	this.add(txtKilo, {left: 65, top: 25});
+	this.add(new qx.ui.basic.Label("Kilometraje:"), {left: 0, top: 28});
+	
+	
 	var gbx = new qx.ui.groupbox.GroupBox(" Reparación ")
 	gbx.setLayout(new qx.ui.layout.Basic());
-	this.add(gbx, {left: 0, top: 0});
+	this.add(gbx, {top: 0, right: 30});
 	
 	var form = new qx.ui.form.Form();
 	
@@ -45,23 +62,18 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 		if (lstReparacion.isSelectionEmpty()) throw new qx.core.ValidationError("Validation Error", "Debe seleccionar tipo reparación");
 	}, "id_tipo_reparacion");
 	
-	var txtCosto = new qx.ui.form.Spinner(0, 0, 1000000);
-	txtCosto.setRequired(true);
+	var txtCosto = new componente.comp.ui.ramon.spinner.Spinner(0, 0, 1000000);
 	txtCosto.setMaxWidth(80);
 	txtCosto.setNumberFormat(application.numberformatMontoEn);
 	txtCosto.getChildControl("upbutton").setVisibility("excluded");
 	txtCosto.getChildControl("downbutton").setVisibility("excluded");
 	txtCosto.setSingleStep(0);
 	txtCosto.setPageStep(0);
-	txtCosto.addListener("focus", function(e){
-		this.getChildControl("textfield").selectAllText();
-	})
-	form.add(txtCosto, "Costo", function(value) {
-		if (value <= 0) throw new qx.core.ValidationError("Validation Error", "Debe ingresar costo");
-	}, "costo");
+	form.add(txtCosto, "Costo", null, "costo");
 	
-	var txtCantidad = new qx.ui.form.Spinner(1, 1, 1000);
+	var txtCantidad = new componente.comp.ui.ramon.spinner.Spinner(1, 1, 10000);
 	txtCantidad.setMaxWidth(80);
+	txtCantidad.setNumberFormat(application.numberformatEntero);
 	txtCantidad.getChildControl("upbutton").setVisibility("excluded");
 	txtCantidad.getChildControl("downbutton").setVisibility("excluded");
 	txtCantidad.setSingleStep(0);
@@ -75,7 +87,7 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 	btnAgregar.addListener("execute", function(e){
 		if (form.validate()) {
 			var p = {};
-			p.id_movimiento = id_movimiento;
+			p.id_movimiento = rowDataMovimiento.id_movimiento;
 			p.id_tipo_reparacion = lstReparacion.getModelSelection().getItem(0);
 			p.reparacion = lstReparacion.getSelection()[0].getUserData("datos").label;
 			p.costo = txtCosto.getValue();
@@ -87,6 +99,12 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 			tblSal.setValid(true);
 			tableModelSal.addRowsAsMapArray([p], null, true);
 			tblSal.setFocusedCell(0, tableModelSal.getRowCount() - 1, true);
+			
+			var total = 0;
+			for (var x = 0; x < tableModelSal.getRowCount(); x++) {
+				total+= tableModelSal.getValueById("total", x);
+			}
+			tblSal.setAdditionalStatusBarText("Total: " + application.numberformatMontoEs.format(total));
 			
 			form.reset();
 			lstReparacion.removeAll();
@@ -108,6 +126,11 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 	
 	
 	
+
+	
+	
+	
+	
 	var commandEliminar = new qx.ui.command.Command("Del");
 	commandEliminar.setEnabled(false);
 	commandEliminar.addListener("execute", function(e){
@@ -116,8 +139,13 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 		tblSal.blur();
 		tableModelSal.removeRows(focusedRow, 1);
 		
-		var rowCount = tableModelSal.getRowCount();
+		var total = 0;
+		for (var x = 0; x < tableModelSal.getRowCount(); x++) {
+			total+= tableModelSal.getValueById("total", x);
+		}
+		tblSal.setAdditionalStatusBarText("Total: " + application.numberformatMontoEs.format(total));
 		
+		var rowCount = tableModelSal.getRowCount();
 		focusedRow = (focusedRow > rowCount - 1) ? rowCount - 1 : focusedRow;
 		tblSal.setFocusedCell(0, focusedRow, true);
 		tblSal.focus();
@@ -149,8 +177,9 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 	//tblTotales.toggleShowCellFocusIndicator();
 	tblSal.setShowCellFocusIndicator(false);
 	tblSal.toggleColumnVisibilityButtonVisible();
-	tblSal.toggleStatusBarVisible();
+	//tblSal.toggleStatusBarVisible();
 	tblSal.setContextMenu(menu);
+	tblSal.setAdditionalStatusBarText("Total: 0,00");
 	
 	var tableColumnModelSal = tblSal.getTableColumnModel();
 	
@@ -187,23 +216,31 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 
 		if (tableModelSal.getRowCount() == 0) {
 			tblSal.setValid(false);
-			//tblSal.focus();
 			cboReparacion.focus();
 			
 			sharedErrorTooltip.setLabel("Debe agregar alguna reparación");
 			sharedErrorTooltip.placeToWidget(tblSal);
 			sharedErrorTooltip.show();
 		} else {
+			
 			var p = {};
-			p.id_movimiento = id_movimiento;
+			p.id_movimiento = rowDataMovimiento.id_movimiento;
+			p.kilo = txtKilo.getValue();
 			p.model = tableModelSal.getDataAsMapArray();
+			p.movimiento_estado = rowDataMovimiento.estado;
 			
 			var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
-			rpc.callAsync(qx.lang.Function.bind(function(resultado, error, id) {
+			rpc.addListener("completed", function(e){
 				btnCancelar.execute();
 				
 				this.fireDataEvent("aceptado");
-			}, this), "salida_taller", p);
+			}, this);
+			rpc.addListener("failed", function(e){
+				btnCancelar.execute();
+				
+				this.fireDataEvent("estado");
+			}, this);
+			rpc.callAsyncListeners(true, "salida_taller", p);
 		}
 	}, this);
 	
@@ -214,18 +251,50 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 		this.destroy();
 	}, this);
 	
-	this.add(btnAceptar, {left: "30%", bottom: 0});
-	this.add(btnCancelar, {right: "30%", bottom: 0});
+	var btnDiferir = new qx.ui.form.Button("Diferir...");
+	btnDiferir.addListener("execute", function(e){
+		(new dialog.Confirm({
+		        "message"   : "Desea diferir la carga de datos en salida de taller?",
+		        "callback"  : function(e){
+	        					if (e) {
+									var p = {};
+									p.id_movimiento = rowDataMovimiento.id_movimiento;
+									p.movimiento_estado = rowDataMovimiento.estado;
+
+									var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
+									rpc.addListener("completed", function(e){
+										btnCancelar.execute();
+										
+										this.fireDataEvent("aceptado");
+									}, this);
+									rpc.addListener("failed", function(e){
+										btnCancelar.execute();
+										
+										this.fireDataEvent("estado");
+									}, this);
+									rpc.callAsyncListeners(true, "diferir_salida_taller", p);
+	        					}
+		        				},
+		        "context"   : this,
+		        "image"     : "icon/48/status/dialog-warning.png"
+		})).show();
+	}, this);
+	
+	this.add(btnAceptar, {left: "35%", bottom: 0});
+	this.add(btnCancelar, {right: "35%", bottom: 0});
+	this.add(btnDiferir, {right: "5%", bottom: 0});
 	
 	
-	cboReparacion.setTabIndex(1);
-	txtCosto.setTabIndex(2);
-	txtCantidad.setTabIndex(3);
-	txtObserva.setTabIndex(4);
-	btnAgregar.setTabIndex(5);
-	tblSal.setTabIndex(6);
-	btnAceptar.setTabIndex(7);
-	btnCancelar.setTabIndex(8);
+	txtKilo.setTabIndex(1);
+	cboReparacion.setTabIndex(2);
+	txtCosto.setTabIndex(3);
+	txtCantidad.setTabIndex(4);
+	txtObserva.setTabIndex(5);
+	btnAgregar.setTabIndex(6);
+	tblSal.setTabIndex(7);
+	btnAceptar.setTabIndex(8);
+	btnCancelar.setTabIndex(9);
+	btnDiferir.setTabIndex(10);
 	
 	
 	
@@ -237,6 +306,7 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 	},
 	events : 
 	{
-		"aceptado": "qx.event.type.Event"
+		"aceptado": "qx.event.type.Event",
+		"estado": "qx.event.type.Event"
 	}
 });

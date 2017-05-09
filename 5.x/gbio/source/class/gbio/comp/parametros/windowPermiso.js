@@ -7,7 +7,7 @@ qx.Class.define("gbio.comp.parametros.windowPermiso",
 
 	this.set({
 		width: 300,
-		height: 350,
+		height: 500,
 		allowMaximize: false,
 		showMinimize: false,
 		showMaximize: false
@@ -80,6 +80,12 @@ qx.Class.define("gbio.comp.parametros.windowPermiso",
 	txtPrimer_aviso.setPageStep(0);
 	form.add(txtPrimer_aviso, "1er.aviso anual", null, "primer_aviso");
 	
+	var txtPrimer_mensaje = new qx.ui.form.TextArea("");
+	txtPrimer_mensaje.addListener("blur", function(e){
+		this.setValue(this.getValue().trim());
+	})
+	form.add(txtPrimer_mensaje, "Mensaje", null, "primer_mensaje");
+	
 	var txtSegundo_aviso = new qx.ui.form.Spinner(0, 0, 100);
 	txtSegundo_aviso.setMaxWidth(50);
 	txtSegundo_aviso.getChildControl("upbutton").setVisibility("excluded");
@@ -87,6 +93,12 @@ qx.Class.define("gbio.comp.parametros.windowPermiso",
 	txtSegundo_aviso.setSingleStep(0);
 	txtSegundo_aviso.setPageStep(0);
 	form.add(txtSegundo_aviso, "2do.aviso anual", null, "segundo_aviso");
+	
+	var txtSegundo_mensaje = new qx.ui.form.TextArea("");
+	txtSegundo_mensaje.addListener("blur", function(e){
+		this.setValue(this.getValue().trim());
+	})
+	form.add(txtSegundo_mensaje, "Mensaje", null, "segundo_mensaje");
 	
 	
 	
