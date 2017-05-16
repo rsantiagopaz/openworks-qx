@@ -1,9 +1,9 @@
 qx.Class.define("componente.general.ramon.ui.window.Window",
 {
 	extend : qx.ui.window.Window,
-	construct : function ()
+	construct : function (caption, icon)
 	{
-		this.base(arguments);
+		this.base(arguments, caption, icon);
 		
 		this._commands = {};
 		this._listeners = [];

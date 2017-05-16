@@ -243,7 +243,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	});
 	gbxEntsal.add(btnAnularEnt, {left: "40%", top: 0});
 	
-	var btnImprimirSal = new qx.ui.form.Button("Imprimir...");
+	var btnImprimirSal = new qx.ui.form.Button("Conformidad...");
 	btnImprimirSal.setEnabled(false);
 	btnImprimirSal.addListener("execute", function(e){
 		window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
@@ -701,12 +701,19 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	}, this);
 	gbxMovimiento.add(btnAnularEntTaller, {left: "40%", top: 0});
 	
-	var btnImprimirEntTaller = new qx.ui.form.Button("Imprimir...");
+	var btnImprimirEntTaller = new qx.ui.form.Button("O.trabajo...");
 	btnImprimirEntTaller.setEnabled(false);
 	btnImprimirEntTaller.addListener("execute", function(e){
 		window.open("services/class/comp/Impresion.php?rutina=entrada_taller&id_entsal=" + rowDataEntSal.id_entsal + "&id_movimiento=" + rowDataMovimiento.id_movimiento);
 	});
 	gbxMovimiento.add(btnImprimirEntTaller, {right: "30%", top: 0});
+	
+	var btnImpConformidad = new qx.ui.form.Button("Conformidad...");
+	btnImpConformidad.setEnabled(false);
+	btnImpConformidad.addListener("execute", function(e){
+		window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
+	});
+	gbxMovimiento.add(btnImpConformidad, {right: "20%", top: 0});
 	
 	var btnEntTaller = new qx.ui.form.Button("Entrada a taller...");
 	btnEntTaller.setEnabled(false);

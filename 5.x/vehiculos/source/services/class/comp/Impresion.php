@@ -366,6 +366,113 @@ break;
 }
 
 
+
+case "choferes" : {
+	
+	?>
+	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<title>Choferes</title>
+	</head>
+	<body>
+	<input type="submit" value="Imprimir" onClick="window.print();"/>
+	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
+	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr><td align="center" colspan="6"><big><b>LISTADO DE CHOFERES</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><?php echo date("Y-m-d H:i:s"); ?></big></td></tr>
+	<tr><td>&nbsp;</td></tr>
+	<?php
+	if (! is_null($_REQUEST['organismo_area_id'])) {
+		$sql = "SELECT";
+		$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
+		$sql.= "  , _organismos_areas.organismo_area_id AS model";
+		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
+		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $_REQUEST['organismo_area_id'] . "'";
+		
+		$rsAux = mysql_query($sql);
+		if (mysql_num_rows($rsAux) > 0) {
+			$rowAux = mysql_fetch_object($rsAux);
+			$rowAux = $rowAux->label;
+		}
+		
+		?>
+		<tr><td align="center" colspan="10"><big>Dependencia: <?php echo $rowAux; ?></big></td></tr>
+		<tr><td>&nbsp;</td></tr>
+		<?php
+	}
+	?>
+	<tr><td>&nbsp;</td></tr>
+	
+	<tr>
+	<td colSpan="10">
+	<table border="1" cellpadding="5" cellspacing="0" width="100%" align="center">
+	<thead>
+	<tr><th>Apellido/Nombre</th><th>DNI</th><th>Dependencia</th><th>E-mail</th><th>Teléfono</th></tr>
+	</thead>
+	<tbody>
+
+	<?php
+	
+	
+	$sql = "SELECT * FROM chofer";
+	$sql.= " WHERE TRUE";
+	if (! is_null($_REQUEST['organismo_area_id'])) $sql.= " AND organismo_area_id='" . $_REQUEST['organismo_area_id'] . "'";
+	$sql.= " ORDER BY apenom";
+	
+	
+	$rs = mysql_query($sql);
+	while ($row = mysql_fetch_object($rs)) {
+		/*
+ 
+		?>
+		<tr><td rowSpan="3"><?php echo $row->apenom . " - " . $row->dni; ?></td><td><?php echo $row->fecha; ?></td><td rowSpan="3"><?php echo nl2br($row->descrip); ?></td></tr>
+		<tr><td><?php echo $row->tipo_incidente_descrip; ?></td></tr>
+		<tr><td><?php echo $row->id_usuario; ?></td></tr>
+		<?php
+
+		*/
+		
+		$sql = "SELECT";
+		$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
+		$sql.= "  , _organismos_areas.organismo_area_id AS model";
+		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
+		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
+		
+		$rsAux = mysql_query($sql);
+		if (mysql_num_rows($rsAux) > 0) {
+			$rowAux = mysql_fetch_object($rsAux);
+			$rowAux = $rowAux->label;
+		} else {
+			$rowAux = "";
+		}
+		
+		?>
+		<tr><td><?php echo $row->apenom; ?></td><td><?php echo $row->dni; ?></td><td><?php echo $rowAux; ?></td><td><?php echo $row->email; ?></td><td><?php echo $row->telefono; ?></td></tr>
+		<?php
+	}
+	
+
+	?>
+	
+	</tbody>
+	</table>
+	</td>
+	</tr>
+	
+
+	</table>
+	</body>
+	</html>
+	<?php
+	
+break;
+}
+
+
 	
 case "historial" : {
 	

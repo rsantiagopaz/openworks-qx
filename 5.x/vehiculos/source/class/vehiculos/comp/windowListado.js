@@ -40,12 +40,16 @@ qx.Class.define("vehiculos.comp.windowListado",
 		
 		chkUnipresu.setEnabled(data);
 		cboUnipresu.setEnabled(data && chkUnipresu.getValue());
+		
+		if (data) {
+			dtfDesde.setEnabled(true);
+			dtfHasta.setEnabled(true);
+		}
 	});
 	
 	
 	composite.add(rbtA1, {row: 0, column: 0});
 	rgpA.add(rbtA1);
-	
 	
 	var chkUnipresu = new qx.ui.form.CheckBox("Unidad presup.:");
 	composite.add(chkUnipresu, {row: 0, column: 1});
@@ -55,9 +59,40 @@ qx.Class.define("vehiculos.comp.windowListado",
 	var lstUnipresu = cboUnipresu.getChildControl("list");
 	composite.add(cboUnipresu, {row: 0, column: 2});
 	
-	
-
 	chkUnipresu.bind("value", cboUnipresu, "enabled");
+	
+	
+	
+	
+	var rbtA3 = new qx.ui.form.RadioButton("Choferes");
+	rbtA3.addListener("changeValue", function(e){
+		var data = e.getData();
+		
+		chkDependencia.setEnabled(data);
+		cboDependencia2.setEnabled(data && chkDependencia.getValue());
+		
+		if (data) {
+			dtfDesde.setEnabled(false);
+			dtfHasta.setEnabled(false);
+		}
+	});
+	
+	composite.add(rbtA3, {row: 1, column: 0});
+	rgpA.add(rbtA3);
+	
+	
+	var chkDependencia = new qx.ui.form.CheckBox("Por dependencia:");
+	chkDependencia.setEnabled(false);
+	composite.add(chkDependencia, {row: 1, column: 1});
+	
+	var cboDependencia2 = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarDependencia"});
+	var lstDependencia2 = cboDependencia2.getChildControl("list");
+	composite.add(cboDependencia2, {row: 1, column: 2});
+	
+	chkDependencia.bind("value", cboDependencia2, "enabled");
+	
+	
+	
 	
 	
 	var rbtA2 = new qx.ui.form.RadioButton("Incidentes").set({value: true});
@@ -71,10 +106,15 @@ qx.Class.define("vehiculos.comp.windowListado",
 		slbTipo.setEnabled(data && rbtB2.getValue());
 		
 		rbtB3.setEnabled(data);
-		cboDependencia.setEnabled(data && rbtB3.getValue());
+		cboDependencia1.setEnabled(data && rbtB3.getValue());
+		
+		if (data) {
+			dtfDesde.setEnabled(false);
+			dtfHasta.setEnabled(false);
+		}
 	});
 	
-	composite.add(rbtA2, {row: 1, column: 0});
+	composite.add(rbtA2, {row: 2, column: 0});
 	rgpA.add(rbtA2);
 	
 	
@@ -85,13 +125,13 @@ qx.Class.define("vehiculos.comp.windowListado",
 	var rgpB = new qx.ui.form.RadioGroup();
 	
 	var rbtB1 = new qx.ui.form.RadioButton("Por chofer").set({value: true});
-	composite.add(rbtB1, {row: 1, column: 1});
+	composite.add(rbtB1, {row: 2, column: 1});
 	rgpB.add(rbtB1);
 	
 	var cboChofer = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Chofer", methodName: "autocompletarChofer"});
 	cboChofer.setWidth(300);
 	var lstChofer = cboChofer.getChildControl("list");
-	composite.add(cboChofer, {row: 1, column: 2});
+	composite.add(cboChofer, {row: 2, column: 2});
 	
 	rbtB1.bind("value", cboChofer, "enabled");
 	
@@ -99,7 +139,7 @@ qx.Class.define("vehiculos.comp.windowListado",
 	
 	
 	var rbtB2 = new qx.ui.form.RadioButton("Por tipo incidente");
-	composite.add(rbtB2, {row: 2, column: 1});
+	composite.add(rbtB2, {row: 3, column: 1});
 	rgpB.add(rbtB2);
 	
 	var slbTipo = new qx.ui.form.SelectBox();
@@ -112,7 +152,7 @@ qx.Class.define("vehiculos.comp.windowListado",
 	for (var x in resultado) {
 		slbTipo.add(new qx.ui.form.ListItem(resultado[x].descrip, null, resultado[x].id_tipo_incidente));
 	}
-	composite.add(slbTipo, {row: 2, column: 2});
+	composite.add(slbTipo, {row: 3, column: 2});
 	
 	rbtB2.bind("value", slbTipo, "enabled");
 	
@@ -120,14 +160,24 @@ qx.Class.define("vehiculos.comp.windowListado",
 	
 	
 	var rbtB3 = new qx.ui.form.RadioButton("Por dependencia");
-	composite.add(rbtB3, {row: 3, column: 1});
+	composite.add(rbtB3, {row: 4, column: 1});
 	rgpB.add(rbtB3);
 	
-	var cboDependencia = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarDependencia"});
-	var lstDependencia = cboDependencia.getChildControl("list");
-	composite.add(cboDependencia, {row: 3, column: 2});
+	var cboDependencia1 = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarDependencia"});
+	var lstDependencia1 = cboDependencia1.getChildControl("list");
+	composite.add(cboDependencia1, {row: 4, column: 2});
 	
-	rbtB3.bind("value", cboDependencia, "enabled");
+	rbtB3.bind("value", cboDependencia1, "enabled");
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
 	
 	
 	
@@ -163,7 +213,8 @@ qx.Class.define("vehiculos.comp.windowListado",
 		
 		cboUnipresu.setValid(true);
 		cboChofer.setValid(true);
-		cboDependencia.setValid(true);
+		cboDependencia1.setValid(true);
+		cboDependencia2.setValid(true);
 		
 		if (rbtA1.getValue() && chkUnipresu.getValue() && lstUnipresu.isSelectionEmpty()) {
 			cboUnipresu.setValid(false);
@@ -177,11 +228,17 @@ qx.Class.define("vehiculos.comp.windowListado",
 			sharedErrorTooltip.setLabel("Debe seleccionar chofer");
 			sharedErrorTooltip.placeToWidget(cboChofer);
 			sharedErrorTooltip.show();
-		} else if (rbtA2.getValue() && rbtB3.getValue() && lstDependencia.isSelectionEmpty()) {
-			cboDependencia.setValid(false);
-			cboDependencia.focus();
+		} else if (rbtA2.getValue() && rbtB3.getValue() && lstDependencia1.isSelectionEmpty()) {
+			cboDependencia1.setValid(false);
+			cboDependencia1.focus();
 			sharedErrorTooltip.setLabel("Debe seleccionar dependencia");
-			sharedErrorTooltip.placeToWidget(cboDependencia);
+			sharedErrorTooltip.placeToWidget(cboDependencia1);
+			sharedErrorTooltip.show();
+		} else if (rbtA3.getValue() && chkDependencia.getValue() && lstDependencia2.isSelectionEmpty()) {
+			cboDependencia2.setValid(false);
+			cboDependencia2.focus();
+			sharedErrorTooltip.setLabel("Debe seleccionar dependencia");
+			sharedErrorTooltip.placeToWidget(cboDependencia2);
 			sharedErrorTooltip.show();
 		} else {
 			if (rbtA1.getValue()) {
@@ -196,26 +253,18 @@ qx.Class.define("vehiculos.comp.windowListado",
 				} else if (rbtB2.getValue()) {
 					txt+= "&id_tipo_incidente=" + slbTipo.getSelection()[0].getModel();
 				} else if (rbtB3.getValue()) {
-					txt+= "&organismo_area_id=" + lstDependencia.getSelection()[0].getModel();
+					txt+= "&organismo_area_id=" + lstDependencia1.getSelection()[0].getModel();
 				}
+			} else if (rbtA3.getValue()) {
+				txt = "?rutina=choferes";
+				
+				if (chkDependencia.getValue()) txt+= "&organismo_area_id=" + lstDependencia2.getSelection()[0].getModel();
 			}
 			
-			txt+= (aux = dtfDesde.getValue()) ? "&desde=" + dateFormat.format(aux) : "";
-			txt+= (aux = dtfHasta.getValue()) ? "&hasta=" + dateFormat.format(aux) : "";
-			
-			/*
-			aux = dtfDesde.getValue();
-			if (aux) {
-				aux = aux.getFullYear() + "-" + qx.lang.String.pad((aux.getMonth() + 1).toString(), 2, "0") + "-" + qx.lang.String.pad(aux.getDate().toString(), 2, "0");
-				txt+= "&desde=" + aux;
+			if (rbtA1.getValue()) {
+				txt+= (aux = dtfDesde.getValue()) ? "&desde=" + dateFormat.format(aux) : "";
+				txt+= (aux = dtfHasta.getValue()) ? "&hasta=" + dateFormat.format(aux) : "";
 			}
-			
-			aux = dtfHasta.getValue();
-			if (aux) {
-				aux = aux.getFullYear() + "-" + qx.lang.String.pad((aux.getMonth() + 1).toString(), 2, "0") + "-" + qx.lang.String.pad(aux.getDate().toString(), 2, "0");
-				txt+= "&hasta=" + aux;
-			}
-			*/
 			
 			window.open("services/class/comp/Impresion.php" + txt);
 		}

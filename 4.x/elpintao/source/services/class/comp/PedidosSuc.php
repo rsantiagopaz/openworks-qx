@@ -77,7 +77,7 @@ class class_PedidosSuc extends class_Base
  	$p = $params[0];
 	$resultado = array();
 	
-	$sql="SELECT pedido_suc.*, fabrica.descrip AS fabrica FROM pedido_suc INNER JOIN fabrica USING(id_fabrica) WHERE pedido_suc.id_sucursal='" . $p . "' AND pedido_suc.estado='C' ORDER BY fecha DESC";
+	$sql="SELECT pedido_suc.*, fabrica.descrip AS fabrica FROM pedido_suc INNER JOIN fabrica USING(id_fabrica) WHERE pedido_suc.id_sucursal='" . $p->id_sucursal . "' AND pedido_suc.estado='C' ORDER BY fecha DESC";
 	$rsPedido = mysql_query($sql);
 	while ($regPedido = mysql_fetch_object($rsPedido)) {
 		$regPedido->seleccionado = false;
@@ -94,12 +94,17 @@ class class_PedidosSuc extends class_Base
 			$rowDetalle->adicional = false;
 			$rowDetalle->stock = array();
 			
-			$sql="SELECT sucursal.id_sucursal, sucursal.descrip AS sucursal_descrip, stock FROM sucursal INNER JOIN stock USING(id_sucursal) WHERE sucursal.activo AND sucursal.id_sucursal <> '" . $p . "' AND id_producto_item='" . $rowDetalle->id_producto_item . "' ORDER BY sucursal_descrip";
+			$sql="SELECT sucursal.id_sucursal, sucursal.descrip AS sucursal_descrip, stock FROM sucursal INNER JOIN stock USING(id_sucursal) WHERE sucursal.activo AND id_producto_item='" . $rowDetalle->id_producto_item . "' ORDER BY sucursal_descrip";
 			$rsStock = mysql_query($sql);
 			while ($rowStock = mysql_fetch_object($rsStock)) {
 				$rowStock->stock = (float) $rowStock->stock;
-				$rowStock->enviar = 0;
-				$rowDetalle->stock[] = $rowStock;
+				
+				if ($rowStock->id_sucursal == $p->id_sucursal) {
+					$rowDetalle->stock_suc = $rowStock->stock;
+				} else {
+					$rowStock->enviar = 0;
+					$rowDetalle->stock[] = $rowStock;
+				}
 			}
 			$regPedido->detalle[] = $rowDetalle;
 		}
@@ -127,14 +132,21 @@ class class_PedidosSuc extends class_Base
   public function method_leer_stock($params, $error) {
   	$p = $params[0];
   	
-  	$resultado = array();
+  	$resultado = new stdClass;
+  	$resultado->stock = array();
+  	$resultado->stock_suc = 0;
   	
-	$sql="SELECT sucursal.id_sucursal, sucursal.descrip AS sucursal_descrip, stock FROM sucursal INNER JOIN stock USING(id_sucursal) WHERE sucursal.activo AND sucursal.id_sucursal <> '" . $p->id_sucursal . "' AND id_producto_item='" . $p->id_producto_item . "' ORDER BY sucursal_descrip";
+	$sql="SELECT sucursal.id_sucursal, sucursal.descrip AS sucursal_descrip, stock FROM sucursal INNER JOIN stock USING(id_sucursal) WHERE sucursal.activo AND id_producto_item='" . $p->id_producto_item . "' ORDER BY sucursal_descrip";
 	$rsStock = mysql_query($sql);
 	while ($rowStock = mysql_fetch_object($rsStock)) {
 		$rowStock->stock = (float) $rowStock->stock;
-		$rowStock->enviar = 0;
-		$resultado[] = $rowStock;
+		
+		if ($rowStock->id_sucursal == $p->id_sucursal) {
+			$resultado->stock_suc = $rowStock->stock;
+		} else {
+			$rowStock->enviar = 0;
+			$resultado->stock[] = $rowStock;
+		}
 	}
 			
 	return $resultado;

@@ -440,14 +440,7 @@ qx.Class.define("componente.elpintao.ramon.productos.windowProducto",
 	
 	
 
-	var commandEscape = new qx.ui.command.Command("Escape");
-	this.registrarCommand(commandEscape);
-	commandEscape.setEnabled(false);
-	commandEscape.addListener("execute", function(e){
-		if (!tbl.isEditing()) btnCancelar.execute();
-		//if (!tbl.isEditing()) btnCancelar.dispatchEvent(new qx.event.type.Event().set({type: "execute"}));
-		//btnCancelar.dispatchEvent(new qx.event.type.Event().set({type: "execute"}));
-	});
+
 
 	
 	var btnAceptar = new qx.ui.form.Button("Aceptar");
@@ -577,8 +570,22 @@ qx.Class.define("componente.elpintao.ramon.productos.windowProducto",
 	tableModel.sortByColumn(0, true);
 
 	
+
 	
 	
+
+	var commandEscape = new qx.ui.command.Command("Escape");
+	this.registrarCommand(commandEscape);
+	commandEscape.setEnabled(false);
+	commandEscape.addListener("execute", function(e){
+		if (! tbl.isEditing()) {
+			btnCancelar.execute();
+		}  else {
+			tbl.cancelEditing();
+			tbl.focus();
+		}
+	});
+
 	
 	
 	

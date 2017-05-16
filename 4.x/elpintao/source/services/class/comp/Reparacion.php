@@ -11,6 +11,29 @@ class class_Reparacion extends class_Base
   }
   
   
+  public function method_control_stock($params, $error) {
+  	set_time_limit(0);
+  	
+	$sql = "SELECT control_stock FROM configuraciones";
+	$rs = mysql_query($sql);
+	$row = mysql_fetch_object($rs);
+	
+	if ($row->control_stock == "S") {
+		$sql = "SELECT count(*) AS cantidad FROM stock_chequeos WHERE DATE(fyh) = DATE(NOW())";
+		$rs = mysql_query($sql);
+		$row = mysql_fetch_object($rs);
+		
+		if ((int) $row->cantidad > 0) {
+			return true;
+		} else {
+			return false;
+		}		
+	} else {
+		return true;
+	}
+  }
+  
+  
   public function method_arreglar_stock($params, $error) {
   	set_time_limit(0);
 

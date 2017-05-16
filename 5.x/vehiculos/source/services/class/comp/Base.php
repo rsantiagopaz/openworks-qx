@@ -68,26 +68,32 @@ class class_Base
   
 
   public function prepararCampos(&$model, $tabla = null) {
-  	static $campos = array();
+  	static $campos;
+  	
+  	if (is_null($campos)) $campos = array();
+  	
 	$set = array();
 	$chequear = false;
+	
 	if (!is_null($tabla)) {
 		$chequear = true;
 		if (is_null($campos[$tabla])) {
 			$campos[$tabla] = array();
 			$rs = mysql_query("SHOW COLUMNS FROM " . $tabla);
 			while ($row = mysql_fetch_assoc($rs)) {
-				$campos[$tabla][$row['Field']] = true;
+				$campos[$tabla][$row['Field']] = $row;
 			}
 		}
 	}
 	foreach($model as $key => $value) {
 		if ($chequear) {
 			if (!is_null($campos[$tabla][$key])) {
-				$set[] = $key . "='" . $value . "'";
+				//$set[] = $key . "='" . $value . "'";
+				$set[] = $key . "=" . ((is_null($value)) ? "NULL" : "'" . $value . "'");
 			}			
 		} else {
-			$set[] = $key . "='" . $value . "'";
+			//$set[] = $key . "='" . $value . "'";
+			$set[] = $key . "=" . ((is_null($value)) ? "NULL" : "'" . $value . "'");
 		}
 	}
 	return implode(", ", $set);

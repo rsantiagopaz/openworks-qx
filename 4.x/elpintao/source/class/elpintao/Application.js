@@ -302,6 +302,28 @@ qx.Class.define("elpintao.Application",
 	
 	
 	
+	
+	
+	
+	var rpc = new qx.io.remote.Rpc("services/", "comp.Reparacion");
+	try {
+		var resultado = rpc.callSync("control_stock");
+	} catch (ex) {
+		alert("Sync exception: " + ex);
+	}
+	
+	if (! resultado) {
+		dialog.Dialog.error("Debe realizar el Control de Stock para poder ingresar.");
+		return;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	var rpc = new qx.io.remote.Rpc("../../services/", "comp.elpintao.ramon.Base");
 	try {
 		var resultado = rpc.callSync("leer_paramet");
@@ -768,8 +790,8 @@ qx.Class.define("elpintao.Application",
 	toolbarMain.add(mnubtnArchivo);
 	toolbarMain.add(mnubtnEdicion);
 	toolbarMain.add(mnubtnVer);
-	toolbarMain.add(mnubtnCentral);
-	//toolbarMain.add(mnubtnSucursal);
+	//toolbarMain.add(mnubtnCentral);
+	toolbarMain.add(mnubtnSucursal);
 	toolbarMain.addSpacer();
 	
 	
