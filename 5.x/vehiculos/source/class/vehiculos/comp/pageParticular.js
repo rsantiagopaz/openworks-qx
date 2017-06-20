@@ -52,6 +52,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		btnAsunto.setEnabled(false);
 		btnAnularEntTaller.setEnabled(false);
 		btnImprimirEntTaller.setEnabled(false);
+		btnImpConformidad.setEnabled(false);
 		btnEntTaller.setEnabled(false);
 		btnSalTaller.setEnabled(false);
 		
@@ -168,13 +169,29 @@ qx.Class.define("vehiculos.comp.pageParticular",
 
 	
 	
+	var gridEntsal = new qx.ui.layout.Grid(6, 6);
+	gridEntsal.setRowAlign(0, "left", "middle");
+	
+	//gridEntsal.setColumnFlex(0, 1);
+	gridEntsal.setColumnFlex(1, 1);
+	//gridEntsal.setColumnFlex(2, 1);
+	//gridEntsal.setColumnFlex(3, 1);
+	gridEntsal.setColumnFlex(4, 1);
+	//gridEntsal.setColumnFlex(5, 1);
+	gridEntsal.setColumnFlex(6, 1);
+	gridEntsal.setColumnFlex(7, 1);
+	//gridEntsal.setColumnFlex(8, 1);
+	gridEntsal.setColumnFlex(9, 1);
+	//gridEntsal.setColumnFlex(10, 1);
+	//gridEntsal.setColumnFlex(11, 1);
+	
+	gridEntsal.setRowFlex(1, 1);
+	
 
 	var gbxEntsal = new qx.ui.groupbox.GroupBox();
-	gbxEntsal.setLayout(new qx.ui.layout.Canvas());
+	gbxEntsal.setLayout(gridEntsal);
 	composite1.add(gbxEntsal, {left: 0, top: 0, right: 0, bottom: "66.5%"});
 	
-	var composite = new qx.ui.container.Composite(new qx.ui.layout.HBox(6).set({alignY: "middle"}));
-	gbxEntsal.add(composite, {left: 0, top: 0});
 	
 	var cboVehiculo = this.cboVehiculo = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarVehiculo"});
 	cboVehiculo.setWidth(175);
@@ -189,8 +206,8 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		}
 	}, this);
 	
-	composite.add(new qx.ui.basic.Label(("Vehículo:")));
-	composite.add(cboVehiculo);
+	gbxEntsal.add(new qx.ui.basic.Label("Vehículo:"), {row: 0, column: 0});
+	gbxEntsal.add(cboVehiculo, {row: 0, column: 1});
 	
 	
 	var btnInfoVehiculo = new qx.ui.form.Button("Info...");
@@ -199,7 +216,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		popupInfo.placeToWidget(btnInfoVehiculo);
 		popupInfo.mostrar(formViewVehiculo);
 	});
-	composite.add(btnInfoVehiculo);
+	gbxEntsal.add(btnInfoVehiculo, {row: 0, column: 2});
 	
 	
 	var btnHistorial = new qx.ui.form.Button("Historial...");
@@ -207,13 +224,11 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	btnHistorial.addListener("execute", function(e){
 		window.open("services/class/comp/Impresion.php?rutina=historial&id_vehiculo=" + vehiculo.id_vehiculo);
 	});
-	composite.add(btnHistorial);
+	gbxEntsal.add(btnHistorial, {row: 0, column: 3});
 	
 	
 	
 	
-	var composite = new qx.ui.container.Composite(new qx.ui.layout.HBox(6));
-	gbxEntsal.add(composite, {top: 0, right: 0});
 	
 	
 	var btnAnularEnt = new qx.ui.form.Button("Anular...");
@@ -241,14 +256,14 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		        "image"     : "icon/48/status/dialog-warning.png"
 		})).show();
 	});
-	gbxEntsal.add(btnAnularEnt, {left: "40%", top: 0});
+	gbxEntsal.add(btnAnularEnt, {row: 0, column: 5});
 	
 	var btnImprimirSal = new qx.ui.form.Button("Conformidad...");
 	btnImprimirSal.setEnabled(false);
 	btnImprimirSal.addListener("execute", function(e){
 		window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
 	});
-	gbxEntsal.add(btnImprimirSal, {right: "30%", top: 0});
+	gbxEntsal.add(btnImprimirSal, {row: 0, column: 8});
 	
 	var btnEnt = new qx.ui.form.Button("Entrada...");
 	btnEnt.setEnabled(false);
@@ -271,7 +286,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		win.open();
 	});
 	
-	composite.add(btnEnt);
+	gbxEntsal.add(btnEnt, {row: 0, column: 10});
 	
 	var btnSal = new qx.ui.form.Button("Salida...");
 	btnSal.setEnabled(false);
@@ -280,7 +295,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		win.addListener("aceptado", function(e){
 			functionActualizarVehiculo(vehiculo.id_vehiculo, rowDataEntSal.id_entsal);
 			
-			window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
+			//window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
 		});
 		win.addListener("estado", function(e){
 			functionActualizar(vehiculo.id_vehiculo, rowDataEntSal.id_entsal);
@@ -294,7 +309,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		win.open();
 	}, this);
 	
-	composite.add(btnSal);
+	gbxEntsal.add(btnSal, {row: 0, column: 11});
 	
 
 	
@@ -351,6 +366,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 			btnAsunto.setEnabled(false);
 			btnAnularEntTaller.setEnabled(false);
 			btnImprimirEntTaller.setEnabled(false);
+			btnImpConformidad.setEnabled(false);
 			btnEntTaller.setEnabled(rowDataEntSal.estado != "S" && rowDataEntSal.estado != "A");
 			btnSalTaller.setEnabled(false);
 		
@@ -367,7 +383,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		}
 	});
 	
-	gbxEntsal.add(tblEntsal, {left: 0, top: 30, right: 0, bottom: 0});
+	gbxEntsal.add(tblEntsal, {row: 1, column: 0, colSpan: 12});
 	
 	
 
@@ -561,10 +577,25 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	
 	
 	
+	var gridMovimiento = new qx.ui.layout.Grid(6, 6);
 	
+	//gridMovimiento.setColumnFlex(0, 1);
+	//gridMovimiento.setColumnFlex(1, 1);
+	gridMovimiento.setColumnFlex(2, 1);
+	gridMovimiento.setColumnFlex(3, 1);
+	gridMovimiento.setColumnFlex(4, 1);
+	//gridMovimiento.setColumnFlex(5, 1);
+	gridMovimiento.setColumnFlex(6, 1);
+	//gridMovimiento.setColumnFlex(7, 1);
+	//gridMovimiento.setColumnFlex(8, 1);
+	gridMovimiento.setColumnFlex(9, 1);
+	//gridMovimiento.setColumnFlex(10, 1);
+	//gridMovimiento.setColumnFlex(11, 1);
+	
+	gridMovimiento.setRowFlex(1, 1);
 	
 	var gbxMovimiento = new qx.ui.groupbox.GroupBox("Movimientos");
-	gbxMovimiento.setLayout(new qx.ui.layout.Canvas());
+	gbxMovimiento.setLayout(gridMovimiento);
 	composite1.add(gbxMovimiento, {left: 0, top: "33.5%", right: 0, bottom: "33.5%"});
 	
 	
@@ -631,6 +662,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 			btnAsunto.setEnabled(rowDataMovimiento.estado == "S" && rowDataMovimiento.documentacion_id == null);
 			btnAnularEntTaller.setEnabled(rowDataMovimiento.estado == "E");
 			btnImprimirEntTaller.setEnabled(rowDataMovimiento.estado != "A");
+			btnImpConformidad.setEnabled(rowDataEntSal.estado == "S" && rowDataMovimiento.estado == "S");
 			btnSalTaller.setEnabled(rowDataMovimiento.estado != "A" && rowDataMovimiento.documentacion_id == null && rowDataEntSal.estado != "A");
 			
 			controllerFormInfoMovimiento.setModel(qx.data.marshal.Json.createModel(rowDataMovimiento));
@@ -647,12 +679,9 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		}
 	});
 	
-	gbxMovimiento.add(tblMovimiento, {left: 0, top: 30, right: 0, bottom: 0});
+	gbxMovimiento.add(tblMovimiento, {row: 1, column: 0, colSpan: 12});
 	
 	
-	
-	var composite = new qx.ui.container.Composite(new qx.ui.layout.HBox(6));
-	gbxMovimiento.add(composite, {top: 0, right: 0});
 	
 	var btnAsunto = new qx.ui.form.Button("Asunto...");
 	btnAsunto.setEnabled(false);
@@ -672,7 +701,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		win.center();
 		win.open();
 	});
-	gbxMovimiento.add(btnAsunto, {left: 0, top: 0});
+	gbxMovimiento.add(btnAsunto, {row: 0, column: 0});
 	
 	var btnAnularEntTaller = new qx.ui.form.Button("Anular...");
 	btnAnularEntTaller.setEnabled(false);
@@ -699,21 +728,21 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		        "image"     : "icon/48/status/dialog-warning.png"
 		})).show();
 	}, this);
-	gbxMovimiento.add(btnAnularEntTaller, {left: "40%", top: 0});
+	gbxMovimiento.add(btnAnularEntTaller, {row: 0, column: 5});
 	
-	var btnImprimirEntTaller = new qx.ui.form.Button("O.trabajo...");
+	var btnImprimirEntTaller = new qx.ui.form.Button("Orden trabajo...");
 	btnImprimirEntTaller.setEnabled(false);
 	btnImprimirEntTaller.addListener("execute", function(e){
 		window.open("services/class/comp/Impresion.php?rutina=entrada_taller&id_entsal=" + rowDataEntSal.id_entsal + "&id_movimiento=" + rowDataMovimiento.id_movimiento);
 	});
-	gbxMovimiento.add(btnImprimirEntTaller, {right: "30%", top: 0});
+	gbxMovimiento.add(btnImprimirEntTaller, {row: 0, column: 7});
 	
 	var btnImpConformidad = new qx.ui.form.Button("Conformidad...");
 	btnImpConformidad.setEnabled(false);
 	btnImpConformidad.addListener("execute", function(e){
-		window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal);
+		window.open("services/class/comp/Impresion.php?rutina=salida_vehiculo&id_entsal=" + rowDataEntSal.id_entsal + "&id_movimiento=" + rowDataMovimiento.id_movimiento);
 	});
-	gbxMovimiento.add(btnImpConformidad, {right: "20%", top: 0});
+	gbxMovimiento.add(btnImpConformidad, {row: 0, column: 8});
 	
 	var btnEntTaller = new qx.ui.form.Button("Entrada a taller...");
 	btnEntTaller.setEnabled(false);
@@ -747,7 +776,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		win.open();
 	});
 	
-	composite.add(btnEntTaller);
+	gbxMovimiento.add(btnEntTaller, {row: 0, column: 10});
 
 	var btnSalTaller = new qx.ui.form.Button("Salida de taller...");
 	btnSalTaller.setEnabled(false);
@@ -768,7 +797,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		win.open();
 	});
 	
-	composite.add(btnSalTaller);
+	gbxMovimiento.add(btnSalTaller, {row: 0, column: 11});
 	
 	
 	

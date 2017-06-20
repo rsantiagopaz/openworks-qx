@@ -1,0 +1,6 @@
+*************************************************************
+** Archivo generado por pf2ix.exe                           *
+** (c) 2004 IFDRIVERS http://www.impresoras-fiscales.com.ar *
+*************************************************************
+**  AUDITORIA POR FECHA
+@AUDITORIAF|140201|140212|T

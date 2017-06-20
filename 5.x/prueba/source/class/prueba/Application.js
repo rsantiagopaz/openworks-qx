@@ -83,12 +83,24 @@ function createRandomRows(rowCount) {
   return rowData;
 }
 
+var grid = new qx.ui.layout.Grid(6, 6);
+grid.setColumnFlex(0, 1);
+grid.setColumnFlex(1, 1);
+grid.setColumnFlex(2, 1);
+grid.setColumnFlex(3, 1);
+grid.setColumnFlex(4, 1);
+grid.setColumnFlex(5, 1);
+grid.setColumnFlex(6, 1);
+
+grid.setRowFlex(1, 1);
 
 // window
 var win = new qx.ui.window.Window("Table").set({
-  layout : new qx.ui.layout.Grow(),
+  layout : grid,
   allowClose: false,
   allowMinimize: false,
+  width: 600,
+  height: 600,
   contentPadding: 0
 });
 this.getRoot().add(win);
@@ -112,7 +124,12 @@ table.addListener("keypress", function(e){
 });
 
 
-win.add(table);
+win.add(table, {row: 1, column: 0, colSpan: 7});
+
+win.add(new qx.ui.form.Button("Button 1"), {row: 0, column: 0});
+win.add(new qx.ui.form.Button("Button 2 Button 2"), {row: 0, column: 1});
+win.add(new qx.ui.form.Button("Button 3"), {row: 0, column: 4});
+win.add(new qx.ui.form.Button("Button 4 Button 4"), {row: 0, column: 6});
 
 var tcm = table.getTableColumnModel();
 

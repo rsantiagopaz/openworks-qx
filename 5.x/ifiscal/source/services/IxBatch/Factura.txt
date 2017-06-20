@@ -1,0 +1,24 @@
+@PONEENCABEZADO|5|EJEMPLO FACTURA A
+
+@FACTABRE|T|C|A|1|P|10|I|I|SUDAMERICANA LIBROS SRL||CUIT|30692137449|N|MEXICO 564|Capital Federal||Remito 01-2345||C
+
+@FACTITEM|Mouse Genius XScrol|1.0|4.08|10.50|M|1|0||||0|0
+@FACTITEM|Patchcord Cat.5E - |5.0|4.10|21.00|M|1|0||||0|0
+@FACTITEM|Microfono NG-H300 N|1.0|4.12|21.00|M|1|0||||0|0
+@FACTITEM|Mouse Genius Netscr|1.0|4.12|10.50|M|1|0||||0|0
+@FACTITEM|Ventilador Cyber Co|2.0|4.12|21.00|M|1|0||||0|0
+@FACTITEM|Lector 3.5 Multi-Ca|2.0|4.22|21.00|M|1|0||||0|0
+@FACTITEM|Teclado Noganet Esp|2.0|4.30|10.50|M|1|0||||0|0
+@FACTITEM|Antena SMA Kozumi W|2.0|4.33|21.00|M|1|0||||0|0
+@FACTITEM|Teclado Ecovision W|1.0|4.39|10.50|M|1|0||||0|0
+@FACTITEM|Limpiador para Pant|1.0|4.44|21.00|M|1|0||||0|0
+@FACTITEM|Auricular Genius Mo|1.0|4.46|21.00|M|1|0||||0|0
+
+@FACTPAGO|DESCUENTO 10%|9.46|D
+@FACTPAGO|PAGO|100.00|T
+
+@FACTCIERRA|T|A|FINAL
+@ESTADO|N
+
+***THE END***
+

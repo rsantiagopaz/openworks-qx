@@ -1,0 +1,12 @@
+**
+*  Ejemplo de ejecucion del IxBatch (con la impresora en el COM1)
+*
+*  ixbatchw.exe -p COM1 -i estado.txt -o estado_salida.txt -t
+*
+**
+
+@ESTADO|N
+
+** END ***
+
+

@@ -790,8 +790,8 @@ qx.Class.define("elpintao.Application",
 	toolbarMain.add(mnubtnArchivo);
 	toolbarMain.add(mnubtnEdicion);
 	toolbarMain.add(mnubtnVer);
-	//toolbarMain.add(mnubtnCentral);
-	toolbarMain.add(mnubtnSucursal);
+	toolbarMain.add(mnubtnCentral);
+	//toolbarMain.add(mnubtnSucursal);
 	toolbarMain.addSpacer();
 	
 	

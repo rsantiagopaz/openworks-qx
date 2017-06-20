@@ -668,7 +668,13 @@ case "salida_vehiculo" : {
 		$sql.= ") AS temporal_1";
 	$sql.= " USING(cod_razon_social))";
 	$sql.= ") AS temporal_2";
-	$sql.= " WHERE id_entsal=" . $rowEntsal->id_entsal . " AND estado='S'";
+
+	if (is_null($_REQUEST['id_movimiento'])) {
+		$sql.= " WHERE id_entsal=" . $rowEntsal->id_entsal . " AND estado='S'";
+	} else {
+		$sql.= " WHERE id_movimiento=" . $_REQUEST['id_movimiento'];
+	}
+	
 	$sql.= " ORDER BY f_ent DESC";
 	
 	

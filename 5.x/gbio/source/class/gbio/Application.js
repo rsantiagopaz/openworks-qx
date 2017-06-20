@@ -360,7 +360,7 @@ qx.Class.define("gbio.Application",
 			imageLoading.destroy();
 			doc.unblock();
 			
-			alert(resultado);
+			//alert(resultado);
 
 			dialog.Dialog.alert("Escritura de empleados completada.");
 		}, "escribir_empleados");
