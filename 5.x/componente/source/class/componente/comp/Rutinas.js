@@ -31,6 +31,11 @@ qx.Class.define("componente.comp.Rutinas",
 	        } else {
 	            return false;
 	        }
+		}, 
+
+
+		isNumeric: function(value) {
+			return !isNaN(parseFloat(value)) && isFinite(value);
 		}
 	}
 

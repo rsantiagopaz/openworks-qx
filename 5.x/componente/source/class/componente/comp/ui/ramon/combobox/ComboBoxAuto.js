@@ -8,10 +8,12 @@ qx.Class.define("componente.comp.ui.ramon.combobox.ComboBoxAuto",
 		var listenerId;
 		var stringModoBuscar = null;
 		
-		this.phpParametros = phpParametros;
 		this._listeners = [];
 		
-		if (caracteres==null) caracteres = 3;
+		if (caracteres == null) caracteres = 3;
+		
+		this.caracteres = caracteres;
+		this.phpParametros = phpParametros;
 
 		listenerId = this.addListener("focus", function(e) {
 			if (this._contextMenu) this._contextMenu.restablecer();
@@ -49,7 +51,7 @@ qx.Class.define("componente.comp.ui.ramon.combobox.ComboBoxAuto",
 				if (texto.length == 0) {
 					this.removeAll();
 					this.close();
-				} else if (texto.length >= caracteres) {
+				} else if (texto.length >= this.caracteres) {
 					var p = {};
 					p.texto = texto;
 					p.parametros = this.phpParametros;
@@ -58,7 +60,7 @@ qx.Class.define("componente.comp.ui.ramon.combobox.ComboBoxAuto",
 					this.rpc.setTimeout(60000 * 1);
 					this.rpc.addListener("completed", qx.lang.Function.bind(function(e){
 						var resultado = e.getData().result;
-						
+
 						//alert(qx.lang.Json.stringify(resultado, null, 2));
 						
 						var listItem;
