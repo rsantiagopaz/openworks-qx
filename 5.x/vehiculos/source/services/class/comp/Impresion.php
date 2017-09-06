@@ -411,7 +411,7 @@ case "choferes" : {
 	<td colSpan="10">
 	<table border="1" cellpadding="5" cellspacing="0" width="100%" align="center">
 	<thead>
-	<tr><th>Apellido/Nombre</th><th>DNI</th><th>Dependencia</th><th>E-mail</th><th>Teléfono</th></tr>
+	<tr><th>Apellido/Nombre</th><th>DNI</th><th>Dependencia</th><th>Lic.emi.</th><th>Lic.ven.</th><th>Teléfono</th></tr>
 	</thead>
 	<tbody>
 
@@ -451,7 +451,7 @@ case "choferes" : {
 		}
 		
 		?>
-		<tr><td><?php echo $row->apenom; ?></td><td><?php echo $row->dni; ?></td><td><?php echo $rowAux; ?></td><td><?php echo $row->email; ?></td><td><?php echo $row->telefono; ?></td></tr>
+		<tr><td><?php echo $row->apenom; ?></td><td><?php echo $row->dni; ?></td><td><?php echo $rowAux; ?></td><td><?php echo $row->f_emision; ?></td><td><?php echo $row->f_vencimiento; ?></td><td><?php echo $row->telefono; ?></td></tr>
 		<?php
 	}
 	

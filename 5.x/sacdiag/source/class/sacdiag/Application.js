@@ -9,11 +9,11 @@
 ************************************************************************ */
 
 /**
- * This is the main application class of your custom application "sical3"
+ * This is the main application class of your custom application "sacdiag"
  *
- * @asset(sical3/*)
+ * @asset(sacdiag/*)
  */
-qx.Class.define("sical3.Application",
+qx.Class.define("sacdiag.Application",
 {
   extend : qx.application.Standalone,
 
@@ -54,7 +54,8 @@ qx.Class.define("sical3.Application",
       */
 
 
-
+      
+      
       // Document is the application root
 	var doc = this.getRoot();
 	
@@ -133,6 +134,7 @@ qx.Class.define("sical3.Application",
 	
 	
 	
+	/*
 	functionLogin(qx.lang.Function.bind(function(e) {
 		var data = e.getData();
 		
@@ -142,9 +144,10 @@ qx.Class.define("sical3.Application",
 
 		this._InitAPP();
 	}, this));
+	*/
 	
 	
-	
+	this._InitAPP();
 	
     },
     
@@ -159,32 +162,13 @@ qx.Class.define("sical3.Application",
 	
 	
 	
-	this.tipo_clasificacion = null;
-	this.tipo_titulo = null;
 
-	
-	var rpc = new qx.io.remote.Rpc("services/", "comp.ComisionDeTitulos");
-	try {
-		var resultado = rpc.callSync("leer_tipos_clasificacion");
-	} catch (ex) {
-		alert("Sync exception: " + ex);
-	}
-	this.tipo_clasificacion = resultado;
-	
-
-	var rpc = new qx.io.remote.Rpc("services/", "comp.ComisionDeTitulos");
-	try {
-		var resultado = rpc.callSync("leer_tipos_titulos");
-	} catch (ex) {
-		alert("Sync exception: " + ex);
-	}
-	this.tipo_titulo = resultado;
 	
 
 	
-	var pageCategorizacionEspaciosTitulos;
-	var pageNovedadesTomoCargos;
-	var pageNovedadesTomoEspacios;
+	var pagePanelDeEstudiosEnProceso;
+	var pageABMprestaciones;
+
 	
 	
 	var numberformatMontoEs = this.numberformatMontoEs = new qx.util.format.NumberFormat("es");
@@ -224,50 +208,73 @@ qx.Class.define("sical3.Application",
 	mnuArchivo.add(btnAcercaDe);
 	
 	
-	var mnuComisionDeTitulos = new qx.ui.menu.Menu();
+	var mnuEdicion = new qx.ui.menu.Menu();
 	
-	var btnCategorizacionEspaciosTitulos = new qx.ui.menu.Button("Categorización de Espacios en Títulos...");
-	btnCategorizacionEspaciosTitulos.addListener("execute", function(){
-		if (pageCategorizacionEspaciosTitulos == null) {
-			pageCategorizacionEspaciosTitulos = new sical3.comp.pageCategorizacionEspaciosTitulos();
-			pageCategorizacionEspaciosTitulos.addListenerOnce("close", function(e){
-				pageCategorizacionEspaciosTitulos = null;
+	var btnPanelDeEstudiosEnProceso = new qx.ui.menu.Button("Panel de Estudios en Proceso...");
+	btnPanelDeEstudiosEnProceso.addListener("execute", function(){
+		if (pagePanelDeEstudiosEnProceso == null) {
+			pagePanelDeEstudiosEnProceso = new sacdiag.comp.pagePanelDeEstudiosEnProceso();
+			pagePanelDeEstudiosEnProceso.addListenerOnce("close", function(e){
+				pagePanelDeEstudiosEnProceso = null;
 			});
-			tabviewMain.add(pageCategorizacionEspaciosTitulos);
+			tabviewMain.add(pagePanelDeEstudiosEnProceso);
 		}
-		tabviewMain.setSelection([pageCategorizacionEspaciosTitulos]);
+		tabviewMain.setSelection([pagePanelDeEstudiosEnProceso]);
 	});
-	mnuComisionDeTitulos.add(btnCategorizacionEspaciosTitulos);
+	mnuEdicion.add(btnPanelDeEstudiosEnProceso);
 	
 	
 	
-	var btnNovedadesTomoCargos = new qx.ui.menu.Button("Novedades Tomo cargos...");
-	btnNovedadesTomoCargos.addListener("execute", function(){
-		if (pageNovedadesTomoCargos == null) {
-			pageNovedadesTomoCargos = new sical3.comp.pageNovedadesTomoCargos();
-			pageNovedadesTomoCargos.addListenerOnce("close", function(e){
-				pageNovedadesTomoCargos = null;
+	var btnControlDePrefacturaciones = new qx.ui.menu.Button("Control de Prefacturaciones...");
+	btnControlDePrefacturaciones.addListener("execute", function(){
+
+	});
+	mnuEdicion.add(btnControlDePrefacturaciones);
+	
+	
+	
+	var btnABMPrestaciones = new qx.ui.menu.Button("ABM Prestaciones...");
+	btnABMPrestaciones.addListener("execute", function(){
+		if (pageABMprestaciones == null) {
+			pageABMprestaciones = new sacdiag.comp.pageABMprestaciones();
+			pageABMprestaciones.addListenerOnce("close", function(e){
+				pageABMprestaciones = null;
 			});
-			tabviewMain.add(pageNovedadesTomoCargos);
+			tabviewMain.add(pageABMprestaciones);
 		}
-		tabviewMain.setSelection([pageNovedadesTomoCargos]);
+		tabviewMain.setSelection([pageABMprestaciones]);
 	});
-	mnuComisionDeTitulos.add(btnNovedadesTomoCargos);
+	mnuEdicion.add(btnABMPrestaciones);
 	
-	var btnNovedadesTomoEspacios = new qx.ui.menu.Button("Novedades Tomo espacios...");
-	btnNovedadesTomoEspacios.addListener("execute", function(){
-		if (pageNovedadesTomoEspacios == null) {
-			pageNovedadesTomoEspacios = new sical3.comp.pageNovedadesTomoEspacios();
-			pageNovedadesTomoEspacios.addListenerOnce("close", function(e){
-				pageNovedadesTomoEspacios = null;
-			});
-			tabviewMain.add(pageNovedadesTomoEspacios);
-		}
-		tabviewMain.setSelection([pageNovedadesTomoEspacios]);
+	
+	var btnABMPrestadores = new qx.ui.menu.Button("ABM Prestadores...");
+	btnABMPrestadores.addListener("execute", function(){
+
 	});
-	mnuComisionDeTitulos.add(btnNovedadesTomoEspacios);
+	mnuEdicion.add(btnABMPrestadores);
+	
+	
+	var btnABMPrestacionesXEfector = new qx.ui.menu.Button("ABM Prestaciones x Efector...");
+	btnABMPrestacionesXEfector.addListener("execute", function(){
+
+	});
+	mnuEdicion.add(btnABMPrestacionesXEfector);
 	
 
+	
+
+	
+	
+	
+	var mnuVer = new qx.ui.menu.Menu();
+	
+	var btnEstadisticas = new qx.ui.menu.Button("Estadisticas...");
+	btnEstadisticas.addListener("execute", function(){
+
+	});
+	mnuVer.add(btnEstadisticas);
+	
+	
 
 	
 
@@ -285,25 +292,21 @@ qx.Class.define("sical3.Application",
 	
 	  
 	var mnubtnArchivo = new qx.ui.toolbar.MenuButton('Archivo');
-	
-	var mnubtnEdicion = new qx.ui.toolbar.MenuButton('');
-	
-	if (this.login._usuario_organismo_area_id == "6") {
-		mnubtnEdicion = new qx.ui.toolbar.MenuButton('Comisión de Títulos');
-		mnubtnEdicion.setMenu(mnuComisionDeTitulos);
-	}
-	
+	var mnubtnEdicion = new qx.ui.toolbar.MenuButton("Edición");
+	var mnubtnVer = new qx.ui.toolbar.MenuButton('Ver');
 	var mnubtnSesion = new qx.ui.toolbar.MenuButton('Sesión');
 
 	
 	mnubtnArchivo.setMenu(mnuArchivo);
-	
+	mnubtnEdicion.setMenu(mnuEdicion);
+	mnubtnVer.setMenu(mnuVer);
 	mnubtnSesion.setMenu(mnuSesion);
 	  
 	
 	var toolbarMain = new qx.ui.toolbar.ToolBar();
 	toolbarMain.add(mnubtnArchivo);
 	toolbarMain.add(mnubtnEdicion);
+	toolbarMain.add(mnubtnVer);
 	toolbarMain.add(mnubtnSesion);
 	toolbarMain.addSpacer();
 	
