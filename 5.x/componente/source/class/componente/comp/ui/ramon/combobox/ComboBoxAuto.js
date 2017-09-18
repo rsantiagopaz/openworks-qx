@@ -51,6 +51,15 @@ qx.Class.define("componente.comp.ui.ramon.combobox.ComboBoxAuto",
 				if (texto.length == 0) {
 					this.removeAll();
 					this.close();
+				/*
+				} else if (texto.length != caracteres) {
+					var children = this._list.getChildren();
+					
+					for(var x in children) {
+						if (children[x].getLabel().indexOf(texto) == -1) children[x].setVisibility("excluded"); else children[x].setVisibility("visible");
+					}
+					this.open();
+				*/
 				} else if (texto.length >= this.caracteres) {
 					var p = {};
 					p.texto = texto;

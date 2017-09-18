@@ -16,12 +16,20 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	
 	var application = qx.core.Init.getApplication();
 	
-	var rowDataTipo_prestacion;
+	var rowDataPrestaciones_tipo;
+	var rowDataPrestacion;
 	
 	
 	
-	var functionActualizarTipoPrestacion = function(id_tipo_prestacion) {
-		btnAgregarPrestacion.setEnabled(false);
+	var functionActualizarPrestacionTipo = function(id_prestacion_tipo) {
+		tblTipo_prestacion.blur();
+		tblTipo_prestacion.setFocusedCell();
+		tblPrestacion.setFocusedCell();
+		
+		commandAgregarPrestacion.setEnabled(false);
+		menuPrestacion.memorizar([commandAgregarPrestacion]);
+		tableModelPrestacion.setDataAsMapArray([], true);
+
 		
 		var p = {};
 		
@@ -29,33 +37,47 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
+			//alert(qx.lang.Json.stringify(data, null, 2));
+			
 			tableModelTipo_prestacion.setDataAsMapArray(data.result, true);
 			
-			if (id_tipo_prestacion != null) {
-				tblTipo_prestacion.buscar("id_tipo_prestacion", id_tipo_prestacion);
+			if (id_prestacion_tipo != null) {
+				tblTipo_prestacion.blur();
+				tblTipo_prestacion.buscar("id_prestacion_tipo", id_prestacion_tipo);
+				tblTipo_prestacion.focus();
 			}
 		});
-		rpc.callAsyncListeners(true, "leer_tipo_prestacion", p);
+		rpc.callAsyncListeners(true, "leer_prestacion_tipo", p);
 		
 		return rpc;
 	}
 	
 	
 	var functionActualizarPrestacion = function(id_prestacion) {
+		tblPrestacion.blur();
+		tblPrestacion.setFocusedCell();
+		
+		commandAgregarPrestacion.setEnabled(true);
+		menuPrestacion.memorizar([commandAgregarPrestacion]);
+		
 		var p = {};
-		p.id_tipo_prestacion = rowDataTipo_prestacion.id_tipo_prestacion;
+		p.phpParametros = {id_prestacion_tipo: rowDataPrestaciones_tipo.id_prestacion_tipo};
 		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
+			//alert(qx.lang.Json.stringify(data, null, 2));
+			
 			tableModelPrestacion.setDataAsMapArray(data.result, true);
 			
 			if (id_prestacion != null) {
+				tblPrestacion.blur();
 				tblPrestacion.buscar("id_prestacion", id_prestacion);
+				tblPrestacion.focus();
 			}
 		});
-		rpc.callAsyncListeners(true, "leer_prestacion", p);
+		rpc.callAsyncListeners(true, "autocompletarPrestacion", p);
 
 		return rpc;
 	}
@@ -70,14 +92,14 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	// Menu
 
 	
-	var commandAgregar = new qx.ui.command.Command("Insert");
-	commandAgregar.addListener("execute", function(e){
-		var win = new sacdiag.comp.windowTipo_prestacion();
+	var commandAgregarTipo_prestacion = new qx.ui.command.Command("Insert");
+	commandAgregarTipo_prestacion.addListener("execute", function(e){
+		var win = new sacdiag.comp.windowPrestacion_tipo();
 		win.setModal(true);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 			
-			functionActualizarVehiculo(vehiculo.id_vehiculo, data);
+			functionActualizarPrestacionTipo(data);
 		});
 		
 		application.getRoot().add(win);
@@ -85,18 +107,18 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		win.open();
 	});
 	
-	var btnAgregar = new qx.ui.menu.Button("Agregar...", null, commandAgregar);
+	var btnAgregarTipo_prestacion = new qx.ui.menu.Button("Agregar...", null, commandAgregarTipo_prestacion);
 	
 	
-	var commandEditar = new qx.ui.command.Command("F2");
-	//commandEditar.setEnabled(false);
-	commandEditar.addListener("execute", function(e){
-		var win = new sacdiag.comp.windowTipo_prestacion(rowDataTipo_prestacion);
+	var commandEditarTipo_prestacion = new qx.ui.command.Command("F2");
+	commandEditarTipo_prestacion.setEnabled(false);
+	commandEditarTipo_prestacion.addListener("execute", function(e){
+		var win = new sacdiag.comp.windowPrestacion_tipo(rowDataPrestaciones_tipo);
 		win.setModal(true);
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 			
-			functionActualizarVehiculo(vehiculo.id_vehiculo, data);
+			functionActualizarPrestacionTipo(data);
 		});
 		
 		application.getRoot().add(win);
@@ -104,13 +126,13 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		win.open();
 	});
 	
-	var btnEditar = new qx.ui.menu.Button("Editar...", null, commandEditar);
+	var btnEditarTipo_prestacion = new qx.ui.menu.Button("Editar...", null, commandEditarTipo_prestacion);
 	
 	
 	var menuTipo_prestacion = new componente.comp.ui.ramon.menu.Menu();
 	
-	menuTipo_prestacion.add(btnAgregar);
-	menuTipo_prestacion.add(btnEditar);
+	menuTipo_prestacion.add(btnAgregarTipo_prestacion);
+	menuTipo_prestacion.add(btnEditarTipo_prestacion);
 	menuTipo_prestacion.memorizar();
 	
 	
@@ -138,11 +160,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	tblTipo_prestacion.toggleColumnVisibilityButtonVisible();
 	//tbl.setRowHeight(45);
 	tblTipo_prestacion.setContextMenu(menuTipo_prestacion);
-	tblTipo_prestacion.addListener("cellDbltap", function(e){
-		if (e.getColumn() == 0) {
 
-		}
-	});
 	
 	var tableColumnModelTipo_prestacion = tblTipo_prestacion.getTableColumnModel();
 	
@@ -187,72 +205,81 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	selectionModelTipo_prestacion.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModelTipo_prestacion.addListener("changeSelection", function(e){
 		if (! selectionModelTipo_prestacion.isSelectionEmpty()) {
-			rowDataTipo_prestacion = tableModelTipo_prestacion.getRowDataAsMap(tblTipo_prestacion.getFocusedRow());
+			rowDataPrestaciones_tipo = tableModelTipo_prestacion.getRowDataAsMap(tblTipo_prestacion.getFocusedRow());
 			
-			btnAgregarPrestacion.setEnabled(true);
+			commandEditarTipo_prestacion.setEnabled(true);
 			
 			functionActualizarPrestacion();
+		} else {
+			commandEditarTipo_prestacion.setEnabled(false);
 		}
+		
+		menuTipo_prestacion.memorizar([commandEditarTipo_prestacion]);
 	});
 
-	this.add(tblTipo_prestacion, {left: 0, top: 0, right: "53%", bottom: 200});	
+	this.add(tblTipo_prestacion, {left: 0, top: 20, right: "53%", bottom: 0});	
+	
+	this.add(new qx.ui.basic.Label("Tipo de prestación"), {left: 0, top: 0});
 	
 	
 	
-	var gbxTipo_prestacion = new qx.ui.groupbox.GroupBox("Agregar tipo prestación")
-	gbxTipo_prestacion.setLayout(new qx.ui.layout.Basic());
-	this.add(gbxTipo_prestacion, {left: 0, right: "53%", bottom: 0});
+
 	
-	var formTipo_prestacion = new qx.ui.form.Form();
 	
-	var txtDescripTipo_prestacion = new qx.ui.form.TextField();
-	txtDescripTipo_prestacion.setRequired(true);
-	txtDescripTipo_prestacion.addListener("blur", function(e){
-		this.setValue(this.getValue().trim());
-	});
-	formTipo_prestacion.add(txtDescripTipo_prestacion, "Descripción", null, "denominacion");
 	
-	var btnAgregarTipo_prestacion = new qx.ui.form.Button("Agregar");
-	btnAgregarTipo_prestacion.addListener("execute", function(e){
-		if (formTipo_prestacion.validate()) {
-			var p = {};
-			p.denominacion = txtDescripTipo_prestacion.getValue();
+	
+	
+	
+	
+	
+	
+	
+	// Menu
+
+	
+	var commandAgregarPrestacion = new qx.ui.command.Command("Insert");
+	commandAgregarPrestacion.setEnabled(false);
+	commandAgregarPrestacion.addListener("execute", function(e){
+		var win = new sacdiag.comp.windowPrestacion(null, rowDataPrestaciones_tipo.id_prestacion_tipo);
+		win.setModal(true);
+		win.addListener("aceptado", function(e){
+			var data = e.getData();
 			
-			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
-			rpc.addListener("completed", function(e){
-				var data = e.getData();
-				
-				var rpc = functionActualizarTipoPrestacion(data.result);
-				rpc.addListener("completed", function(e){
-					txtDescripTipo_prestacion.setValue("");
-					tblTipo_prestacion.focus();
-					txtDescripTipo_prestacion.focus();
-				});
-			});
-			rpc.addListener("failed", function(e){
-				var data = e.getData();
-				
-				tblTipo_prestacion.buscar("id_tipo_prestacion", data.code);
-				//alert(qx.lang.Json.stringify(data, null, 2));
-			});
-			
-			rpc.callAsyncListeners(true, "escribir_tipo_prestacion", p);
-		} else {
-			formTipo_prestacion.getValidationManager().getInvalidFormItems()[0].focus();
-		}
+			functionActualizarPrestacion(data);
+		});
+		
+		application.getRoot().add(win);
+		win.center();
+		win.open();
 	});
-	formTipo_prestacion.addButton(btnAgregarTipo_prestacion);
+	
+	var btnAgregarPrestacion = new qx.ui.menu.Button("Agregar...", null, commandAgregarPrestacion);
 	
 	
-	var formRenderer = new qx.ui.form.renderer.Single(formTipo_prestacion);
+	var commandEditarPrestacion = new qx.ui.command.Command("F2");
+	commandEditarPrestacion.setEnabled(false);
+	commandEditarPrestacion.addListener("execute", function(e){
+		var win = new sacdiag.comp.windowPrestacion(rowDataPrestacion, rowDataPrestaciones_tipo.id_prestacion_tipo);
+		win.setModal(true);
+		win.addListener("aceptado", function(e){
+			var data = e.getData();
+			
+			functionActualizarPrestacion(data);
+		});
+		
+		application.getRoot().add(win);
+		win.center();
+		win.open();
+	});
+	
+	var btnEditarPrestacion = new qx.ui.menu.Button("Editar...", null, commandEditarPrestacion);
 	
 	
-	gbxTipo_prestacion.add(formRenderer);
+	var menuPrestacion = new componente.comp.ui.ramon.menu.Menu();
 	
-	
-	
-	
-	
+	menuPrestacion.add(btnAgregarPrestacion);
+	menuPrestacion.add(btnEditarPrestacion);
+	menuPrestacion.memorizar();
 	
 	
 	
@@ -261,7 +288,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	
 	
 	var tableModelPrestacion = new qx.ui.table.model.Simple();
-	tableModelPrestacion.setColumns(["Código", "Descripción", "Valor"], ["codigo", "descripcion", "valor"]);
+	tableModelPrestacion.setColumns(["Código", "Descripción", "Valor"], ["codigo", "denominacion", "valor"]);
 	tableModelPrestacion.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrestacion.getRowCount();
 		
@@ -276,11 +303,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	tblPrestacion.setShowCellFocusIndicator(false);
 	tblPrestacion.toggleColumnVisibilityButtonVisible();
 	//tbl.setRowHeight(45);
-	tblPrestacion.addListener("cellDbltap", function(e){
-		if (e.getColumn() == 0) {
-
-		}
-	});
+	tblPrestacion.setContextMenu(menuPrestacion);
 	
 	var tableColumnModelPrestacion = tblPrestacion.getTableColumnModel();
 	
@@ -321,72 +344,31 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	*/
 	
 	
-	var selectionModel = tblPrestacion.getSelectionModel();
-	selectionModel.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
-	selectionModel.addListener("changeSelection", function(e){
-		//btnAddUno.setEnabled(! selectionModel.isSelectionEmpty());
+	var selectionModelPrestacion = tblPrestacion.getSelectionModel();
+	selectionModelPrestacion.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
+	selectionModelPrestacion.addListener("changeSelection", function(e){
+		if (! selectionModelPrestacion.isSelectionEmpty()) {
+			rowDataPrestacion = tableModelPrestacion.getRowDataAsMap(tblPrestacion.getFocusedRow());
+			
+			commandEditarPrestacion.setEnabled(true);
+		} else {
+			commandEditarPrestacion.setEnabled(false);
+		}
+		
+		menuPrestacion.memorizar([commandEditarPrestacion]);
 	});
 
-	this.add(tblPrestacion, {left: "53%", top: 0, right: 0, bottom: 200});
+	this.add(tblPrestacion, {left: "53%", top: 20, right: 0, bottom: 0});
+	
+	this.add(new qx.ui.basic.Label("Prestación"), {left: "53%", top: 0});
 	
 	
 	
-	var gbxPrestacion = new qx.ui.groupbox.GroupBox("Agregar prestación")
-	gbxPrestacion.setLayout(new qx.ui.layout.Basic());
-	this.add(gbxPrestacion, {left: "53%", right: 0, bottom: 0});
-	
-	
-	var formPrestacion = new qx.ui.form.Form();
-	
-	var txtCodigo = new qx.ui.form.TextField();
-	txtCodigo.setRequired(true);
-	formPrestacion.add(txtCodigo, "Código", null, "codigo");
-	
-	var txtDescripPrestacion = new qx.ui.form.TextField();
-	txtDescripPrestacion.setRequired(true);
-	formPrestacion.add(txtDescripPrestacion, "Descripción", null, "descripcion");
-	
-	var txtValor = new qx.ui.form.Spinner();
-	formPrestacion.add(txtValor, "Valor", null, "valor");
+
 	
 	
 	
-	
-	var btnAgregarPrestacion = new qx.ui.form.Button("Agregar");
-	btnAgregarPrestacion.addListener("execute", function(e){
-		if (formPrestacion.validate()) {
-			var p = {};
-			p.id_tipo_prestacion = rowDataTipo_prestacion.id_tipo_prestacion;
-			p.codigo = txtCodigo.getValue();
-			p.descripcion = txtDescripPrestacion.getValue();
-			p.valor = txtValor.getValue();
-			
-			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
-			rpc.callAsync(function(resultado, error, id){
-				var rpc = functionActualizarPrestacion(resultado);
-				rpc.addListener("completed", function(e){
-					txtCodigo.setValue("");
-					txtDescripPrestacion.setValue("")
-					txtValor.setValue(0);
-					
-					tblPrestacion.focus();
-					txtCodigo.focus();
-				});
-			}, "escribir_prestacion", p);
-		} else {
-			formPrestacion.getValidationManager().getInvalidFormItems()[0].focus();
-		}
-	});
-	
-	formPrestacion.addButton(btnAgregarPrestacion);
-	
-	var formRenderer = new qx.ui.form.renderer.Single(formPrestacion);
-	
-	gbxPrestacion.add(formRenderer);
-	
-	
-	
-	functionActualizarTipoPrestacion();
+	functionActualizarPrestacionTipo();
 	
 	
 		

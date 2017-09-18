@@ -295,7 +295,6 @@ qx.Class.define("vehiculos.comp.pageGeneral",
 		var selectionEmpty = selectionModelGral.isSelectionEmpty();
 		commandVer.setEnabled(! selectionEmpty);
 		menu.memorizar([commandVer]);
-		this.debug(commandVer.getEnabled());
 		
 		if (! selectionEmpty) rowDataGral = tableModelGral.getRowData(tblGral.getFocusedRow());
 	});

@@ -1,13 +1,13 @@
-qx.Class.define("sacdiag.comp.windowTipo_prestacion",
+qx.Class.define("sacdiag.comp.windowPrestacion",
 {
 	extend : componente.comp.ui.ramon.window.Window,
-	construct : function (rowTP)
+	construct : function (rowData, id_prestacion_tipo)
 	{
 	this.base(arguments);
 	
 	this.set({
-		width: 500,
-		height: 250,
+		//width: 500,
+		height: 200,
 		showMinimize: false,
 		showMaximize: false,
 		allowMaximize: false,
@@ -17,7 +17,7 @@ qx.Class.define("sacdiag.comp.windowTipo_prestacion",
 	this.setLayout(new qx.ui.layout.Canvas());
 
 	this.addListenerOnce("appear", function(e){
-		txtDescrip.focus();
+		txtCodigo.focus();
 	});
 	
 	
@@ -27,6 +27,14 @@ qx.Class.define("sacdiag.comp.windowTipo_prestacion",
 	var form = new qx.ui.form.Form();
 	
 	
+	var txtCodigo = new qx.ui.form.TextField("");
+	txtCodigo.setRequired(true);
+	//txtCodigo.setMinWidth(400);
+	txtCodigo.addListener("blur", function(e){
+		this.setValue(this.getValue().trim());
+	})
+	form.add(txtCodigo, "Código", null, "codigo");
+	
 	var txtDescrip = new qx.ui.form.TextField("");
 	txtDescrip.setRequired(true);
 	txtDescrip.setMinWidth(400);
@@ -35,20 +43,27 @@ qx.Class.define("sacdiag.comp.windowTipo_prestacion",
 	})
 	form.add(txtDescrip, "Descripción", null, "denominacion");
 	
+	var txtValor = new qx.ui.form.Spinner();
+	//txtValor.setRequired(true);
+	//txtValor.setMinWidth(400);
+	form.add(txtValor, "Valor", null, "valor");
+	
+	
+	
 	var controllerForm = new qx.data.controller.Form(null, form);
 	
 	var formView = new qx.ui.form.renderer.Single(form);
 	this.add(formView, {left: 0, top: 0});
 	
 	
-	if (rowTP == null) {
-		this.setCaption("Nuevo tipo prestacion");
+	if (rowData == null) {
+		this.setCaption("Nueva prestación");
 		
-		aux = qx.data.marshal.Json.createModel({id_tipo_prestacion: "0", denominacion: ""}, true);
+		aux = qx.data.marshal.Json.createModel({id_prestacion: "0", id_prestacion_tipo: id_prestacion_tipo, codigo: "", denominacion: "", valor: 0}, true);
 	} else {
-		this.setCaption("Modificar tipo prestacion");
+		this.setCaption("Modificar prestación");
 		
-		aux = qx.data.marshal.Json.createModel(rowTP, true);
+		aux = qx.data.marshal.Json.createModel(rowData, true);
 	}
 	
 	controllerForm.setModel(aux);
@@ -66,18 +81,28 @@ qx.Class.define("sacdiag.comp.windowTipo_prestacion",
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
-				this.fireDataEvent("aceptado", data);
+				this.fireDataEvent("aceptado", data.result);
 				
 				btnCancelar.execute();
 			}, this);
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				if (data.message == "duplicado") {
-					
+				//alert(qx.lang.Json.stringify(data, null, 2));
+				
+				if (data.message == "codigo_duplicado") {
+					txtCodigo.focus();
+					txtCodigo.setInvalidMessage("Ya existe una prestación con el mismo código");
+					txtCodigo.setValid(false);
+				}
+				
+				if (data.message == "descrip_duplicado") {
+					txtDescrip.focus();
+					txtDescrip.setInvalidMessage("Ya existe una prestación con la misma descripción");
+					txtDescrip.setValid(false);
 				}
 			}, this);
-			rpc.callAsyncListeners(true, "alta_modifica_tipo_prestacion", p);
+			rpc.callAsyncListeners(true, "alta_modifica_prestacion", p);
 			
 		} else {
 			form.getValidationManager().getInvalidFormItems()[0].focus();
@@ -95,10 +120,7 @@ qx.Class.define("sacdiag.comp.windowTipo_prestacion",
 	this.add(btnCancelar, {right: "20%", bottom: 0});
 	
 	},
-	members : 
-	{
 
-	},
 	events : 
 	{
 		"aceptado": "qx.event.type.Event"

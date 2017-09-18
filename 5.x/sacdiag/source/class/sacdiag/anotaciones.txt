@@ -1,0 +1,12 @@
+- el campo solicitudes.id_prestacion_tipo esta de mas. No tiene fundamento para estar ahi teoricamente.
+
+- el campo solicitudes.id_efector_publico no coincide tipo con efectores_publicos.id_efector_publico. Le puse varchar(5).
+
+- el campo prefacturaciones.estado no va en esa tabla, va en prefacturaciones_items. Yo directamente lo cambié de tabla.
+
+
+
+
+bloquear/desbloquear antes de ser capturado. Mientras esta autorizado.
+
+cambiar efector antes de capturado.
