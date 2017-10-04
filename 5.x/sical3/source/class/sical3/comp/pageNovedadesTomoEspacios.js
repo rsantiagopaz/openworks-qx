@@ -133,7 +133,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	slbUsuario.setMinWidth(200);
 	slbUsuario.add(new qx.ui.form.ListItem("-", null, "0"));
 	
-	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
+	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
 	try {
 		var resultado = rpc.callSync("autocompletarUsuario", {texto: ""});
 	} catch (ex) {
@@ -200,7 +200,7 @@ qx.Class.define("sical3.comp.pageNovedadesTomoEspacios",
 	
 	var mnuNivel = new qx.ui.menu.Menu();
 	
-	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
+	var rpc = new sical3.comp.rpc.Rpc("services/", "comp.NovedadesTomoEspacios");
 	try {
 		var resultado = rpc.callSync("autocompletarNivel", {texto: ""});
 	} catch (ex) {

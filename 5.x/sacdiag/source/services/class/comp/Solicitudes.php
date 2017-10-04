@@ -11,7 +11,10 @@ class class_Solicitudes extends class_Base
   public function method_leer_solicitud($params, $error) {
 	$p = $params[0];
 	
-	$sql = "SELECT solicitudes.*, personas.persona_nombre, personas.persona_dni, efectores_publicos.denominacion AS efector_publico, prestadores.denominacion AS prestador FROM solicitudes INNER JOIN personas USING(persona_id) INNER JOIN efectores_publicos USING(id_efector_publico) INNER JOIN prestadores USING(id_prestador) WHERE TRUE";
+	$resultado = array();
+	
+	//$sql = "SELECT solicitudes.*, _personas.persona_nombre, _personas.persona_dni, efectores_publicos.denominacion AS efector_publico, prestadores.denominacion AS prestador FROM solicitudes INNER JOIN _personas USING(persona_id) INNER JOIN efectores_publicos USING(id_efector_publico) INNER JOIN prestadores USING(id_prestador) WHERE TRUE";
+	$sql = "SELECT solicitudes.*, _personas.persona_nombre, _personas.persona_dni FROM solicitudes INNER JOIN _personas USING(persona_id) WHERE TRUE";
 	
 	if (! is_null($p->desde) && ! is_null($p->hasta)) {
 		$sql.= " AND (fecha_emite BETWEEN '" . substr($p->desde, 0, 10) . "' AND '" . substr($p->hasta, 0, 10) . "')";
@@ -27,7 +30,22 @@ class class_Solicitudes extends class_Base
 	
 	$sql.= " ORDER BY fecha_emite DESC";
 	
-	return $this->toJson($sql);
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
+		$sql = "SELECT organismo_area_descripcion FROM _organismos_areas WHERE organismo_area_id='" . $row->id_efector_publico . "'";
+		$rsAux = $this->mysqli->query($sql);
+		$rowAux = $rsAux->fetch_object();
+		$row->efector_publico = $rowAux->organismo_area_descripcion;
+		
+		$sql = "SELECT organismo_area_descripcion FROM _organismos_areas WHERE organismo_area_id='" . $row->id_prestador . "'";
+		$rsAux = $this->mysqli->query($sql);
+		$rowAux = $rsAux->fetch_object();
+		$row->prestador = $rowAux->organismo_area_descripcion;
+		
+		$resultado[] = $row;
+	}
+	
+	return $resultado;
   }
   
   
@@ -48,12 +66,13 @@ class class_Solicitudes extends class_Base
   }
   
   
-  public function method_escribir_solicitudes($params, $error) {
+  public function method_escribir_solicitud($params, $error) {
 	$p = $params[0];
 	
-	$sql = "SELECT";
-	
-	return $this->toJson($sql);
+	$set = $this->prepararCampos($p, "solicitudes");
+	  		
+	$sql = "UPDATE solicitudes SET " . $set . " WHERE id_solicitud=" . $p->id_solicitud;
+	$this->mysqli->query($sql);
   }
 }
 

@@ -7,7 +7,7 @@ qx.Class.define("vehiculos.comp.windowSal",
 	
 	this.set({
 		caption: "Salida",
-		width: 300,
+		width: 320,
 		height: 250,
 		showMinimize: false,
 		showMaximize: false,
@@ -31,11 +31,42 @@ qx.Class.define("vehiculos.comp.windowSal",
 	txtResp_sal.setMinWidth(200);
 	form.add(txtResp_sal, "Responsable", null, "resp_sal");
 	
+	var cboUnipresu = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarUnipresu"});
+	var lstUnipresu = cboUnipresu.getChildControl("list");
+	lstUnipresu.addListener("changeSelection", function(e){
+		/*
+		if (lstUnipresu.isSelectionEmpty()) {
+			this.setLabel('Particular');
+			functionActualizarVehiculo();
+		} else {
+			this.setLabel(lstUnipresu.getSelection()[0].getLabel());
+			functionActualizarVehiculo(lstUnipresu.getModelSelection().getItem(0));
+		}
+		*/
+	}, this);
+	form.add(cboUnipresu, "Unidad presup.", null, "cod_up", null, {grupo: 1, item: {row: 20, column: 1, colSpan: 11}});
+	
 	var controllerForm = new qx.data.controller.Form(null, form);
 	
 	//var formView = new componente.comp.ui.ramon.abstractrenderer.Grid(form, 12, 25, 10);
 	var formView = new qx.ui.form.renderer.Single(form);
 	this.add(formView, {left: 0, top: 0});
+	
+	
+	if (rowDataEntSal.cod_up != "0") {
+		var p = {};
+		p.texto = parseInt(rowDataEntSal.cod_up);
+		
+		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
+		rpc.addListener("completed", function(e){
+			var data = e.getData();
+			
+			var item = new qx.ui.form.ListItem(data.result[0].label, null, data.result[0].model);
+			cboUnipresu.add(item);
+			lstUnipresu.setSelection([item]);
+		});
+		rpc.callAsyncListeners(true, "autocompletarUnipresu", p);
+	}
 	
 	
 	var btnAceptar = new qx.ui.form.Button("Aceptar");
@@ -44,6 +75,7 @@ qx.Class.define("vehiculos.comp.windowSal",
 		p.id_vehiculo = vehiculo.id_vehiculo;
 		p.id_entsal = rowDataEntSal.id_entsal;
 		p.resp_sal = txtResp_sal.getValue();
+		p.cod_up = ((lstUnipresu.isSelectionEmpty()) ? 0 : lstUnipresu.getSelection()[0].getModel());
 		p.entsal_estado = rowDataEntSal.estado;
 		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");

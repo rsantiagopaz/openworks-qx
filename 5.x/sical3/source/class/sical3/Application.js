@@ -99,8 +99,8 @@ qx.Class.define("sical3.Application",
 		
 		//loginWidget._username.getLayoutParent().getLayout().getCellWidget(0, 1).setValue("danielramirez");
 		//loginWidget._username.getLayoutParent().getLayout().getCellWidget(1, 1).setValue("danielramirez");
-		loginWidget._username.setValue("danielramirez");
-		loginWidget._password.setValue("danielramirez");
+		//loginWidget._username.setValue("danielramirez");
+		//loginWidget._password.setValue("danielramirez");
 		
 		
 		loginWidget._password.setInvalidMessage("Contraseña incorrecta");
@@ -272,7 +272,7 @@ qx.Class.define("sical3.Application",
 		}
 		tabviewMain.setSelection([pageNovedadesTomoEspacios]);
 	});
-	//mnuComisionDeTitulos.add(btnNovedadesTomoEspacios);
+	mnuComisionDeTitulos.add(btnNovedadesTomoEspacios);
 	
 
 

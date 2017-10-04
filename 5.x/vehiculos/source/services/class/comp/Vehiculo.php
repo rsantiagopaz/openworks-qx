@@ -320,7 +320,7 @@ class class_Vehiculo extends class_Base
 	  	$sql = "UPDATE vehiculo SET estado='S' WHERE id_vehiculo=" . $p->id_vehiculo;
 	  	mysql_query($sql);
 	
-	  	$sql = "UPDATE entsal SET f_sal=NOW(), id_usuario_sal='" . $_SESSION['usuario'] . "', resp_sal='" . $p->resp_sal . "', estado='S' WHERE id_entsal=" . $p->id_entsal;
+	  	$sql = "UPDATE entsal SET cod_up='" . $p->cod_up . "', f_sal=NOW(), id_usuario_sal='" . $_SESSION['usuario'] . "', resp_sal='" . $p->resp_sal . "', estado='S' WHERE id_entsal=" . $p->id_entsal;
 	  	mysql_query($sql);
 	  	
 	  	mysql_query("COMMIT");
@@ -611,7 +611,9 @@ class class_Vehiculo extends class_Base
   public function method_autocompletarUnipresu($params, $error) {
   	$p = $params[0];
   	
-  	if (is_numeric($p->texto)) {
+  	if (is_int($p->texto)) {
+  		$sql = "SELECT cod_up AS model, CONCAT(nombre, ' - ', REPLACE(codigo, '-', '')) AS label FROM unipresu WHERE cod_up=" . $p->texto;
+  	} else if (is_numeric($p->texto)) {
   		$sql = "SELECT cod_up AS model, CONCAT(REPLACE(codigo, '-', ''), ' - ', nombre) AS label FROM unipresu WHERE version=0 AND estado='A' AND REPLACE(codigo, '-', '') LIKE '%" . $p->texto . "%'";
   	} else {
   		$sql = "SELECT cod_up AS model, CONCAT(nombre, ' - ', REPLACE(codigo, '-', '')) AS label FROM unipresu WHERE version=0 AND estado='A' AND nombre LIKE '%" . $p->texto . "%'";

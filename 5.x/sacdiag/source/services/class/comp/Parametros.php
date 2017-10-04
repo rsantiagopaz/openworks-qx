@@ -119,8 +119,8 @@ class class_Parametros extends class_Base
   	$sql.= "  prestaciones.*";
   	$sql.= ", prestadores_prestaciones.id_prestador_prestacion";
   	$sql.= ", prestadores_prestaciones.estado";
-  	$sql.= " FROM prestadores_prestaciones INNER JOIN prestadores USING(id_prestador) INNER JOIN prestaciones USING(id_prestacion)";
-  	$sql.= " WHERE id_prestador=" . $p->id_prestador;
+  	$sql.= " FROM prestadores_prestaciones INNER JOIN prestaciones USING(id_prestacion)";
+  	$sql.= " WHERE id_prestador='" . $p->id_prestador . "'";
   	$sql.= " ORDER BY denominacion";
   	
   	return $this->toJson($sql, $opciones);
@@ -165,9 +165,9 @@ class class_Parametros extends class_Base
 	$p = $params[0];
 
 	if (is_numeric($p->texto)) {
-		$sql = "SELECT persona_id AS model, CONCAT(persona_dni, ' - ', persona_nombre) AS label FROM personas WHERE persona_dni LIKE '". $p->texto . "%' ORDER BY label";
+		$sql = "SELECT persona_id AS model, CONCAT(persona_dni, ' - ', persona_nombre) AS label FROM _personas WHERE persona_dni LIKE '". $p->texto . "%' ORDER BY label";
 	} else {
-		$sql = "SELECT persona_id AS model, CONCAT(TRIM(persona_nombre), ' (', persona_dni, ')') AS label FROM personas WHERE persona_nombre LIKE '%". $p->texto . "%' ORDER BY label";
+		$sql = "SELECT persona_id AS model, CONCAT(TRIM(persona_nombre), ' (', persona_dni, ')') AS label FROM _personas WHERE persona_nombre LIKE '%". $p->texto . "%' ORDER BY label";
 	}
 
 	return $this->toJson($sql);
@@ -177,7 +177,7 @@ class class_Parametros extends class_Base
   public function method_autocompletarPrestador($params, $error) {
   	$p = $params[0];
   	
-  	$sql = "SELECT prestadores.*, id_prestador AS model, denominacion AS label FROM prestadores WHERE denominacion LIKE '%". $p->texto . "%' ORDER BY denominacion";
+  	$sql = "SELECT _organismos_areas.*, organismo_area_id AS model, organismo_area_descripcion AS label FROM _organismos_areas WHERE organismo_area_estado='3' AND organismo_area_descripcion LIKE '%". $p->texto . "%' ORDER BY organismo_area_descripcion";
 
 	return $this->toJson($sql);
   }

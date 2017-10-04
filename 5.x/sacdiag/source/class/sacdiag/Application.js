@@ -167,6 +167,7 @@ qx.Class.define("sacdiag.Application",
 
 	
 	var pagePanelDeEstudiosEnProceso;
+	var pageControlDePrefacturaciones;
 	var pageABMprestaciones;
 	var pageABMprestadores;
 
@@ -228,7 +229,14 @@ qx.Class.define("sacdiag.Application",
 	
 	var btnControlDePrefacturaciones = new qx.ui.menu.Button("Control de Prefacturaciones...");
 	btnControlDePrefacturaciones.addListener("execute", function(){
-
+		if (pageControlDePrefacturaciones == null) {
+			pageControlDePrefacturaciones = new sacdiag.comp.pageControlDePrefacturaciones();
+			pageControlDePrefacturaciones.addListenerOnce("close", function(e){
+				pageControlDePrefacturaciones = null;
+			});
+			tabviewMain.add(pageControlDePrefacturaciones);
+		}
+		tabviewMain.setSelection([pageControlDePrefacturaciones]);
 	});
 	mnuEdicion.add(btnControlDePrefacturaciones);
 	

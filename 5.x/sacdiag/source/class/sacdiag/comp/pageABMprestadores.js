@@ -38,12 +38,14 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
+			
+			//alert(qx.lang.Json.stringify(data, null, 2));
 
 			tableModelPrestador.setDataAsMapArray(data.result, true);
 			
 			if (id_prestador != null) {
 				tblPrestador.blur();
-				tblPrestador.buscar("id_prestador", id_prestador);
+				tblPrestador.buscar("organismo_area_id", id_prestador);
 				tblPrestador.focus();
 			}
 		});
@@ -58,7 +60,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		tblPrestacion.setFocusedCell();
 		
 		var p = {};
-		p.id_prestador = rowDataPrestador.id_prestador;
+		p.id_prestador = rowDataPrestador.organismo_area_id;
 		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
@@ -149,7 +151,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	
 	
 	var tableModelPrestador = new qx.ui.table.model.Simple();
-	tableModelPrestador.setColumns(["Descripción", "CUIT", "Domicilio", "Teléfono", "Contacto"], ["denominacion", "cuit", "domicilio", "telefonos", "contacto"]);
+	tableModelPrestador.setColumns(["Descripción", "CUIT", "Domicilio", "Teléfono", "Contacto"], ["organismo_area_descripcion", "cuit", "domicilio", "telefonos", "contacto"]);
 	tableModelPrestador.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrestador.getRowCount();
 		
