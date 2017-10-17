@@ -137,7 +137,7 @@ class class_Parametros extends class_Base
 	$sql = "SELECT";
 	$sql.= "  cod_razon_social";
 	$sql.= ", CONCAT(razones_sociales.razon_social, ' (', proveedores.cuit, ')') AS descrip";
-	$sql.= " FROM (taller INNER JOIN `019`.razones_sociales USING(cod_razon_social)) INNER JOIN `019`.proveedores USING(cod_proveedor)";
+	$sql.= " FROM (taller LEFT JOIN `019`.razones_sociales USING(cod_razon_social)) LEFT JOIN `019`.proveedores USING(cod_proveedor)";
 	$sql.= " ORDER BY descrip";
 	
 	return $this->toJson($sql);

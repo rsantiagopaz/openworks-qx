@@ -28,6 +28,8 @@ qx.Class.define("vehiculos.comp.windowParametro",
 		rpc.callAsync(function(resultado, error, id) {
 			tableModelTaller.setDataAsMapArray(resultado, true);
 			
+			//alert(qx.lang.Json.stringify(resultado, null, 2));
+			
 			if (cod_razon_social != null) tblTaller.buscar("cod_razon_social", cod_razon_social);
 		}, "leer_taller");
 	};

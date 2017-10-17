@@ -116,7 +116,7 @@ tableModel.setData(createRandomRows(1000));
 tableModel.setColumnEditable(1, true);
 
 // table
-var table = new qx.ui.table.Table(tableModel).set({
+var table = new componente.comp.ui.ramon.table.Table(tableModel).set({
   decorator: null
 });
 table.addListener("keypress", function(e){

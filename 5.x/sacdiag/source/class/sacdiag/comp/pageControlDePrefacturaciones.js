@@ -17,11 +17,16 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	var application = qx.core.Init.getApplication();
 	
 	var rowDataSolicitud;
+	var rowDataPrefac;
 	
 	
 	
 	
 	var functionActualizarPrefac = function(id_prefacturacion) {
+		
+		tblPrefac.resetSelection();
+		tblSolicitud.resetSelection();
+		tblPrestacion.resetSelection();
 		
 		tblPrefac.setFocusedCell();
 		tblSolicitud.setFocusedCell();
@@ -36,7 +41,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
-			alert(qx.lang.Json.stringify(data, null, 2));
+			//alert(qx.lang.Json.stringify(data, null, 2));
 
 			tableModelPrefac.setDataAsMapArray(data.result, true);
 			
@@ -254,8 +259,9 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			commandVerPrestacion.setEnabled(false);
 			menuPrefac.memorizar([commandVerPrestacion]);
 		} else {
-			rowDataSolicitud = tableModelPrefac.getRowDataAsMap(tblPrefac.getFocusedRow());
+			rowDataPrefac = tableModelPrefac.getRowDataAsMap(tblPrefac.getFocusedRow());
 			
+			/*
 			commandVerPrestacion.setEnabled(true);
 			btnCambiarPrestador.setEnabled(rowDataSolicitud.estado == "E" || rowDataSolicitud.estado == "A");
 			btnAutorizar.setEnabled(rowDataSolicitud.estado == "E");
@@ -263,20 +269,35 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			btnBloquear.setLabel((rowDataSolicitud.estado == "B") ? "Desbloquear" : "Bloquear")
 			
 			menuPrefac.memorizar([commandVerPrestacion, btnCambiarPrestador, btnAutorizar, btnBloquear]);
+			*/
 			
+			
+			tblSolicitud.resetSelection();
+			tblPrestacion.resetSelection();
+			
+			tblSolicitud.setFocusedCell();
+			tblPrestacion.setFocusedCell();
+			
+			tableModelSolicitud.setDataAsMapArray([], true);
+			tableModelPrestacion.setDataAsMapArray([], true);
 			
 			var p = {};
-			p.id_solicitud = rowDataSolicitud.id_solicitud;
+			p.id_prefacturacion = rowDataPrefac.id_prefacturacion;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Solicitudes");
+			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
 				//alert(qx.lang.Json.stringify(data, null, 2));
 		
-				tableModelPrestacion.setDataAsMapArray(data.result, true);
+				tableModelSolicitud.setDataAsMapArray(data.result, true);
 			});
-			rpc.callAsyncListeners(true, "leer_solicitudes_prestaciones", p);
+			rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				alert(qx.lang.Json.stringify(data, null, 2));
+			});
+			rpc.callAsyncListeners(true, "leer_solicitudes", p);
 		}
 	});
 
@@ -358,7 +379,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 		"F" : "Prefacturada",
 		"P" : "para Pago"
 	});
-	tableColumnModelSolicitud.setDataCellRenderer(3, cellrendererReplace);
+	tableColumnModelSolicitud.setDataCellRenderer(4, cellrendererReplace);
 	
 	
 	var selectionModelSolicitud = tblSolicitud.getSelectionModel();
@@ -370,14 +391,11 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 		} else {
 			rowDataSolicitud = tableModelSolicitud.getRowDataAsMap(tblSolicitud.getFocusedRow());
 			
-			commandVerPrestacion.setEnabled(true);
-			btnCambiarPrestador.setEnabled(rowDataSolicitud.estado == "E" || rowDataSolicitud.estado == "A");
-			btnAutorizar.setEnabled(rowDataSolicitud.estado == "E");
-			btnBloquear.setEnabled(rowDataSolicitud.estado == "B" || rowDataSolicitud.estado == "A");
-			btnBloquear.setLabel((rowDataSolicitud.estado == "B") ? "Desbloquear" : "Bloquear")
+			tblPrestacion.resetSelection();
 			
-			menuSolicitud.memorizar([commandVerPrestacion, btnCambiarPrestador, btnAutorizar, btnBloquear]);
+			tblPrestacion.setFocusedCell();
 			
+			tableModelPrestacion.setDataAsMapArray([], true);
 			
 			var p = {};
 			p.id_solicitud = rowDataSolicitud.id_solicitud;
@@ -389,6 +407,11 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 				//alert(qx.lang.Json.stringify(data, null, 2));
 		
 				tableModelPrestacion.setDataAsMapArray(data.result, true);
+			});
+			rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				alert(qx.lang.Json.stringify(data, null, 2));
 			});
 			rpc.callAsyncListeners(true, "leer_solicitudes_prestaciones", p);
 		}

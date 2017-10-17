@@ -379,7 +379,7 @@ class class_Vehiculo extends class_Base
   	$opciones = new stdClass;
   	$opciones->functionAux = functionAux1;
   	
-	$sql = "SELECT * FROM entsal WHERE id_vehiculo=" . $p->id_vehiculo . " ORDER BY f_ent DESC";
+	$sql = "SELECT entsal.*, CONCAT(unipresu.nombre, ' - ', REPLACE(unipresu.codigo, '-', '')) AS unipresu FROM entsal LEFT JOIN unipresu USING(cod_up) WHERE id_vehiculo=" . $p->id_vehiculo . " ORDER BY f_ent DESC";
 	
 	return $this->toJson($sql, $opciones);
   }

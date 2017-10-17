@@ -198,7 +198,17 @@ case "gastos" : {
 	<tr><td colspan="20">
 	<table border="1" rules="all" cellpadding="5" cellspacing="0" width="100%" align="center">
 	<thead>
-	<tr><th>Vehículo</th><th>#</th><th>Taller</th><th>Salida</th><th>Total</th></tr>
+	<tr><th>Vehículo</th><th>#</th><th>Taller</th>
+	
+	<?php
+	if (is_null($_REQUEST['cod_up'])) {
+		?>
+		<th>Unidad presup.</th>
+		<?php
+	}
+	?>
+	
+	<th>Salida</th><th>Total</th></tr>
 	</thead>
 	<tbody>
 	<?php
@@ -210,15 +220,15 @@ case "gastos" : {
 
 	
 	$sql = "SELECT * FROM(";
-	$sql.= "(SELECT movimiento.*, razones_sociales.razon_social AS taller, entsal.cod_up, vehiculo.nro_patente, vehiculo.marca FROM ((movimiento INNER JOIN `019`.razones_sociales USING(cod_razon_social)) INNER JOIN entsal USING(id_entsal)) INNER JOIN vehiculo USING(id_vehiculo))";
+	$sql.= "(SELECT movimiento.*, razones_sociales.razon_social AS taller, entsal.cod_up, vehiculo.nro_patente, vehiculo.marca, CONCAT(REPLACE(unipresu.codigo, '-', ''), ' - ', unipresu.nombre) AS up FROM (((movimiento INNER JOIN `019`.razones_sociales USING(cod_razon_social)) INNER JOIN entsal USING(id_entsal)) INNER JOIN vehiculo USING(id_vehiculo)) LEFT JOIN unipresu USING(cod_up))";
 	$sql.= " UNION ALL";
-	$sql.= "(SELECT movimiento.*, temporal_1.razon_social AS taller, entsal.cod_up, vehiculo.nro_patente, vehiculo.marca FROM ((movimiento INNER JOIN ";
+	$sql.= "(SELECT movimiento.*, temporal_1.razon_social AS taller, entsal.cod_up, vehiculo.nro_patente, vehiculo.marca, CONCAT(REPLACE(unipresu.codigo, '-', ''), ' - ', unipresu.nombre) AS up FROM (((movimiento INNER JOIN ";
 		$sql.= "(";
 		$sql.= "SELECT";
 		$sql.= "  0 AS cod_razon_social";
 		$sql.= ", 'Parque Automotor' AS razon_social";
 		$sql.= ") AS temporal_1";
-	$sql.= " USING(cod_razon_social)) INNER JOIN entsal USING(id_entsal)) INNER JOIN vehiculo USING(id_vehiculo))";
+	$sql.= " USING(cod_razon_social)) INNER JOIN entsal USING(id_entsal)) INNER JOIN vehiculo USING(id_vehiculo)) LEFT JOIN unipresu USING(cod_up))";
 	$sql.= ") AS temporal_2";
 	$sql.= " WHERE estado='S'";
 	
@@ -237,6 +247,13 @@ case "gastos" : {
 		<td><?php echo $row->nro_patente . "  " . $row->marca; ?></td>
 		<td><?php echo $row->id_movimiento; ?></td>
 		<td><?php echo $row->taller; ?></td>
+		<?php
+		if (is_null($_REQUEST['cod_up'])) {
+			?>
+			<td><?php echo $row->up; ?></td>
+			<?php
+		}
+		?>
 		<td><?php echo $row->f_sal; ?></td>
 		<td align="right"><?php echo number_format($row->total, 2, ",", "."); ?></td>
 		</tr>
@@ -244,7 +261,18 @@ case "gastos" : {
 	}
 	?>
 	
-	<tr><td colspan="5" align="right"><?php echo number_format($total, 2, ",", "."); ?></td></tr>
+	<?php
+	if (is_null($_REQUEST['cod_up'])) {
+		?>
+		<tr><td colspan="6" align="right"><?php echo number_format($total, 2, ",", "."); ?></td></tr>
+		<?php
+	} else {
+		?>
+		<tr><td colspan="5" align="right"><?php echo number_format($total, 2, ",", "."); ?></td></tr>
+		<?php
+	}
+	?>
+	
 
 	</tbody>
 	</table>
@@ -528,6 +556,7 @@ case "historial" : {
 		<tr>
 		<td><?php echo "Entrada: " . $rowEntsal->f_ent; ?></td>
 		<td><?php echo "Salida: " . $rowEntsal->f_sal; ?></td>
+		<td><?php echo "Km: " . number_format($rowEntsal->kilo, 0, ",", "."); ?></td>
 		<td align="right"><?php echo "Total: " . number_format($rowEntsal->total, 2, ",", "."); ?></td>
 		</tr>
 		<?php
@@ -536,7 +565,7 @@ case "historial" : {
 		
 		
 		$sql = "SELECT * FROM(";
-		$sql.= "(SELECT movimiento.*, razones_sociales.razon_social AS taller FROM movimiento INNER JOIN `019`.razones_sociales USING(cod_razon_social))";
+		$sql.= "(SELECT movimiento.*, razones_sociales.razon_social AS taller FROM movimiento LEFT JOIN `019`.razones_sociales USING(cod_razon_social))";
 		$sql.= " UNION ALL";
 		$sql.= "(SELECT movimiento.*, temporal_1.razon_social AS taller FROM movimiento INNER JOIN ";
 			$sql.= "(";
@@ -560,6 +589,7 @@ case "historial" : {
 			<tr>
 			<td><?php echo "Entrada: " . $rowMovimiento->f_ent; ?></td>
 			<td><?php echo "Salida: " . $rowMovimiento->f_sal; ?></td>
+			<td><?php echo "Km: " . number_format($rowMovimiento->kilo, 0, ",", "."); ?></td>
 			<td align="right"><?php echo "Total: " . number_format($rowMovimiento->total, 2, ",", "."); ?></td>
 			</tr>
 			<tr><td>&nbsp;</td></tr>

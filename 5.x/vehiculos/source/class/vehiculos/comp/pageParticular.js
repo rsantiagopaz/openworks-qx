@@ -110,6 +110,8 @@ qx.Class.define("vehiculos.comp.pageParticular",
 		var p = {};
 		p.id_entsal = rowDataEntSal.id_entsal;
 		
+		//alert(qx.lang.Json.stringify(p, null, 2));
+		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
 		rpc.callAsync(function(resultado, error, id) {
 			var bandera = true;
@@ -120,6 +122,9 @@ qx.Class.define("vehiculos.comp.pageParticular",
 				}
 			}
 			btnAnularEnt.setEnabled(bandera && (rowDataEntSal.estado == "E" || rowDataEntSal.estado == "T"));
+			
+			//alert(qx.lang.Json.stringify(resultado, null, 2));
+			//alert(qx.lang.Json.stringify(error, null, 2));
 			
 			tblMovimiento.setFocusedCell();
 			tableModelMovimiento.setDataAsMapArray(resultado, true);
@@ -317,11 +322,12 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	//Tabla
 
 	var tableModelEntsal = new qx.ui.table.model.Simple();
-	tableModelEntsal.setColumns(["Entrada", "Salida", "Km", "Total", "bandera_estado"], ["f_ent", "f_sal", "kilo", "total", "bandera_estado"]);
+	tableModelEntsal.setColumns(["Entrada", "Salida", "Unidad presup.", "Km", "Total", "bandera_estado"], ["f_ent", "f_sal", "unipresu", "kilo", "total", "bandera_estado"]);
 	tableModelEntsal.setColumnSortable(0, false);
 	tableModelEntsal.setColumnSortable(1, false);
 	tableModelEntsal.setColumnSortable(2, false);
 	tableModelEntsal.setColumnSortable(3, false);
+	tableModelEntsal.setColumnSortable(4, false);
 
 	var custom = {tableColumnModel : function(obj) {
 		return new qx.ui.table.columnmodel.Resize(obj);
@@ -334,7 +340,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 	tblEntsal.toggleStatusBarVisible();
 	
 	var tableColumnModelEntsal = tblEntsal.getTableColumnModel();
-	tableColumnModelEntsal.setColumnVisible(4, false);
+	tableColumnModelEntsal.setColumnVisible(5, false);
 	
 	var cellrendererString = new qx.ui.table.cellrenderer.String();
 	cellrendererString.addNumericCondition("==", -1, "center", "#FF0000", null, null, "bandera_estado");
@@ -351,7 +357,7 @@ qx.Class.define("vehiculos.comp.pageParticular",
 			return cellrendererNumber;
 		}
 	});
-	tableColumnModelEntsal.setDataCellRenderer(3, cellrendererDynamic);
+	tableColumnModelEntsal.setDataCellRenderer(4, cellrendererDynamic);
 	
 	var selectionModelEntsal = tblEntsal.getSelectionModel();
 	selectionModelEntsal.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
