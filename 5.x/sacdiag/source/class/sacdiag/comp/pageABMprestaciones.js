@@ -61,6 +61,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		menuPrestacion.memorizar([commandAgregarPrestacion]);
 		
 		var p = {};
+		p.texto = "";
 		p.phpParametros = {id_prestacion_tipo: rowDataPrestaciones_tipo.id_prestacion_tipo};
 		
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
@@ -308,40 +309,11 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	var tableColumnModelPrestacion = tblPrestacion.getTableColumnModel();
 	
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
-	/*
-	resizeBehavior.set(0, {width:"3%", minWidth:100});
-	resizeBehavior.set(1, {width:"5%", minWidth:100});
-	resizeBehavior.set(2, {width:"5%", minWidth:100});
-	resizeBehavior.set(3, {width:"21%", minWidth:100});
-	resizeBehavior.set(4, {width:"5%", minWidth:100});
-	resizeBehavior.set(5, {width:"21%", minWidth:100});
-	resizeBehavior.set(6, {width:"5%", minWidth:100});
-	resizeBehavior.set(7, {width:"5%", minWidth:100});
-	resizeBehavior.set(8, {width:"21%", minWidth:100});
-	resizeBehavior.set(9, {width:"4%", minWidth:100});
-	resizeBehavior.set(10, {width:"5%", minWidth:100});
 
-	
-	
-	var cellrendererBoolean = new qx.ui.table.cellrenderer.Boolean();
-	cellrendererBoolean.setDefaultCellStyle("display: table-cell; vertical-align: middle; position: relative;");
-	tableColumnModel.setDataCellRenderer(0, cellrendererBoolean);
-	
-	var cellrendererDate = new defineMultiLineCellDate();
-	cellrendererDate.setDateFormat(new qx.util.format.DateFormat("dd/MM/y"));
-	tableColumnModel.setDataCellRenderer(1, cellrendererDate);
-	
-	var cellrenderer = new defineMultiLineCellHtml();
-	tableColumnModel.setDataCellRenderer(2, cellrenderer);
-	tableColumnModel.setDataCellRenderer(3, cellrenderer);
-	tableColumnModel.setDataCellRenderer(4, cellrenderer);
-	tableColumnModel.setDataCellRenderer(5, cellrenderer);
-	tableColumnModel.setDataCellRenderer(6, cellrenderer);
-	tableColumnModel.setDataCellRenderer(7, cellrenderer);
-	tableColumnModel.setDataCellRenderer(8, cellrenderer);
-	tableColumnModel.setDataCellRenderer(9, cellrenderer);
-	tableColumnModel.setDataCellRenderer(10, cellrenderer);
-	*/
+	resizeBehaviorPrestacion.set(0, {width:"15%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"75%", minWidth:100});
+	resizeBehaviorPrestacion.set(2, {width:"10%", minWidth:100});
+
 	
 	
 	var selectionModelPrestacion = tblPrestacion.getSelectionModel();

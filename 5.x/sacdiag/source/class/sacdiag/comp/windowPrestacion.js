@@ -43,7 +43,12 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 	})
 	form.add(txtDescrip, "Descripción", null, "denominacion");
 	
-	var txtValor = new qx.ui.form.Spinner();
+	var txtValor = new qx.ui.form.Spinner(0, 0, 1000000);
+	txtValor.setNumberFormat(application.numberformatMontoEn);
+	txtValor.getChildControl("upbutton").setVisibility("excluded");
+	txtValor.getChildControl("downbutton").setVisibility("excluded");
+	txtValor.setSingleStep(0);
+	txtValor.setPageStep(0);
 	//txtValor.setRequired(true);
 	//txtValor.setMinWidth(400);
 	form.add(txtValor, "Valor", null, "valor");

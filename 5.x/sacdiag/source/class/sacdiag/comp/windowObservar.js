@@ -1,12 +1,11 @@
-qx.Class.define("sacdiag.comp.windowSeleccionarPrestador",
+qx.Class.define("sacdiag.comp.windowObservar",
 {
 	extend : componente.comp.ui.ramon.window.Window,
-	construct : function (rowData)
+	construct : function ()
 	{
 	this.base(arguments);
 	
 	this.set({
-		caption: "Seleccionar prestador",
 		width: 500,
 		height: 200,
 		showMinimize: false,
@@ -18,7 +17,7 @@ qx.Class.define("sacdiag.comp.windowSeleccionarPrestador",
 	this.setLayout(new qx.ui.layout.Canvas());
 
 	this.addListenerOnce("appear", function(e){
-		slbPrestador.focus();
+		txtObserva.focus();
 	});
 	
 	
@@ -28,22 +27,13 @@ qx.Class.define("sacdiag.comp.windowSeleccionarPrestador",
 	var form = new qx.ui.form.Form();
 	
 	
-	var slbPrestador = new qx.ui.form.SelectBox();
-	slbPrestador.setRequired(true);
-	slbPrestador.setWidth(400);
-	form.add(slbPrestador, "Prestador", null, "prestador");
-	
-	var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Parametros");
-	rpc.addListener("completed", function(e){
-		var data = e.getData();
-		
-		for (var x in data.result) {
-			slbPrestador.add(new qx.ui.form.ListItem(data.result[x].label, null, data.result[x].model));
-		}
+	var txtObserva = new qx.ui.form.TextArea("");
+	txtObserva.setRequired(true);
+	txtObserva.setMinWidth(350);
+	txtObserva.addListener("blur", function(e){
+		this.setValue(this.getValue().trim());
 	});
-	rpc.callAsyncListeners(true, "autocompletarPrestador", {texto: ""});
-	
-	
+	form.add(txtObserva, "Observaciones", null, "observaciones");
 	
 	
 	
@@ -60,7 +50,7 @@ qx.Class.define("sacdiag.comp.windowSeleccionarPrestador",
 		if (form.validate()) {
 			btnCancelar.execute();
 			
-			this.fireDataEvent("aceptado", slbPrestador.getModelSelection().getItem(0));
+			this.fireDataEvent("aceptado", txtObserva.getValue());
 		} else {
 			form.getValidationManager().getInvalidFormItems()[0].focus();
 		}

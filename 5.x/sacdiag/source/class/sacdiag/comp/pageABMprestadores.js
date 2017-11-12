@@ -151,7 +151,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	
 	
 	var tableModelPrestador = new qx.ui.table.model.Simple();
-	tableModelPrestador.setColumns(["Descripción", "CUIT", "Domicilio", "Teléfono", "Contacto"], ["organismo_area_descripcion", "cuit", "domicilio", "telefonos", "contacto"]);
+	tableModelPrestador.setColumns(["Descripción", "CUIT", "Domicilio", "Teléfono", "Contacto"], ["denominacion", "cuit", "domicilio", "telefonos", "contacto"]);
 	tableModelPrestador.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrestador.getRowCount();
 		
@@ -172,40 +172,13 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	var tableColumnModelPrestador = tblPrestador.getTableColumnModel();
 	
 	var resizeBehaviorPrestador = tableColumnModelPrestador.getBehavior();
-	/*
-	resizeBehavior.set(0, {width:"3%", minWidth:100});
-	resizeBehavior.set(1, {width:"5%", minWidth:100});
-	resizeBehavior.set(2, {width:"5%", minWidth:100});
-	resizeBehavior.set(3, {width:"21%", minWidth:100});
-	resizeBehavior.set(4, {width:"5%", minWidth:100});
-	resizeBehavior.set(5, {width:"21%", minWidth:100});
-	resizeBehavior.set(6, {width:"5%", minWidth:100});
-	resizeBehavior.set(7, {width:"5%", minWidth:100});
-	resizeBehavior.set(8, {width:"21%", minWidth:100});
-	resizeBehavior.set(9, {width:"4%", minWidth:100});
-	resizeBehavior.set(10, {width:"5%", minWidth:100});
 
-	
-	
-	var cellrendererBoolean = new qx.ui.table.cellrenderer.Boolean();
-	cellrendererBoolean.setDefaultCellStyle("display: table-cell; vertical-align: middle; position: relative;");
-	tableColumnModel.setDataCellRenderer(0, cellrendererBoolean);
-	
-	var cellrendererDate = new defineMultiLineCellDate();
-	cellrendererDate.setDateFormat(new qx.util.format.DateFormat("dd/MM/y"));
-	tableColumnModel.setDataCellRenderer(1, cellrendererDate);
-	
-	var cellrenderer = new defineMultiLineCellHtml();
-	tableColumnModel.setDataCellRenderer(2, cellrenderer);
-	tableColumnModel.setDataCellRenderer(3, cellrenderer);
-	tableColumnModel.setDataCellRenderer(4, cellrenderer);
-	tableColumnModel.setDataCellRenderer(5, cellrenderer);
-	tableColumnModel.setDataCellRenderer(6, cellrenderer);
-	tableColumnModel.setDataCellRenderer(7, cellrenderer);
-	tableColumnModel.setDataCellRenderer(8, cellrenderer);
-	tableColumnModel.setDataCellRenderer(9, cellrenderer);
-	tableColumnModel.setDataCellRenderer(10, cellrenderer);
-	*/
+	resizeBehaviorPrestador.set(0, {width:"30%", minWidth:100});
+	resizeBehaviorPrestador.set(1, {width:"15%", minWidth:100});
+	resizeBehaviorPrestador.set(2, {width:"30%", minWidth:100});
+	resizeBehaviorPrestador.set(3, {width:"15%", minWidth:100});
+	resizeBehaviorPrestador.set(4, {width:"10%", minWidth:100});
+
 	
 	
 	var selectionModelPrestador = tblPrestador.getSelectionModel();
@@ -257,8 +230,11 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		
 		if (tblPrestacion.buscar("id_prestacion", model) == null) {
 			var p = {};
-			p.id_prestador = rowDataPrestador.id_prestador;
+			p.id_prestador = rowDataPrestador.model;
 			p.id_prestacion = model;
+			
+			//alert(qx.lang.Json.stringify(p, null, 2));
+			
 			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
@@ -366,10 +342,10 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	var tableColumnModelPrestacion = tblPrestacion.getTableColumnModel();
 	
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
-	resizeBehaviorPrestacion.set(0, {width:"25%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"25%", minWidth:100});
-	resizeBehaviorPrestacion.set(2, {width:"25%", minWidth:100});
-	resizeBehaviorPrestacion.set(3, {width:"25%", minWidth:100});
+	resizeBehaviorPrestacion.set(0, {width:"15%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"65%", minWidth:100});
+	resizeBehaviorPrestacion.set(2, {width:"10%", minWidth:100});
+	resizeBehaviorPrestacion.set(3, {width:"10%", minWidth:100});
 
 
 	var cellrendererReplace = new qx.ui.table.cellrenderer.Replace();

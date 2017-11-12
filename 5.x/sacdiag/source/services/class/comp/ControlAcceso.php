@@ -33,6 +33,32 @@ class class_ControlAcceso extends class_Base
 
 	return $resultado;
   }
+  
+  
+  public function method_traer_areas($params, $error) {
+  	$p = $params[0];
+  	
+	$sql = "SELECT";
+	$sql.= "  sistemas_perfiles_usuarios_oas.id_sist_perfil_usuario_oas AS model";
+	$sql.= ", CONCAT(_organismos_areas.organismo_area, ' - ', _servicios.denominacion) AS label";
+	$sql.= ", organismo_area_id";
+	$sql.= " FROM";
+	$sql.= "  sistemas_perfiles_usuarios_oas
+        INNER JOIN _sistemas_perfiles ON sistemas_perfiles_usuarios_oas.perfil_id = _sistemas_perfiles.perfil_id AND _sistemas_perfiles.perfil_id = '" . "acp001" . "'
+        INNER JOIN _sistemas_usuarios ON sistemas_perfiles_usuarios_oas.id_sistema_usuario = _sistemas_usuarios.id_sistema_usuario
+        INNER JOIN oas_usuarios ON sistemas_perfiles_usuarios_oas.id_oas_usuario = oas_usuarios.id_oas_usuario
+        INNER JOIN _usuarios ON _sistemas_usuarios.SYSusuario = _usuarios.SYSusuario AND oas_usuarios.SYSusuario = _usuarios.SYSusuario AND _usuarios.SYSusuario = '" . $p->usuario . "' AND _usuarios.SYSpassword = '" . md5($p->password) . "'
+        INNER JOIN _organismos_areas_servicios ON oas_usuarios.id_organismo_area_servicio = _organismos_areas_servicios.id_organismo_area_servicio
+        INNER JOIN _organismos_areas ON _organismos_areas_servicios.id_organismo_area = _organismos_areas.organismo_area_id
+        INNER JOIN _servicios ON _organismos_areas_servicios.id_servicio = _servicios.id_servicio";
+	
+	
+	
+	$sql.= " ORDER BY label";
+	
+	return $this->toJson($sql);
+
+  }
 }
 
 ?>

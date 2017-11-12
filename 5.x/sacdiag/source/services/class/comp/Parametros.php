@@ -80,32 +80,56 @@ class class_Parametros extends class_Base
   public function method_alta_modifica_prestador($params, $error) {
   	$p = $params[0];
   	
-  	$id_prestador = $p->model->id_prestador;
+  	$organismo_area_id = $p->model->organismo_area_id;
   	
 
-	$sql = "SELECT id_prestador FROM prestadores WHERE denominacion LIKE '" . $p->model->denominacion . "' AND id_prestador<>" . $p->model->id_prestador;
+	$sql = "SELECT organismo_area_id FROM _organismos_areas WHERE organismo_area_estado='3' AND organismo_area LIKE '" . $p->model->denominacion . "' AND organismo_area_id <> '" . $p->model->organismo_area_id . "'";
 	$rs = $this->mysqli->query($sql);
 	if ($rs->num_rows > 0) {
 		$row = $rs->fetch_object();
 		
-		$error->SetError((int) $row->id_prestador, "descrip_duplicado");
+		$error->SetError((int) $row->organismo_area_id, "descrip_duplicado");
 		return $error;
 	}
 
 		
-	$set = $this->prepararCampos($p->model, "prestadores");
+	$this->mysqli->query("START TRANSACTION");
 		
-	if ($p->model->id_prestador == "0") {
-		$sql = "INSERT prestadores SET " . $set;
+	if ($p->model->organismo_area_id == "-1") {
+		do {
+			$organismo_area_id = $this->generateRandomString(5);
+			
+			$sql = "SELECT organismo_area_id FROM _organismos_areas WHERE organismo_area_id='" . $organismo_area_id . "'";
+			$rs = $this->mysqli->query($sql);
+			
+		} while ($rs->num_rows > 0);
+		
+		$p->model->organismo_area_id = $organismo_area_id;
+		
+		
+		$sql = "INSERT _organismos_areas SET organismo_area='" . $p->model->denominacion . "', organismo_area_id='" . $organismo_area_id . "', organismo_area_estado='3', organismo_area_tipo_id='E', organismo_id='PP', publico='N'";
 		$this->mysqli->query($sql);
 		
-		$id_prestador = $this->mysqli->insert_id;
+		
+		$set = $this->prepararCampos($p->model, "prestador_datos");
+		
+		$sql = "INSERT prestador_datos SET " . $set;
+		$this->mysqli->query($sql);
 	} else {
-		$sql = "UPDATE prestadores SET " . $set . " WHERE id_prestador=" . $p->model->id_prestador;
+		
+		$sql = "UPDATE _organismos_areas SET organismo_area='" . $p->model->denominacion . "' WHERE organismo_area_id='" . $organismo_area_id . "'";
+		$this->mysqli->query($sql);
+		
+		
+		$set = $this->prepararCampos($p->model, "prestador_datos");
+		
+		$sql = "INSERT prestador_datos SET " . $set . " ON DUPLICATE KEY UPDATE " . $set;
 		$this->mysqli->query($sql);
 	}
 	
-	return $id_prestador;
+	$this->mysqli->query("COMMIT");
+	
+	return $organismo_area_id;
   }
   
   
@@ -177,9 +201,23 @@ class class_Parametros extends class_Base
   public function method_autocompletarPrestador($params, $error) {
   	$p = $params[0];
   	
-  	$sql = "SELECT _organismos_areas.*, organismo_area_id AS model, organismo_area_descripcion AS label FROM _organismos_areas WHERE organismo_area_estado='3' AND organismo_area_descripcion LIKE '%". $p->texto . "%' ORDER BY organismo_area_descripcion";
+	function functionAux(&$row, $key) {
+		if (is_null($row->organismo_area_id)) {
+			$row->organismo_area_id = $row->model;
+			$row->cuit = "";
+			$row->domicilio = "";
+			$row->telefonos = "";
+			$row->contacto = "";
+			$row->observaciones = "";
+		}
+	};
+  	
+  	$opciones = new stdClass;
+  	$opciones->functionAux = functionAux;
+  	
+  	$sql = "SELECT organismo_area_id AS model, organismo_area AS label, organismo_area AS denominacion, prestador_datos.* FROM _organismos_areas LEFT JOIN prestador_datos USING(organismo_area_id) WHERE organismo_area_estado='3' AND organismo_area LIKE '%". $p->texto . "%' ORDER BY organismo_area";
 
-	return $this->toJson($sql);
+	return $this->toJson($sql, $opciones);
   }
   
   
@@ -189,10 +227,26 @@ class class_Parametros extends class_Base
   	$opciones = new stdClass;
   	$opciones->valor = "float";
   	
-  	$sql = "SELECT prestaciones.*, id_prestacion AS model, CONCAT(prestaciones.denominacion, ' (', prestaciones_tipo.denominacion, ')') AS label FROM prestaciones INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) WHERE prestaciones.denominacion LIKE'%". $p->texto . "%'";
-  	if (! is_null($p->phpParametros)) $sql.= " AND id_prestacion_tipo=" . $p->phpParametros->id_prestacion_tipo;
+  	if (is_numeric($p->texto)) {
+  		$sql = "SELECT prestaciones.*, id_prestacion AS model, CONCAT(prestaciones.codigo, ', ', prestaciones.denominacion, ' (', prestaciones_tipo.denominacion, ')') AS label FROM prestaciones INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) WHERE prestaciones.codigo LIKE'%". $p->texto . "%'";
+  	} else {
+  		$sql = "SELECT prestaciones.*, id_prestacion AS model, CONCAT(prestaciones.denominacion, ', ', prestaciones.codigo, ' (', prestaciones_tipo.denominacion, ')') AS label FROM prestaciones INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) WHERE prestaciones.denominacion LIKE'%". $p->texto . "%'";
+  		if (! is_null($p->phpParametros)) $sql.= " AND id_prestacion_tipo=" . $p->phpParametros->id_prestacion_tipo;  		
+  	}
+  	
+  	$sql.= " ORDER BY label";
+
 
 	return $this->toJson($sql, $opciones);
+  }
+  
+  
+  public function method_autocompletarPersonal($params, $error) {
+	$p = $params[0];
+
+	$sql = "SELECT id_personal AS model, TRIM(apenom) AS label FROM _personal WHERE apenom LIKE '%". $p->texto . "%' ORDER BY label";
+
+	return $this->toJson($sql);
   }
   
   
@@ -210,6 +264,11 @@ class class_Parametros extends class_Base
 		$error->SetError(0, "password");
 		return $error;
 	}
+  }
+  
+  
+  public function generateRandomString($length = 10) {
+	return substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
   }
 }
 

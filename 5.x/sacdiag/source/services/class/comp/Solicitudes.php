@@ -11,6 +11,16 @@ class class_Solicitudes extends class_Base
   public function method_leer_solicitud($params, $error) {
 	$p = $params[0];
 	
+	$estado = array();
+	$estado["E"] = "Emitida";
+	$estado["A"] = "Aprobada";
+	$estado["B"] = "Bloqueada";
+	$estado["C"] = "Capturada";
+	$estado["L"] = "Liberada";
+	$estado["F"] = "Prefacturada";
+	$estado["P"] = "para Pago";
+	
+	
 	$resultado = array();
 	
 	//$sql = "SELECT solicitudes.*, _personas.persona_nombre, _personas.persona_dni, efectores_publicos.denominacion AS efector_publico, prestadores.denominacion AS prestador FROM solicitudes INNER JOIN _personas USING(persona_id) INNER JOIN efectores_publicos USING(id_efector_publico) INNER JOIN prestadores USING(id_prestador) WHERE TRUE";
@@ -26,21 +36,37 @@ class class_Solicitudes extends class_Base
 	
 	if (! is_null($p->id_prestador)) $sql.= " AND id_prestador='" . $p->id_prestador . "'";
 	if (! is_null($p->persona_id)) $sql.= " AND persona_id='" . $p->persona_id . "'";
-	if (! empty($p->estado)) $sql.= " AND estado='" . $p->estado . "'";
+	if (! is_null($p->id_usuario_medico)) $sql.= " AND id_usuario_medico='" . $p->id_usuario_medico . "'";
+	if (empty($p->estado)) $sql.= " AND estado <> 'C'"; else $sql.= " AND estado='" . $p->estado . "'";
 	
 	$sql.= " ORDER BY fecha_emite DESC";
 	
 	$rs = $this->mysqli->query($sql);
 	while ($row = $rs->fetch_object()) {
-		$sql = "SELECT organismo_area_descripcion FROM _organismos_areas WHERE organismo_area_id='" . $row->id_efector_publico . "'";
-		$rsAux = $this->mysqli->query($sql);
-		$rowAux = $rsAux->fetch_object();
-		$row->efector_publico = $rowAux->organismo_area_descripcion;
+		$row->estado_descrip = $estado[$row->estado];
 		
-		$sql = "SELECT organismo_area_descripcion FROM _organismos_areas WHERE organismo_area_id='" . $row->id_prestador . "'";
+		if ($row->estado=="E") {
+			$row->estado_condicion = 1;
+		} else if ($row->estado=="A") {
+			$row->estado_condicion = 2;
+		} else {
+			$row->estado_condicion = 0;
+		}
+		
+		$sql = "SELECT organismo_area FROM _organismos_areas WHERE organismo_area_id='" . $row->id_efector_publico . "'";
 		$rsAux = $this->mysqli->query($sql);
 		$rowAux = $rsAux->fetch_object();
-		$row->prestador = $rowAux->organismo_area_descripcion;
+		$row->efector_publico = $rowAux->organismo_area;
+		
+		$sql = "SELECT organismo_area FROM _organismos_areas WHERE organismo_area_id='" . $row->id_prestador . "'";
+		$rsAux = $this->mysqli->query($sql);
+		$rowAux = $rsAux->fetch_object();
+		$row->prestador = $rowAux->organismo_area;
+		
+		$sql = "SELECT apenom AS medico_descrip FROM _personal WHERE id_personal=" . $row->id_usuario_medico;
+		$rsAux = $this->mysqli->query($sql);
+		$rowAux = $rsAux->fetch_object();
+		$row->medico_descrip = $rowAux->medico_descrip;
 		
 		$resultado[] = $row;
 	}
@@ -59,7 +85,8 @@ class class_Solicitudes extends class_Base
 	$sql.= "  solicitudes_prestaciones.*";
 	$sql.= ", prestaciones.*";
 	$sql.= ", prestaciones_tipo.denominacion AS prestacion_tipo";
-	$sql.= " FROM solicitudes_prestaciones INNER JOIN prestaciones USING(id_prestacion) INNER JOIN prestaciones_tipo USING(id_prestacion_tipo)";
+	$sql.= ", prestaciones_resultados.denominacion AS prestacion_resultado";
+	$sql.= " FROM solicitudes_prestaciones INNER JOIN prestaciones USING(id_prestacion) INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) LEFT JOIN prestaciones_resultados USING(id_prestacion_resultado)";
 	$sql.= " WHERE solicitudes_prestaciones.id_solicitud=" . $p->id_solicitud;
 	
 	return $this->toJson($sql, $opciones);

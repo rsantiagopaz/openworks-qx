@@ -61,93 +61,30 @@ qx.Class.define("sacdiag.Application",
 	
 	doc.set({blockerColor: '#bfbfbf', blockerOpacity: 0.4});
 	
-	var functionLogin = this.functionLogin = function(functionSuccess) {
-		var loginWidget = new dialog.Login({
-			text : "Ingrese datos de identificación",
-			checkCredentials : function(username, password, callback) {
-				loginWidget._username.setValid(true);
-				loginWidget._password.setValid(true);
-				
-				var p = {};
-				p.usuario = username;
-				p.password = password;
-				
-				var rpc = new qx.io.remote.Rpc("services/", "comp.ControlAcceso");
-				rpc.setTimeout(1000 * 60);
-				rpc.callAsync(function(resultado, error, id){
-					//alert(qx.lang.Json.stringify(resultado, null, 2));
-					//alert(qx.lang.Json.stringify(error, null, 2));
-					
-					if (error) {
-						callback(error);
-					} else {
-						callback(null, resultado);
-					}
-				}, "login", p);
-			},
-			callback : function(err, data) {
-				if(err) {
-					//alert(qx.lang.Json.stringify(err, null, 2));
-				} else {
-					//alert(qx.lang.Json.stringify(data, null, 2));
-				}
-			}
-		});
-		
-		loginWidget._username.getLayoutParent().getLayout().getCellWidget(0, 0).setValue("Usuario:");
-		loginWidget._username.getLayoutParent().getLayout().getCellWidget(1, 0).setValue("Contraseña:");
-		
-		//loginWidget._username.getLayoutParent().getLayout().getCellWidget(0, 1).setValue("danielramirez");
-		//loginWidget._username.getLayoutParent().getLayout().getCellWidget(1, 1).setValue("danielramirez");
-		loginWidget._username.setValue("danielramirez");
-		loginWidget._password.setValue("danielramirez");
-		
-		
-		loginWidget._password.setInvalidMessage("Contraseña incorrecta");
-		
-		loginWidget.setAllowCancel(false);
-		loginWidget._loginButton.setLabel("Aceptar");
-		loginWidget._username.addListener("appear", function(e) {
-			//loginWidget.activate();
-			loginWidget._username.focus();
-		});
-		
-		loginWidget.addListener("loginSuccess", functionSuccess);
-		loginWidget.addListener("loginFailure", function(e){
-			var data = e.getData();
-			if (data.message=="permiso") {
-				loginWidget._username.setInvalidMessage("El usuario no cuenta con los permisos necesarios");
-				loginWidget._username.setValid(false);
-				loginWidget._username.focus();
-			} else if (data.message=="nick") {
-				loginWidget._username.setInvalidMessage("Usuario no encontrado");
-				loginWidget._username.setValid(false);
-				loginWidget._username.focus();
-			} else if (data.message=="password") {
-				loginWidget._password.setValid(false);
-				loginWidget._password.focus();
-			}
-		});
-		
-		loginWidget.show();
-	}
+
 	
 	
-	
-	/*
-	functionLogin(qx.lang.Function.bind(function(e) {
+	var win = new sacdiag.comp.windowLogin();
+	win.setModal(true);
+	win.addListenerOnce("appear", function(e){
+		win.center();
+	});
+	win.addListener("aceptado", function(e){
 		var data = e.getData();
 		
 		this.login = data;
-		
 		//alert(qx.lang.Json.stringify(data, null, 2));
-
+		
 		this._InitAPP();
-	}, this));
-	*/
+	}, this)
+	//doc.add(win);
+	//win.center();
+	win.open();
 	
 	
-	this._InitAPP();
+	
+	
+	
 	
     },
     
@@ -161,8 +98,6 @@ qx.Class.define("sacdiag.Application",
 	//alert("entrooo");
 	
 	
-	
-
 	
 
 	
@@ -212,20 +147,6 @@ qx.Class.define("sacdiag.Application",
 	
 	var mnuEdicion = new qx.ui.menu.Menu();
 	
-	var btnPanelDeEstudiosEnProceso = new qx.ui.menu.Button("Panel de Estudios en Proceso...");
-	btnPanelDeEstudiosEnProceso.addListener("execute", function(){
-		if (pagePanelDeEstudiosEnProceso == null) {
-			pagePanelDeEstudiosEnProceso = new sacdiag.comp.pagePanelDeEstudiosEnProceso();
-			pagePanelDeEstudiosEnProceso.addListenerOnce("close", function(e){
-				pagePanelDeEstudiosEnProceso = null;
-			});
-			tabviewMain.add(pagePanelDeEstudiosEnProceso);
-		}
-		tabviewMain.setSelection([pagePanelDeEstudiosEnProceso]);
-	});
-	mnuEdicion.add(btnPanelDeEstudiosEnProceso);
-	
-	
 	
 	var btnControlDePrefacturaciones = new qx.ui.menu.Button("Control de Prefacturaciones...");
 	btnControlDePrefacturaciones.addListener("execute", function(){
@@ -241,19 +162,18 @@ qx.Class.define("sacdiag.Application",
 	mnuEdicion.add(btnControlDePrefacturaciones);
 	
 	
-	
-	var btnABMPrestaciones = new qx.ui.menu.Button("ABM Prestaciones...");
-	btnABMPrestaciones.addListener("execute", function(){
-		if (pageABMprestaciones == null) {
-			pageABMprestaciones = new sacdiag.comp.pageABMprestaciones();
-			pageABMprestaciones.addListenerOnce("close", function(e){
-				pageABMprestaciones = null;
+	var btnPanelDeEstudiosEnProceso = new qx.ui.menu.Button("Panel de Estudios en Proceso...");
+	btnPanelDeEstudiosEnProceso.addListener("execute", function(){
+		if (pagePanelDeEstudiosEnProceso == null) {
+			pagePanelDeEstudiosEnProceso = new sacdiag.comp.pagePanelDeEstudiosEnProceso();
+			pagePanelDeEstudiosEnProceso.addListenerOnce("close", function(e){
+				pagePanelDeEstudiosEnProceso = null;
 			});
-			tabviewMain.add(pageABMprestaciones);
+			tabviewMain.add(pagePanelDeEstudiosEnProceso);
 		}
-		tabviewMain.setSelection([pageABMprestaciones]);
+		tabviewMain.setSelection([pagePanelDeEstudiosEnProceso]);
 	});
-	mnuEdicion.add(btnABMPrestaciones);
+	mnuEdicion.add(btnPanelDeEstudiosEnProceso);
 	
 	
 	var btnABMPrestadores = new qx.ui.menu.Button("ABM Prestadores...");
@@ -268,6 +188,20 @@ qx.Class.define("sacdiag.Application",
 		tabviewMain.setSelection([pageABMprestadores]);
 	});
 	mnuEdicion.add(btnABMPrestadores);
+	
+	
+	var btnABMPrestaciones = new qx.ui.menu.Button("ABM Prestaciones...");
+	btnABMPrestaciones.addListener("execute", function(){
+		if (pageABMprestaciones == null) {
+			pageABMprestaciones = new sacdiag.comp.pageABMprestaciones();
+			pageABMprestaciones.addListenerOnce("close", function(e){
+				pageABMprestaciones = null;
+			});
+			tabviewMain.add(pageABMprestaciones);
+		}
+		tabviewMain.setSelection([pageABMprestaciones]);
+	});
+	mnuEdicion.add(btnABMPrestaciones);
 	
 	
 
@@ -333,8 +267,8 @@ qx.Class.define("sacdiag.Application",
 	
 	doc.add(toolbarMain, {left: 5, top: 0, right: "50%"});
 	
-	doc.add(new qx.ui.basic.Label("Usuario: " + this.login._usuario), {left: "51%", top: 5});
-	doc.add(new qx.ui.basic.Label("Org/Area: " + this.login._usuario_organismo_area), {left: "51%", top: 25});
+	doc.add(new qx.ui.basic.Label("Usuario: " + this.login.usuario), {left: "51%", top: 5});
+	doc.add(new qx.ui.basic.Label("Org/Area: " + this.login.label), {left: "51%", top: 25});
 	
 	
 	//doc.add(contenedorMain, {left: 0, top: 33, right: 0, bottom: 0});
@@ -350,6 +284,7 @@ qx.Class.define("sacdiag.Application",
 	//tabviewMain.setSelection([page]);
 	
 	
+	btnPanelDeEstudiosEnProceso.execute();
 	
 	}
   }

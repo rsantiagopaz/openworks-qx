@@ -76,9 +76,11 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 	if (rowData == null) {
 		this.setCaption("Nuevo prestador");
 		
-		aux = qx.data.marshal.Json.createModel({id_prestador: "0", denominacion: "", cuit: "", domicilio: "", telefonos: "", contacto: "", observaciones: ""}, true);
+		aux = qx.data.marshal.Json.createModel({organismo_area_id: "-1", denominacion: "", cuit: "", domicilio: "", telefonos: "", contacto: "", observaciones: ""}, true);
 	} else {
 		this.setCaption("Modificar prestador");
+		
+		//alert(qx.lang.Json.stringify(rowData, null, 2));
 		
 		aux = qx.data.marshal.Json.createModel(rowData, true);
 	}
