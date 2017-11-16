@@ -7,6 +7,23 @@ class class_Base
 	function __construct() {
 		require('Conexion.php');
 		
+		
+		set_time_limit(0);
+		
+		$time = $_SERVER["REQUEST_TIME"];
+		$timeout_duration = 1320;
+		
+		if (! isset($_SESSION["LAST_ACTIVITY"])) {
+			throw new JsonRpcError("sesion_terminada", 0);
+		} else if (($time - $_SESSION["LAST_ACTIVITY"]) > $timeout_duration) {
+			throw new JsonRpcError("sesion_terminada", 0);
+		} else {
+			$_SESSION["LAST_ACTIVITY"] = $time;
+		}
+		
+		
+		
+		
 		$aux = new mysqli_driver;
 		$aux->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
 		

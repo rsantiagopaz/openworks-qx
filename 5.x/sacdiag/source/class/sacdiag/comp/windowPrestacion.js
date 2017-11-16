@@ -82,7 +82,7 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 			
 			//alert(qx.lang.Json.stringify(p, null, 2));
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Parametros");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				

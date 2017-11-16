@@ -44,11 +44,14 @@ class class_Solicitudes extends class_Base
 	$rs = $this->mysqli->query($sql);
 	while ($row = $rs->fetch_object()) {
 		$row->estado_descrip = $estado[$row->estado];
+		$row->anses_negativa = ($row->anses_negativa == "S") ? "Si" : "No";
 		
 		if ($row->estado=="E") {
 			$row->estado_condicion = 1;
 		} else if ($row->estado=="A") {
 			$row->estado_condicion = 2;
+		} else if ($row->estado=="B") {
+			$row->estado_condicion = 3;
 		} else {
 			$row->estado_condicion = 0;
 		}

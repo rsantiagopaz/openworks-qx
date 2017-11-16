@@ -52,7 +52,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 		
 		var p = {};
 		
-		var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
@@ -69,7 +69,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 		rpc.addListener("failed", function(e){
 			var data = e.getData();
 			
-			alert(qx.lang.Json.stringify(data, null, 2));
+			//alert(qx.lang.Json.stringify(data, null, 2));
 
 		});
 		rpc.callAsyncListeners(true, "leer_prefacturacion", p);
@@ -102,7 +102,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 				p.observaciones = data;
 				p.estado = "O";
 				
-				var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+				var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 				rpc.addListener("completed", function(e){
 					var data = e.getData();
 					
@@ -124,7 +124,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 										p.observaciones = "";
 										p.estado = "E";
 										
-										var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+										var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 										rpc.addListener("completed", function(e){
 											var data = e.getData();
 											
@@ -152,7 +152,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			p.id_prefacturacion = rowDataPrefac.id_prefacturacion;
 			p.documentacion_id = data;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -180,7 +180,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 									p.id_prefacturacion = rowDataPrefac.id_prefacturacion;
 									p.estado = "A";
 									
-									var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+									var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 									rpc.addListener("completed", function(e){
 										var data = e.getData();
 										
@@ -308,7 +308,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			var p = {};
 			p.id_prefacturacion = rowDataPrefac.id_prefacturacion;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -328,7 +328,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				alert(qx.lang.Json.stringify(data, null, 2));
+				//alert(qx.lang.Json.stringify(data, null, 2));
 			});
 			rpc.callAsyncListeners(true, "leer_solicitudes", p);
 		}
@@ -384,7 +384,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 				p.observaciones = data;
 				p.prefacturaciones_items_estado = "O";
 				
-				var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+				var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 				rpc.addListener("completed", function(e){
 					var data = e.getData();
 					
@@ -425,7 +425,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 										p.observaciones = "";
 										p.prefacturaciones_items_estado = "F";
 										
-										var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+										var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 										rpc.addListener("completed", function(e){
 											var data = e.getData();
 											
@@ -531,7 +531,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			var p = {};
 			p.id_solicitud = rowDataSolicitud.id_solicitud;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Solicitudes");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -542,7 +542,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				alert(qx.lang.Json.stringify(data, null, 2));
+				//alert(qx.lang.Json.stringify(data, null, 2));
 			});
 			rpc.callAsyncListeners(true, "leer_solicitudes_prestaciones", p);
 		}
@@ -609,15 +609,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	var selectionModelPrestacion = tblPrestacion.getSelectionModel();
 	selectionModelPrestacion.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModelPrestacion.addListener("changeSelection", function(e){
-		if (! selectionModelPrestacion.isSelectionEmpty()) {
-			rowDataPrestacion = tableModelPrestacion.getRowDataAsMap(tblPrestacion.getFocusedRow());
-			
-			commandEditarPrestacion.setEnabled(true);
-		} else {
-			commandEditarPrestacion.setEnabled(false);
-		}
-		
-		menuPrestacion.memorizar([commandEditarPrestacion]);
+
 	});
 
 	this.add(tblPrestacion, {left: "51%", top: "56%", right: 0, bottom: 0});

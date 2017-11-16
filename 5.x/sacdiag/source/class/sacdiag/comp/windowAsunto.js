@@ -54,7 +54,7 @@ qx.Class.define("sacdiag.comp.windowAsunto",
 			p.documentacion_id = txtObserva.getValue();
 			p.organismo_area_id = application.login.organismo_area_id;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Prefacturacion");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
 			rpc.addListener("completed", function(e){
 				var resultado = e.getData().result;
 				

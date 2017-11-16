@@ -33,7 +33,7 @@ qx.Class.define("sacdiag.comp.windowSeleccionarPrestador",
 	slbPrestador.setWidth(400);
 	form.add(slbPrestador, "Prestador", null, "prestador");
 	
-	var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Parametros");
+	var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 	rpc.addListener("completed", function(e){
 		var data = e.getData();
 		

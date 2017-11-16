@@ -1,10 +1,23 @@
 <?php
-session_start();
 
-require("Base.php");
-
-class class_ControlAcceso extends class_Base
+class class_ControlAcceso
 {
+	protected $mysqli;
+	
+	function __construct() {
+		require('Conexion.php');
+		
+		//session_unset();
+		//session_destroy();
+		session_start();
+		
+		$_SESSION["LAST_ACTIVITY"] = $_SERVER["REQUEST_TIME"];
+		
+		
+		
+		$this->mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+		$this->mysqli->query("SET NAMES 'utf8'");
+	}
 
 
   public function method_login($params, $error) {
@@ -12,6 +25,7 @@ class class_ControlAcceso extends class_Base
   	
 	$resultado = new stdClass;
 	
+	/*
 	$resultado->ok = "¡¡Bienvenido ".$_SESSION['usuario_nombre']." (".$SYSusuario.")!!\n\n";
 	$resultado->ok.="Puede comenzar a trabajar. Recuerde CERRAR SESION cuando termine o si desea cambiar de usuario.\n\n";
 	$resultado->ok.="¡NUNCA DEJE EL NAVEGADOR ABIERTO Y SE RETIRE!";
@@ -29,6 +43,7 @@ class class_ControlAcceso extends class_Base
 	$resultado->_usuario_organismo_area = $_SESSION['usuario_organismo_area'];
 	$resultado->_usuario_sistemas_perfiles = $_SESSION['sistemas_perfiles_usuario'];
 	$resultado->_usuario_organismo_area_mesa_entradas = ((empty($_SESSION['usuario_organismo_area_mesa_entrada'])) ? "0" : $_SESSION['usuario_organismo_area_mesa_entrada']);
+	*/
 
 
 	return $resultado;
@@ -37,6 +52,8 @@ class class_ControlAcceso extends class_Base
   
   public function method_traer_areas($params, $error) {
   	$p = $params[0];
+  	
+  	$resultado = array();
   	
 	$sql = "SELECT";
 	$sql.= "  sistemas_perfiles_usuarios_oas.id_sist_perfil_usuario_oas AS model";
@@ -52,12 +69,15 @@ class class_ControlAcceso extends class_Base
         INNER JOIN _organismos_areas ON _organismos_areas_servicios.id_organismo_area = _organismos_areas.organismo_area_id
         INNER JOIN _servicios ON _organismos_areas_servicios.id_servicio = _servicios.id_servicio";
 	
-	
-	
 	$sql.= " ORDER BY label";
 	
-	return $this->toJson($sql);
-
+	
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
+		$resultado[] = $row;
+	}
+	
+	return $resultado;
   }
 }
 

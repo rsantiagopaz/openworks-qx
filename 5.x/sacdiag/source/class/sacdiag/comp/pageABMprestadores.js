@@ -79,7 +79,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		rpc.addListener("failed", function(e){
 			var data = e.getData();
 			
-			alert(qx.lang.Json.stringify(data, null, 2));
+			//alert(qx.lang.Json.stringify(data, null, 2));
 			
 
 		});

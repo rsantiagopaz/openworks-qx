@@ -38,8 +38,10 @@ qx.Class.define("sacdiag.comp.windowLogin",
 			btnAceptar.setEnabled(false);
 			slbArea.removeAll();
 			
-			var rpc = new qx.io.remote.Rpc("services/", "comp.ControlAcceso");
-			rpc.callAsync(function(resultado, error, id) {
+			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.ControlAcceso");
+			rpc.addListener("completed", function(e){
+				var resultado = e.getData().result;
+				
 				//alert(qx.lang.Json.stringify(resultado, null, 2));
 				//alert(qx.lang.Json.stringify(error, null, 2));
 				var item;
@@ -51,8 +53,9 @@ qx.Class.define("sacdiag.comp.windowLogin",
 					slbArea.add(item);
 				}
 				
-				btnAceptar.setEnabled(true);
-			}, "traer_areas", p);
+				btnAceptar.setEnabled(true);			
+			});
+			rpc.callAsyncListeners(true, "traer_areas", p);
 		} else {
 			slbArea.removeAll();
 		}

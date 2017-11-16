@@ -36,6 +36,11 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		tblSolicitud.setFocusedCell();
 		tableModelPrestacion.setDataAsMapArray([], true);
 		
+		btnCambiarPrestador.setEnabled(false);
+		btnAutorizar.setEnabled(false);
+		btnBloquear.setEnabled(false);
+		menuSolicitud.memorizar([btnCambiarPrestador, btnAutorizar, btnBloquear]);
+		
 		controllerFormInfoEntsal.resetModel();
 		
 		var p = {};
@@ -48,7 +53,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		
 		//alert(qx.lang.Json.stringify(p, null, 2));
 		
-		var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Solicitudes");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
@@ -73,7 +78,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 	var gbxFiltrar = new qx.ui.groupbox.GroupBox("Filtrar solicitudes");
 	gbxFiltrar.setLayout(new qx.ui.layout.Grid(6, 6));
-	this.add(gbxFiltrar, {left: 0, top: 0});
+	this.add(gbxFiltrar, {left: 0, top: 0, right: "80%"});
 	
 	
 
@@ -82,10 +87,10 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	var dtfDesde = new qx.ui.form.DateField();
 	gbxFiltrar.add(dtfDesde, {row: 0, column: 1});
 	
-	gbxFiltrar.add(new qx.ui.basic.Label("Hasta:"), {row: 0, column: 2});
+	gbxFiltrar.add(new qx.ui.basic.Label("Hasta:"), {row: 1, column: 0});
 	
 	var dtfHasta = new qx.ui.form.DateField();
-	gbxFiltrar.add(dtfHasta, {row: 0, column: 3});
+	gbxFiltrar.add(dtfHasta, {row: 1, column: 1});
 	
 	
 	var aux = new Date;
@@ -94,7 +99,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	dtfDesde.setValue(aux);
 	
 	
-	gbxFiltrar.add(new qx.ui.basic.Label("Prestador:"), {row: 1, column: 0});
+	gbxFiltrar.add(new qx.ui.basic.Label("Prestador:"), {row: 2, column: 0});
 	
 	var cboPrestador = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPrestador"});
 	//cboPrestador.setWidth(400);
@@ -104,11 +109,11 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		var data = e.getData();
 		
 	});
-	gbxFiltrar.add(cboPrestador, {row: 1, column: 1, colSpan: 3});
+	gbxFiltrar.add(cboPrestador, {row: 2, column: 1, colSpan: 3});
 	
 	
 	
-	gbxFiltrar.add(new qx.ui.basic.Label("Paciente:"), {row: 2, column: 0});
+	gbxFiltrar.add(new qx.ui.basic.Label("Paciente:"), {row: 3, column: 0});
 	
 	var cboPaciente = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPersona"});
 	//cboPrestador.setWidth(400);
@@ -118,10 +123,10 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		var data = e.getData();
 		
 	});
-	gbxFiltrar.add(cboPaciente, {row: 2, column: 1, colSpan: 3});
+	gbxFiltrar.add(cboPaciente, {row: 3, column: 1, colSpan: 3});
 	
 	
-	gbxFiltrar.add(new qx.ui.basic.Label("Médico:"), {row: 3, column: 0});
+	gbxFiltrar.add(new qx.ui.basic.Label("Médico:"), {row: 4, column: 0});
 	
 	var cboPersonal = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPersonal"});
 	//cboPrestador.setWidth(400);
@@ -131,11 +136,11 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		var data = e.getData();
 		
 	});
-	gbxFiltrar.add(cboPersonal, {row: 3, column: 1, colSpan: 3});
+	gbxFiltrar.add(cboPersonal, {row: 4, column: 1, colSpan: 3});
 	
 	
 	
-	gbxFiltrar.add(new qx.ui.basic.Label("Estado:"), {row: 4, column: 0});
+	gbxFiltrar.add(new qx.ui.basic.Label("Estado:"), {row: 5, column: 0});
 	
 	var slbEstado = new qx.ui.form.SelectBox();
 	slbEstado.add(new qx.ui.form.ListItem("-", null, ""));
@@ -147,7 +152,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	slbEstado.add(new qx.ui.form.ListItem("Prefacturada", null, "F"));
 	slbEstado.add(new qx.ui.form.ListItem("para Pago", null, "P"));
 	
-	gbxFiltrar.add(slbEstado, {row: 4, column: 1});
+	gbxFiltrar.add(slbEstado, {row: 5, column: 1});
 	
 
 	
@@ -155,30 +160,13 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	btnFiltrar.addListener("execute", function(e){
 		functionActualizarSolicitud();
 	})
-	gbxFiltrar.add(btnFiltrar, {row: 5, column: 3});
+	gbxFiltrar.add(btnFiltrar, {row: 6, column: 3});
 	
 	
 	
 	
 	
 	// Menu
-
-	
-	var commandVerPrestacion = new qx.ui.command.Command("Enter");
-	commandVerPrestacion.setEnabled(false);
-	commandVerPrestacion.addListener("execute", function(e){
-		var win = new sacdiag.comp.windowSolicitudes_prestaciones(rowDataSolicitud);
-		win.setModal(true);
-		win.addListener("aceptado", function(e){
-			var data = e.getData();
-
-		});
-		
-		application.getRoot().add(win);
-		win.center();
-		win.open();
-	});
-	
 	
 	var btnCambiarPrestador = new qx.ui.menu.Button("Cambiar prestador...");
 	btnCambiarPrestador.setEnabled(false);
@@ -192,7 +180,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 			
 			var p = rowDataSolicitud;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Solicitudes");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -227,7 +215,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 									
 									var p = rowDataSolicitud;
 									
-									var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Solicitudes");
+									var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
 									rpc.addListener("completed", function(e){
 										var data = e.getData();
 										
@@ -238,7 +226,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 									rpc.addListener("failed", function(e){
 										var data = e.getData();
 										
-										alert(qx.lang.Json.stringify(data, null, 2));
+										//alert(qx.lang.Json.stringify(data, null, 2));
 									});
 									rpc.callAsyncListeners(true, "escribir_solicitud", p);
 	        					}
@@ -258,7 +246,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 			
 			var p = rowDataSolicitud;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Solicitudes");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -269,7 +257,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				alert(qx.lang.Json.stringify(data, null, 2));
+				//alert(qx.lang.Json.stringify(data, null, 2));
 			});
 			rpc.callAsyncListeners(true, "escribir_solicitud", p);			
 		}
@@ -285,7 +273,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 				
 				rowDataSolicitud.estado = "B";
 				rowDataSolicitud.estado_descrip = mapEstado["B"];
-				rowDataSolicitud.estado_condicion = 0;
+				rowDataSolicitud.estado_condicion = 3;
 				rowDataSolicitud.observaciones_bloqueo = data;
 				
 				functionBloquear();
@@ -313,16 +301,12 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		}
 	});
 	
-	var btnVerPrestacion = new qx.ui.menu.Button("Ver prestaciones...", null, commandVerPrestacion);
-	
 	
 	var menuSolicitud = new componente.comp.ui.ramon.menu.Menu();
 	
 	menuSolicitud.add(btnCambiarPrestador);
 	menuSolicitud.add(btnAutorizar);
 	menuSolicitud.add(btnBloquear);
-	//menuSolicitud.addSeparator();
-	//menuSolicitud.add(btnVerPrestacion);
 	menuSolicitud.memorizar();
 	
 	
@@ -335,6 +319,13 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 	var tableModelSolicitud = new qx.ui.table.model.Simple();
 	tableModelSolicitud.setColumns(["Paciente", "DNI", "Fecha", "Efector público", "Prestador", "Estado", "estado_condicion"], ["persona_nombre", "persona_dni", "fecha_emite", "efector_publico", "prestador", "estado_descrip", "estado_condicion"]);
+	tableModelSolicitud.setColumnSortable(0, false);
+	tableModelSolicitud.setColumnSortable(1, false);
+	tableModelSolicitud.setColumnSortable(2, false);
+	tableModelSolicitud.setColumnSortable(3, false);
+	tableModelSolicitud.setColumnSortable(4, false);
+	tableModelSolicitud.setColumnSortable(5, false);
+	tableModelSolicitud.setColumnSortable(6, false);
 	tableModelSolicitud.addListener("dataChanged", function(e){
 		var rowCount = tableModelSolicitud.getRowCount();
 		
@@ -358,11 +349,11 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	var resizeBehaviorSolicitud = tableColumnModelSolicitud.getBehavior();
 	
 	resizeBehaviorSolicitud.set(0, {width:"24%", minWidth:100});
-	resizeBehaviorSolicitud.set(1, {width:"10%", minWidth:100});
-	resizeBehaviorSolicitud.set(2, {width:"10%", minWidth:100});
+	resizeBehaviorSolicitud.set(1, {width:"9%", minWidth:100});
+	resizeBehaviorSolicitud.set(2, {width:"9%", minWidth:100});
 	resizeBehaviorSolicitud.set(3, {width:"24%", minWidth:100});
 	resizeBehaviorSolicitud.set(4, {width:"24%", minWidth:100});
-	resizeBehaviorSolicitud.set(5, {width:"8%", minWidth:100});
+	resizeBehaviorSolicitud.set(5, {width:"10%", minWidth:100});
 
 	
 
@@ -372,8 +363,9 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 
 	var cellrendererString = new qx.ui.table.cellrenderer.String();
-	cellrendererString.addNumericCondition("==", 1, null, "#FF6600", null, null, "estado_condicion");
+	cellrendererString.addNumericCondition("==", 1, null, "#FF8000", null, null, "estado_condicion");
 	cellrendererString.addNumericCondition("==", 2, null, "#119900", null, null, "estado_condicion");
+	cellrendererString.addNumericCondition("==", 3, null, "#FF0000", null, null, "estado_condicion");
 	tableColumnModelSolicitud.setDataCellRenderer(5, cellrendererString);
 	
 	
@@ -381,26 +373,24 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	selectionModelSolicitud.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModelSolicitud.addListener("changeSelection", function(e){
 		if (selectionModelSolicitud.isSelectionEmpty()) {
-			commandVerPrestacion.setEnabled(false);
-			menuSolicitud.memorizar([commandVerPrestacion]);
+
 		} else {
 			rowDataSolicitud = tableModelSolicitud.getRowDataAsMap(tblSolicitud.getFocusedRow());
 			
 			controllerFormInfoEntsal.setModel(qx.data.marshal.Json.createModel(rowDataSolicitud));
 			
-			commandVerPrestacion.setEnabled(true);
 			btnCambiarPrestador.setEnabled(rowDataSolicitud.estado == "E" || rowDataSolicitud.estado == "A");
 			btnAutorizar.setEnabled(rowDataSolicitud.estado == "E");
 			btnBloquear.setEnabled(rowDataSolicitud.estado == "B" || rowDataSolicitud.estado == "A");
 			btnBloquear.setLabel((rowDataSolicitud.estado == "B") ? "Desbloquear" : "Bloquear")
 			
-			menuSolicitud.memorizar([commandVerPrestacion, btnCambiarPrestador, btnAutorizar, btnBloquear]);
+			menuSolicitud.memorizar([btnCambiarPrestador, btnAutorizar, btnBloquear]);
 			
 			
 			var p = {};
 			p.id_solicitud = rowDataSolicitud.id_solicitud;
 			
-			var rpc = new componente.comp.io.ramon.rpc.Rpc("services/", "comp.Solicitudes");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -412,14 +402,17 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		}
 	});
 
-	this.add(tblSolicitud, {left: 0, top: 215, right: "51%", bottom: 0});
+	this.add(tblSolicitud, {left: "23%", top: 0, right: 0, bottom: "50%"});
 	
 	
 	
 	
 	var gbxOtros = new qx.ui.groupbox.GroupBox("Otros datos");
-	gbxOtros.setLayout(new qx.ui.layout.Basic());
-	this.add(gbxOtros, {left: "51%", top: 215, right: 0, bottom: "41%"});
+	gbxOtros.setLayout(new qx.ui.layout.Grow());
+	this.add(gbxOtros, {left: 0, top: "50%", right: "50%", bottom: 0});
+	
+	var containerScroll = new qx.ui.container.Scroll();
+	gbxOtros.add(containerScroll);
 	
 	
 	var formInfoEntsal = new qx.ui.form.Form();
@@ -428,13 +421,13 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Observaciones", null, "observaciones_bloqueo");
+	formInfoEntsal.add(aux, "Obs.bloqueo", null, "observaciones_bloqueo");
 	
 	var aux = new qx.ui.form.TextArea("");
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Info.clínica", null, "informacion_clinica");
+	formInfoEntsal.add(aux, "Observaciones", null, "observaciones");
 	
 	var aux = new qx.ui.form.TextField("");
 	aux.setReadOnly(true);
@@ -446,13 +439,31 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Ori.diagnostica", null, "orientacion_diagnostica");
+	formInfoEntsal.add(aux, "Info.clínica", null, "informacion_clinica");
 	
 	aux = new qx.ui.form.TextField();
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	//formInfoEntsal.add(aux, "Usuario ent.", null, "id_usuario_ent");
+	formInfoEntsal.add(aux, "Cert.neg.ANSES", null, "anses_negativa");
+	
+	var aux = new qx.ui.form.TextArea("");
+	aux.setReadOnly(true);
+	aux.setDecorator("main");
+	aux.setBackgroundColor("#ffffc0");
+	formInfoEntsal.add(aux, "Ori.diagnostica", null, "orientacion_diagnostica");
+	
+	var aux = new qx.ui.form.TextArea("");
+	aux.setReadOnly(true);
+	aux.setDecorator("main");
+	aux.setBackgroundColor("#ffffc0");
+	formInfoEntsal.add(aux, "Servicio", null, "servicio");
+	
+	var aux = new qx.ui.form.TextArea("");
+	aux.setReadOnly(true);
+	aux.setDecorator("main");
+	aux.setBackgroundColor("#ffffc0");
+	formInfoEntsal.add(aux, "Habitacion cama", null, "habitacion_cama");
 	
 	var controllerFormInfoEntsal = new qx.data.controller.Form(null, formInfoEntsal);
 	//modelForm = controllerFormInfoVehiculo.createModel(true);
@@ -460,7 +471,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	var formViewEntsal = new qx.ui.form.renderer.Double(formInfoEntsal);
 	
 	
-	gbxOtros.add(formViewEntsal, {left: 0, top: 0});
+	containerScroll.add(formViewEntsal, {left: 0, top: 0});
 	
 	
 	
@@ -474,7 +485,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 	
 	var tableModelPrestacion = new qx.ui.table.model.Simple();
-	tableModelPrestacion.setColumns(["Tipo prestación", "Código", "Descripción"], ["prestacion_tipo", "codigo", "denominacion"]);
+	tableModelPrestacion.setColumns(["Código", "Descripción"], ["codigo", "denominacion"]);
 	tableModelPrestacion.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrestacion.getRowCount();
 		
@@ -495,27 +506,19 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
 
-	resizeBehaviorPrestacion.set(0, {width:"40%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"20%", minWidth:100});
-	resizeBehaviorPrestacion.set(2, {width:"40%", minWidth:100});
+	resizeBehaviorPrestacion.set(0, {width:"30%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"70%", minWidth:100});
+	//resizeBehaviorPrestacion.set(2, {width:"60%", minWidth:100});
 
 	
 	
 	var selectionModelPrestacion = tblPrestacion.getSelectionModel();
 	selectionModelPrestacion.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModelPrestacion.addListener("changeSelection", function(e){
-		if (! selectionModelPrestacion.isSelectionEmpty()) {
-			rowDataPrestacion = tableModelPrestacion.getRowDataAsMap(tblPrestacion.getFocusedRow());
-			
-			commandEditarPrestacion.setEnabled(true);
-		} else {
-			commandEditarPrestacion.setEnabled(false);
-		}
-		
-		menuPrestacion.memorizar([commandEditarPrestacion]);
+
 	});
 
-	this.add(tblPrestacion, {left: "51%", top: "60%", right: 0, bottom: 0});
+	this.add(tblPrestacion, {left: "51%", top: "52%", right: 0, bottom: 0});
 
 	
 	
