@@ -31,6 +31,55 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 	
 	
+	/*
+	var defineMultiLineCellHtml = qx.Class.define("multiLineCellHtml",{
+		extend : qx.ui.table.cellrenderer.Html,
+	
+		members : {
+			_getContentHtml : function(cellInfo) {
+				var html = qx.bom.String.escape(cellInfo.value || "");
+
+				return '<div style="display: table-cell; vertical-align: middle; position: relative;">' + html + '</div>';
+			},
+
+			_getCellStyle:function (cellInfo) {
+				return "white-space:normal; line-height:1em; display: table;";
+			}
+		}
+	});
+	*/
+	
+	
+	
+	var contexto = this;
+	
+	var defineMultiLineCellHtml = qx.Class.define("multiLineCellHtml",{
+		extend : qx.ui.table.cellrenderer.Html,
+	
+		members : {
+
+			_getCellStyle:function (cellInfo) {
+				
+				alert(qx.lang.Json.stringify(cellInfo.value, null, 2));
+				
+				//qx.dev.Debug.debugObject(cellInfo, null, 2);
+				
+				var color = '#ffff00';
+				
+				if (cellInfo.rowData.estado_condicion == 1) color = "#FF8000"; 
+				if (cellInfo.rowData.estado_condicion == 2) color = "#119900";
+				if (cellInfo.rowData.estado_condicion == 3) color = "#FF0000";
+				
+				return this.base(arguments, cellInfo) + "background-color:" + color + ";";
+			}
+		}
+	});
+	
+	
+	
+	
+	
+	
 	
 	var functionActualizarSolicitud = function(id_solicitud) {
 		
@@ -367,7 +416,14 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	cellrendererString.addNumericCondition("==", 1, null, "#FF8000", null, null, "estado_condicion");
 	cellrendererString.addNumericCondition("==", 2, null, "#119900", null, null, "estado_condicion");
 	cellrendererString.addNumericCondition("==", 3, null, "#FF0000", null, null, "estado_condicion");
-	tableColumnModelSolicitud.setDataCellRenderer(5, cellrendererString);
+	//tableColumnModelSolicitud.setDataCellRenderer(5, cellrendererString);
+	
+	
+	
+	
+	
+	var cellrendererHtml = new defineMultiLineCellHtml();
+	tableColumnModelSolicitud.setDataCellRenderer(5, cellrendererHtml);
 	
 	
 	
@@ -455,7 +511,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Orient.diagnóstica", null, "orientacion_diagnostica");
+	formInfoEntsal.add(aux, "Ori.diagnostica", null, "orientacion_diagnostica");
 	
 	var aux = new qx.ui.form.TextArea("");
 	aux.setReadOnly(true);
@@ -467,7 +523,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Habitación cama", null, "habitacion_cama");
+	formInfoEntsal.add(aux, "Habitacion cama", null, "habitacion_cama");
 	
 	var controllerFormInfoEntsal = new qx.data.controller.Form(null, formInfoEntsal);
 	//modelForm = controllerFormInfoVehiculo.createModel(true);

@@ -7,6 +7,133 @@ class class_Parametros extends class_Base
 {
 	
 	
+  public function method_alta_modifica_prestador($params, $error) {
+  	$p = $params[0];
+  	
+  	$fecha = date("Y-m-d");
+  	
+  	$organismo_area_id = $p->model->organismo_area_id;
+  	$p->model->razon_social = $p->model->denominacion;
+  	
+
+	$sql = "SELECT organismo_area_id FROM _organismos_areas WHERE organismo_area_estado='3' AND organismo_area LIKE '" . $p->model->denominacion . "' AND organismo_area_id <> '" . $p->model->organismo_area_id . "'";
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows > 0) {
+		$row = $rs->fetch_object();
+		
+		$error->SetError((int) $row->organismo_area_id, "descrip_duplicado");
+		return $error;
+	}
+
+		
+	$this->mysqli->query("START TRANSACTION");
+		
+	if ($p->model->organismo_area_id == "-1") {
+		
+		do {
+			$organismo_area_id = $this->generateRandomString(5);
+			
+			$sql = "SELECT organismo_area_id FROM _organismos_areas WHERE organismo_area_id='" . $organismo_area_id . "'";
+			$rs = $this->mysqli->query($sql);
+			
+		} while ($rs->num_rows > 0);
+		
+		$p->model->organismo_area_id = $organismo_area_id;
+		
+		
+		 
+
+
+
+
+		
+		$sig_semanal = "NULL";
+		
+		if ($p->model->cronograma_semanal) {
+			$sql = "SELECT * FROM cronograma_semanal";
+			$rs = $this->mysqli->query($sql);
+			while ($row = $rs->fetch_object()) {
+				if ($fecha >= $row->fecha_desde && $fecha <= $row->fecha_hasta) {
+					$sig_semanal = "'" . $row->id_prestador . "'";
+					break;
+				}
+			}
+			
+			if ($sig_semanal != "NULL") {
+				$sql = "SELECT * FROM prestador_datos WHERE sig_semanal=" . $sig_semanal;
+				$rs = $this->mysqli->query($sql);
+				if ($rs->num_rows > 0) {
+					$row = $rs->fetch_object();
+				
+					$sql = "UPDATE prestador_datos SET sig_semanal='" . $organismo_area_id . "' WHERE organismo_area_id='" . $row->organismo_area_id . "'";
+					$this->mysqli->query($sql);
+				}
+			}
+		}
+		
+		
+		
+		
+		$sig_mensual = "NULL";
+		
+		if ($p->model->cronograma_mensual) {
+			$sql = "SELECT * FROM cronograma_mensual";
+			$rs = $this->mysqli->query($sql);
+			while ($row = $rs->fetch_object()) {
+				if ((int) substr($fecha, 5 , 2) == (int) $row->mes) {
+					$sig_mensual = "'" . $row->id_prestador . "'";
+					break;
+				}
+			}
+			
+			if ($sig_mensual != "NULL") {
+				$sql = "SELECT * FROM prestador_datos WHERE sig_mensual=" . $sig_mensual;
+				$rs = $this->mysqli->query($sql);
+				if ($rs->num_rows > 0) {
+					$row = $rs->fetch_object();
+				
+					$sql = "UPDATE prestador_datos SET sig_mensual='" . $organismo_area_id . "' WHERE organismo_area_id='" . $row->organismo_area_id . "'";
+					$this->mysqli->query($sql);
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+	
+		
+		
+		$sql = "INSERT _organismos_areas SET organismo_area='" . $p->model->denominacion . "', organismo_area_id='" . $organismo_area_id . "', organismo_area_estado='3', organismo_area_tipo_id='E', organismo_id='PP', publico='N'";
+		$this->mysqli->query($sql);
+		
+		
+		$set = $this->prepararCampos($p->model, "prestador_datos");
+		
+		$sql = "INSERT prestador_datos SET " . $set . ", sig_semanal=" . $sig_semanal . ", sig_mensual=" . $sig_mensual;
+		$this->mysqli->query($sql);
+
+	} else {
+		
+		$sql = "UPDATE _organismos_areas SET organismo_area='" . $p->model->denominacion . "' WHERE organismo_area_id='" . $organismo_area_id . "'";
+		$this->mysqli->query($sql);
+		
+		
+		$set = $this->prepararCampos($p->model, "prestador_datos");
+		
+		$sql = "INSERT prestador_datos SET " . $set . " ON DUPLICATE KEY UPDATE " . $set;
+		$this->mysqli->query($sql);
+	}
+	
+	$this->mysqli->query("COMMIT");
+	
+	return $organismo_area_id;
+  }
+	
+	
   public function method_alta_modifica_prestacion($params, $error) {
   	$p = $params[0];
   	
@@ -75,62 +202,7 @@ class class_Parametros extends class_Base
 		return $id_prestacion_tipo;
 	}
   }
-  
-  
-  public function method_alta_modifica_prestador($params, $error) {
-  	$p = $params[0];
-  	
-  	$organismo_area_id = $p->model->organismo_area_id;
-  	
 
-	$sql = "SELECT organismo_area_id FROM _organismos_areas WHERE organismo_area_estado='3' AND organismo_area LIKE '" . $p->model->denominacion . "' AND organismo_area_id <> '" . $p->model->organismo_area_id . "'";
-	$rs = $this->mysqli->query($sql);
-	if ($rs->num_rows > 0) {
-		$row = $rs->fetch_object();
-		
-		$error->SetError((int) $row->organismo_area_id, "descrip_duplicado");
-		return $error;
-	}
-
-		
-	$this->mysqli->query("START TRANSACTION");
-		
-	if ($p->model->organismo_area_id == "-1") {
-		do {
-			$organismo_area_id = $this->generateRandomString(5);
-			
-			$sql = "SELECT organismo_area_id FROM _organismos_areas WHERE organismo_area_id='" . $organismo_area_id . "'";
-			$rs = $this->mysqli->query($sql);
-			
-		} while ($rs->num_rows > 0);
-		
-		$p->model->organismo_area_id = $organismo_area_id;
-		
-		
-		$sql = "INSERT _organismos_areas SET organismo_area='" . $p->model->denominacion . "', organismo_area_id='" . $organismo_area_id . "', organismo_area_estado='3', organismo_area_tipo_id='E', organismo_id='PP', publico='N'";
-		$this->mysqli->query($sql);
-		
-		
-		$set = $this->prepararCampos($p->model, "prestador_datos");
-		
-		$sql = "INSERT prestador_datos SET " . $set;
-		$this->mysqli->query($sql);
-	} else {
-		
-		$sql = "UPDATE _organismos_areas SET organismo_area='" . $p->model->denominacion . "' WHERE organismo_area_id='" . $organismo_area_id . "'";
-		$this->mysqli->query($sql);
-		
-		
-		$set = $this->prepararCampos($p->model, "prestador_datos");
-		
-		$sql = "INSERT prestador_datos SET " . $set . " ON DUPLICATE KEY UPDATE " . $set;
-		$this->mysqli->query($sql);
-	}
-	
-	$this->mysqli->query("COMMIT");
-	
-	return $organismo_area_id;
-  }
   
   
   public function method_leer_prestador_prestacion($params, $error) {
@@ -201,7 +273,15 @@ class class_Parametros extends class_Base
   public function method_autocompletarPrestador($params, $error) {
   	$p = $params[0];
   	
-	function functionAux(&$row, $key) {
+  	$resultado = array();
+
+  	
+  	$sql = "SELECT organismo_area_id AS model, organismo_area AS label, organismo_area AS denominacion, prestador_datos.* FROM _organismos_areas LEFT JOIN prestador_datos USING(organismo_area_id) WHERE organismo_area_estado='3' AND organismo_area LIKE '%". $p->texto . "%' ORDER BY organismo_area";
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
+		$row->semanal_descrip = "";
+		$row->mensual_descrip = "";
+		
 		if (is_null($row->organismo_area_id)) {
 			$row->organismo_area_id = $row->model;
 			$row->cuit = "";
@@ -209,15 +289,33 @@ class class_Parametros extends class_Base
 			$row->telefonos = "";
 			$row->contacto = "";
 			$row->observaciones = "";
+			$row->cronograma_semanal = 0;
+			$row->cronograma_mensual = 0;
 		}
-	};
-  	
-  	$opciones = new stdClass;
-  	$opciones->functionAux = functionAux;
-  	
-  	$sql = "SELECT organismo_area_id AS model, organismo_area AS label, organismo_area AS denominacion, prestador_datos.* FROM _organismos_areas LEFT JOIN prestador_datos USING(organismo_area_id) WHERE organismo_area_estado='3' AND organismo_area LIKE '%". $p->texto . "%' ORDER BY organismo_area";
-
-	return $this->toJson($sql, $opciones);
+		
+		$row->cronograma_semanal = (bool) $row->cronograma_semanal;
+		$row->cronograma_mensual = (bool) $row->cronograma_mensual;
+		
+		if (! empty($row->sig_semanal)) {
+			$sql = "SELECT organismo_area FROM _organismos_areas WHERE organismo_area_id='" . $row->sig_semanal . "'";
+			$rsAux = $this->mysqli->query($sql);
+			$rowAux = $rsAux->fetch_object();
+			
+			$row->semanal_descrip = $rowAux->organismo_area;
+		}
+		
+		if (! empty($row->sig_mensual)) {
+			$sql = "SELECT organismo_area FROM _organismos_areas WHERE organismo_area_id='" . $row->sig_mensual . "'";
+			$rsAux = $this->mysqli->query($sql);
+			$rowAux = $rsAux->fetch_object();
+			
+			$row->mensual_descrip = $rowAux->organismo_area;
+		}
+		
+		$resultado[] = $row;
+	}
+	
+	return $resultado;
   }
   
   

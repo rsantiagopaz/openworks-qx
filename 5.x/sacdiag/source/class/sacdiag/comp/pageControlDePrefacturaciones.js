@@ -241,12 +241,12 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	
 	var resizeBehaviorPrefac = tableColumnModelPrefac.getBehavior();
 
-	resizeBehaviorPrefac.set(0, {width:"10%", minWidth:100});
+	resizeBehaviorPrefac.set(0, {width:"12%", minWidth:100});
 	resizeBehaviorPrefac.set(1, {width:"45%", minWidth:100});
-	resizeBehaviorPrefac.set(2, {width:"15%", minWidth:100});
+	resizeBehaviorPrefac.set(2, {width:"12%", minWidth:100});
 	resizeBehaviorPrefac.set(3, {width:"10%", minWidth:100});
 	resizeBehaviorPrefac.set(4, {width:"10%", minWidth:100});
-	resizeBehaviorPrefac.set(5, {width:"10%", minWidth:100});
+	resizeBehaviorPrefac.set(5, {width:"11%", minWidth:100});
 
 	
 
@@ -490,11 +490,11 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	
 	var resizeBehaviorSolicitud = tableColumnModelSolicitud.getBehavior();
 
-	resizeBehaviorSolicitud.set(0, {width:"35%", minWidth:100});
-	resizeBehaviorSolicitud.set(1, {width:"10%", minWidth:100});
-	resizeBehaviorSolicitud.set(2, {width:"10%", minWidth:100});
-	resizeBehaviorSolicitud.set(3, {width:"35%", minWidth:100});
-	resizeBehaviorSolicitud.set(4, {width:"10%", minWidth:100});
+	resizeBehaviorSolicitud.set(0, {width:"32%", minWidth:100});
+	resizeBehaviorSolicitud.set(1, {width:"12%", minWidth:100});
+	resizeBehaviorSolicitud.set(2, {width:"12%", minWidth:100});
+	resizeBehaviorSolicitud.set(3, {width:"32%", minWidth:100});
+	resizeBehaviorSolicitud.set(4, {width:"12%", minWidth:100});
 	
 
 	var cellrendererDate = new qx.ui.table.cellrenderer.Date();
@@ -577,7 +577,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	
 	
 	var tableModelPrestacion = new qx.ui.table.model.Simple();
-	tableModelPrestacion.setColumns(["Tipo prestación", "Código", "Descripción", "Valor", "Resultado"], ["prestacion_tipo", "codigo", "denominacion", "valor", "prestacion_resultado"]);
+	tableModelPrestacion.setColumns(["Código", "Descripción", "Valor", "Resultado"], ["codigo", "denominacion", "valor", "prestacion_resultado"]);
 	tableModelPrestacion.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrestacion.getRowCount();
 		
@@ -598,11 +598,10 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
 
-	resizeBehaviorPrestacion.set(0, {width:"35%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"10%", minWidth:100});
-	resizeBehaviorPrestacion.set(2, {width:"35%", minWidth:100});
-	resizeBehaviorPrestacion.set(3, {width:"10%", minWidth:100});
-	resizeBehaviorPrestacion.set(4, {width:"10%", minWidth:100});
+	resizeBehaviorPrestacion.set(0, {width:"18%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"46%", minWidth:100});
+	resizeBehaviorPrestacion.set(2, {width:"18%", minWidth:100});
+	resizeBehaviorPrestacion.set(3, {width:"18%", minWidth:100});
 
 	
 	

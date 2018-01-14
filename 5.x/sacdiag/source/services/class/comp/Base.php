@@ -10,25 +10,39 @@ class class_Base
 		
 		set_time_limit(0);
 		
-		$time = $_SERVER["REQUEST_TIME"];
-		$timeout_duration = 1320;
+		session_start();
 		
-		if (! isset($_SESSION["LAST_ACTIVITY"])) {
+		
+		if (! isset($_SESSION["sacdiag_LAST_ACTIVITY"])) {
 			throw new JsonRpcError("sesion_terminada", 0);
-		} else if (($time - $_SESSION["LAST_ACTIVITY"]) > $timeout_duration) {
-			throw new JsonRpcError("sesion_terminada", 0);
+			
 		} else {
-			$_SESSION["LAST_ACTIVITY"] = $time;
+			$request_time = (int) $_SERVER["REQUEST_TIME"];
+			
+			if ($_SESSION["cookie_lifetime"] == 0) {
+				$timeout_duration = $_SESSION["gc_maxlifetime"] - 60;
+			} else if ($_SESSION["cookie_lifetime"] <= $_SESSION["gc_maxlifetime"]) {
+				$timeout_duration = $_SESSION["cookie_lifetime"] - 60;
+			} else if ($_SESSION["gc_maxlifetime"] <= $_SESSION["cookie_lifetime"]) {
+				$timeout_duration = $_SESSION["gc_maxlifetime"] - 60;
+			}
+			
+			//$timeout_duration = 60 * 5;
+			
+			if (($request_time - $_SESSION["sacdiag_LAST_ACTIVITY"]) > $timeout_duration) {
+				throw new JsonRpcError("sesion_terminada", 0);
+			} else {
+				$_SESSION["sacdiag_LAST_ACTIVITY"] = $request_time;
+				
+				
+				
+				$aux = new mysqli_driver;
+				$aux->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+				
+				$this->mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+				$this->mysqli->query("SET NAMES 'utf8'");
+			}
 		}
-		
-		
-		
-		
-		$aux = new mysqli_driver;
-		$aux->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
-		
-		$this->mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
-		$this->mysqli->query("SET NAMES 'utf8'");
 	}
 	
 	

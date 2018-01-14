@@ -715,7 +715,7 @@ case "salida_vehiculo" : {
 		<tr><td colspan="2"><?php echo "# " .  $rowMovimiento->id_movimiento . " - " . $rowMovimiento->taller; ?></td><td>Km: <?php echo $rowMovimiento->kilo; ?></td></tr>
 		<tr><td colspan="20">
 		<table border="1" rules="all" cellpadding="1" cellspacing="0" width="100%" align="center">
-		<tr><th>Tipo reparación</th><th align="right">Costo</th><th align="right">Cant.</th><th align="right">Total</th></tr>
+		<tr><th>Tipo reparación</th><th>Observaciones</th><th align="right">Costo</th><th align="right">Cant.</th><th align="right">Total</th></tr>
 		<?php
 		//$sql = "SELECT * FROM reparacion WHERE id_movimiento=" . $rowMovimiento->id_movimiento;
 		$sql = "SELECT reparacion.*, tipo_reparacion.descrip AS tipo_reparacion FROM reparacion INNER JOIN tipo_reparacion USING(id_tipo_reparacion) WHERE id_movimiento=" . $rowMovimiento->id_movimiento;
@@ -725,6 +725,7 @@ case "salida_vehiculo" : {
 			?>
 			<tr>
 			<td><?php echo $rowReparacion->tipo_reparacion; ?></td>
+			<td><?php echo $rowReparacion->observa; ?></td>
 			<td align="right"><?php echo number_format($rowReparacion->costo, 2, ",", "."); ?></td>
 			<td align="right"><?php echo $rowReparacion->cantidad; ?></td>
 			<td align="right"><?php echo number_format((float) $rowReparacion->total, 2, ",", "."); ?></td>
@@ -733,7 +734,7 @@ case "salida_vehiculo" : {
 		}
 		?>
 		<tr>
-		<td colspan="4" align="right"><?php echo number_format((float) $rowMovimiento->total, 2, ",", "."); ?></td>
+		<td colspan="5" align="right"><?php echo number_format((float) $rowMovimiento->total, 2, ",", "."); ?></td>
 		</tr>
 		</table>
 		<tr><td>&nbsp;</td></tr>

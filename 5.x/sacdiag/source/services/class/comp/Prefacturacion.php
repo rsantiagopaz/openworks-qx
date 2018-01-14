@@ -132,7 +132,7 @@ class class_Prefacturacion extends class_Base
 	$row = $rs->fetch_object();
 	$bool2 = ($row->organismo_area_de_id != $p->organismo_area_id || trim($row->organismo_area_para_id) != "");
 	if ($bool1 || $bool2) {
-		return true;
+		return false;
 	} else {
 		return true;
 	}

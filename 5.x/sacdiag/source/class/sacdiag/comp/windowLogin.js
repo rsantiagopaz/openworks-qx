@@ -146,8 +146,8 @@ qx.Class.define("sacdiag.comp.windowLogin",
 	this.add(formView, {left: 0, top: 0});
 	
 	
-	aux = qx.data.marshal.Json.createModel({usuario: "", password: "", id_sist_perfil_usuario_oas: null}, true);
-	//aux = qx.data.marshal.Json.createModel({usuario: "juangranda", password: "mezklito", id_sist_perfil_usuario_oas: null}, true);
+	//aux = qx.data.marshal.Json.createModel({usuario: "", password: "", id_sist_perfil_usuario_oas: null}, true);
+	aux = qx.data.marshal.Json.createModel({usuario: "rsantiagopaz", password: "ramon", id_sist_perfil_usuario_oas: null}, true);
 	controllerForm.setModel(aux);
 	
 	

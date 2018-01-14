@@ -54,6 +54,13 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 	form.add(txtValor, "Valor", null, "valor");
 	
 	
+	var slbTipo_cronograma = new qx.ui.form.SelectBox();
+	slbTipo_cronograma.add(new qx.ui.form.ListItem("Semanal", null, "SE"));
+	slbTipo_cronograma.add(new qx.ui.form.ListItem("Mensual", null, "ME"));
+	slbTipo_cronograma.add(new qx.ui.form.ListItem("Ranking", null, "RK"));
+	form.add(slbTipo_cronograma, "Cronograma", null, "cronograma_tipo");
+	
+	
 	
 	var controllerForm = new qx.data.controller.Form(null, form);
 	
@@ -64,7 +71,7 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 	if (rowData == null) {
 		this.setCaption("Nueva prestación");
 		
-		aux = qx.data.marshal.Json.createModel({id_prestacion: "0", id_prestacion_tipo: id_prestacion_tipo, codigo: "", denominacion: "", valor: 0}, true);
+		aux = qx.data.marshal.Json.createModel({id_prestacion: "0", id_prestacion_tipo: id_prestacion_tipo, codigo: "", denominacion: "", valor: 0, cronograma_tipo: "SE"}, true);
 	} else {
 		this.setCaption("Modificar prestación");
 		

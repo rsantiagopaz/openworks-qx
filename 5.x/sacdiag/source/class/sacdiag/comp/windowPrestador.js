@@ -7,7 +7,7 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 	
 	this.set({
 		//width: 500,
-		height: 300,
+		height: 400,
 		showMinimize: false,
 		showMaximize: false,
 		allowMaximize: false,
@@ -51,7 +51,7 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 	txtTelefono.addListener("blur", function(e){
 		this.setValue(this.getValue().trim());
 	})
-	form.add(txtTelefono, "Telefono", null, "telefonos");
+	form.add(txtTelefono, "Teléfono", null, "telefonos");
 	
 	var txtContacto = new qx.ui.form.TextField("");
 	txtContacto.addListener("blur", function(e){
@@ -59,11 +59,17 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 	})
 	form.add(txtContacto, "Contacto", null, "contacto");
 	
-	var txtObserva = new qx.ui.form.TextField("");
+	var txtObserva = new qx.ui.form.TextArea("");
 	txtObserva.addListener("blur", function(e){
 		this.setValue(this.getValue().trim());
 	})
 	form.add(txtObserva, "Observaciones", null, "observaciones");
+	
+	var chkCronogramaSemanal = new qx.ui.form.CheckBox("Cronograma semanal");
+	form.add(chkCronogramaSemanal, "", null, "cronograma_semanal");
+	
+	var chkCronogramaMensual = new qx.ui.form.CheckBox("Cronograma mensual");
+	form.add(chkCronogramaMensual, "", null, "cronograma_mensual");
 	
 	
 	
@@ -76,13 +82,16 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 	if (rowData == null) {
 		this.setCaption("Nuevo prestador");
 		
-		aux = qx.data.marshal.Json.createModel({organismo_area_id: "-1", denominacion: "", cuit: "", domicilio: "", telefonos: "", contacto: "", observaciones: ""}, true);
+		aux = qx.data.marshal.Json.createModel({organismo_area_id: "-1", denominacion: "", cuit: "", domicilio: "", telefonos: "", contacto: "", observaciones: "", cronograma_semanal: false, cronograma_mensual: false}, true);
 	} else {
 		this.setCaption("Modificar prestador");
 		
 		//alert(qx.lang.Json.stringify(rowData, null, 2));
 		
 		aux = qx.data.marshal.Json.createModel(rowData, true);
+		
+		chkCronogramaSemanal.setEnabled(false);
+		chkCronogramaMensual.setEnabled(false);
 	}
 	
 	controllerForm.setModel(aux);
@@ -100,6 +109,8 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
+				//alert(qx.lang.Json.stringify(data, null, 2));
+				
 				this.fireDataEvent("aceptado", data.result);
 				
 				btnCancelar.execute();
@@ -107,7 +118,7 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
+				alert(qx.lang.Json.stringify(data, null, 2));
 				
 				if (data.message == "descrip_duplicado") {
 					txtDescrip.focus();

@@ -134,32 +134,17 @@ qx.Class.define("sacdiag.Application",
 	var mnuArchivo = new qx.ui.menu.Menu();
 	var btnAcercaDe = new qx.ui.menu.Button("Acerca de...");
 	btnAcercaDe.addListener("execute", function(){
-		/*
-		var windowAcercaDe = new elpintao.comp.varios.windowAcercaDe();
-		windowAcercaDe.setModal(true);
-		doc.add(windowAcercaDe);
-		windowAcercaDe.center();
-		windowAcercaDe.open();
-		*/
+		var win = new sacdiag.comp.windowAcercaDe();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
 	});
 	mnuArchivo.add(btnAcercaDe);
 	
 	
 	var mnuEdicion = new qx.ui.menu.Menu();
 	
-	
-	var btnControlDePrefacturaciones = new qx.ui.menu.Button("Control de Prefacturaciones...");
-	btnControlDePrefacturaciones.addListener("execute", function(){
-		if (pageControlDePrefacturaciones == null) {
-			pageControlDePrefacturaciones = new sacdiag.comp.pageControlDePrefacturaciones();
-			pageControlDePrefacturaciones.addListenerOnce("close", function(e){
-				pageControlDePrefacturaciones = null;
-			});
-			tabviewMain.add(pageControlDePrefacturaciones);
-		}
-		tabviewMain.setSelection([pageControlDePrefacturaciones]);
-	});
-	mnuEdicion.add(btnControlDePrefacturaciones);
 	
 	
 	var btnPanelDeEstudiosEnProceso = new qx.ui.menu.Button("Panel de Estudios en Proceso...");
@@ -176,18 +161,21 @@ qx.Class.define("sacdiag.Application",
 	mnuEdicion.add(btnPanelDeEstudiosEnProceso);
 	
 	
-	var btnABMPrestadores = new qx.ui.menu.Button("ABM Prestadores...");
-	btnABMPrestadores.addListener("execute", function(){
-		if (pageABMprestadores == null) {
-			pageABMprestadores = new sacdiag.comp.pageABMprestadores();
-			pageABMprestadores.addListenerOnce("close", function(e){
-				pageABMprestadores = null;
+	var btnControlDePrefacturaciones = new qx.ui.menu.Button("Control de Prefacturaciones...");
+	btnControlDePrefacturaciones.addListener("execute", function(){
+		if (pageControlDePrefacturaciones == null) {
+			pageControlDePrefacturaciones = new sacdiag.comp.pageControlDePrefacturaciones();
+			pageControlDePrefacturaciones.addListenerOnce("close", function(e){
+				pageControlDePrefacturaciones = null;
 			});
-			tabviewMain.add(pageABMprestadores);
+			tabviewMain.add(pageControlDePrefacturaciones);
 		}
-		tabviewMain.setSelection([pageABMprestadores]);
+		tabviewMain.setSelection([pageControlDePrefacturaciones]);
 	});
-	mnuEdicion.add(btnABMPrestadores);
+	mnuEdicion.add(btnControlDePrefacturaciones);
+	
+	
+	mnuEdicion.addSeparator();
 	
 	
 	var btnABMPrestaciones = new qx.ui.menu.Button("ABM Prestaciones...");
@@ -204,6 +192,21 @@ qx.Class.define("sacdiag.Application",
 	mnuEdicion.add(btnABMPrestaciones);
 	
 	
+	var btnABMPrestadores = new qx.ui.menu.Button("ABM Prestadores...");
+	btnABMPrestadores.addListener("execute", function(){
+		if (pageABMprestadores == null) {
+			pageABMprestadores = new sacdiag.comp.pageABMprestadores();
+			pageABMprestadores.addListenerOnce("close", function(e){
+				pageABMprestadores = null;
+			});
+			tabviewMain.add(pageABMprestadores);
+		}
+		tabviewMain.setSelection([pageABMprestadores]);
+	});
+	mnuEdicion.add(btnABMPrestadores);
+	
+	
+
 
 	
 
@@ -218,7 +221,7 @@ qx.Class.define("sacdiag.Application",
 	btnEstadisticas.addListener("execute", function(){
 
 	});
-	mnuVer.add(btnEstadisticas);
+	//mnuVer.add(btnEstadisticas);
 	
 	
 
@@ -232,8 +235,8 @@ qx.Class.define("sacdiag.Application",
 	btnContrasena.addListener("execute", function(e){
 
 	});
-	mnuSesion.add(btnContrasena);
-	mnuSesion.addSeparator();
+	//mnuSesion.add(btnContrasena);
+	//mnuSesion.addSeparator();
 
 	var btnCerrar = new qx.ui.menu.Button("Cerrar");
 	btnCerrar.addListener("execute", function(e){

@@ -31,11 +31,14 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		
 		btnAgregarPrestacion.setEnabled(false);
 		tableModelPrestacion.setDataAsMapArray([], true);
+		
+		txtSemanal_descrip.setValue("");
+		txtMensual_descrip.setValue("");
 
 
 		var p = {};
 		
-		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
@@ -48,6 +51,11 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 				tblPrestador.buscar("organismo_area_id", id_prestador);
 				tblPrestador.focus();
 			}
+		});
+		rpc.addListener("failed", function(e){
+			var data = e.getData();
+			
+			alert(qx.lang.Json.stringify(data, null, 2));
 		});
 		rpc.callAsyncListeners(true, "autocompletarPrestador", p);
 		
@@ -62,7 +70,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		var p = {};
 		p.id_prestador = rowDataPrestador.organismo_area_id;
 		
-		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
@@ -187,6 +195,9 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		if (! selectionModelPrestador.isSelectionEmpty()) {
 			rowDataPrestador = tableModelPrestador.getRowDataAsMap(tblPrestador.getFocusedRow());
 			
+			txtSemanal_descrip.setValue(rowDataPrestador.semanal_descrip);
+			txtMensual_descrip.setValue(rowDataPrestador.mensual_descrip);
+			
 			btnAgregarPrestacion.setEnabled(true);
 			
 			functionActualizarPrestacion();
@@ -199,9 +210,12 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		menuPrestador.memorizar([commandEditarPrestador]);
 	});
 
-	this.add(tblPrestador, {left: 0, top: 20, right: "53%", bottom: 0});	
+	this.add(tblPrestador, {left: 0, top: 20, right: "53%", bottom: 30});	
 	
 	this.add(new qx.ui.basic.Label("Prestador"), {left: 0, top: 0});
+	
+	
+	
 	
 	
 	
@@ -235,7 +249,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 			
 			//alert(qx.lang.Json.stringify(p, null, 2));
 			
-			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
@@ -276,7 +290,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		
 		var p = rowDataPrestacion;
 		
-		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.callAsyncListeners(true, "escribir_estado", p);
 	});
 	var btnEstadoSuspendido = new qx.ui.menu.RadioButton("Suspendido");
@@ -288,7 +302,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		
 		var p = rowDataPrestacion;
 		
-		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.callAsyncListeners(true, "escribir_estado", p);
 	});
 	
@@ -343,9 +357,9 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
 	resizeBehaviorPrestacion.set(0, {width:"15%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"65%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"63%", minWidth:100});
 	resizeBehaviorPrestacion.set(2, {width:"10%", minWidth:100});
-	resizeBehaviorPrestacion.set(3, {width:"10%", minWidth:100});
+	resizeBehaviorPrestacion.set(3, {width:"12%", minWidth:100});
 
 
 	var cellrendererReplace = new qx.ui.table.cellrenderer.Replace();
@@ -376,14 +390,30 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		menuPrestacion.memorizar([btnEstadoPrestacion, btnEliminarPrestacion]);
 	});
 
-	this.add(tblPrestacion, {left: "53%", top: 30, right: 0, bottom: 0});
+	this.add(tblPrestacion, {left: "51%", top: 30, right: 0, bottom: 0});
 	
 	//this.add(new qx.ui.basic.Label("Prestación"), {left: "53%", top: 0});
 	
 	
 	
-
+	var form = new qx.ui.form.Form();
 	
+	var txtSemanal_descrip = new qx.ui.form.TextField();
+	txtSemanal_descrip.setReadOnly(true);
+	txtSemanal_descrip.setMinWidth(200);
+	txtSemanal_descrip.setDecorator("main");
+	txtSemanal_descrip.setBackgroundColor("#ffffc0");
+	form.add(txtSemanal_descrip, "Sig.semanal", null, "sig_semanal");
+	var txtMensual_descrip = new qx.ui.form.TextField();
+	txtMensual_descrip.setReadOnly(true);
+	txtMensual_descrip.setMinWidth(200);
+	txtMensual_descrip.setDecorator("main");
+	txtMensual_descrip.setBackgroundColor("#ffffc0");
+	form.add(txtMensual_descrip, "Sig.mensual", null, "sig_mensual");
+
+	var formView = new qx.ui.form.renderer.Double(form);
+	
+	this.add(formView, {left: 0, bottom: 0});
 	
 	
 	functionActualizarPrestador();

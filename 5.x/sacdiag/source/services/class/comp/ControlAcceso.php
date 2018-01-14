@@ -11,8 +11,10 @@ class class_ControlAcceso
 		//session_destroy();
 		session_start();
 		
-		$_SESSION["LAST_ACTIVITY"] = $_SERVER["REQUEST_TIME"];
-		
+		$_SESSION["sacdiag_LAST_ACTIVITY"] = (int) $_SERVER["REQUEST_TIME"];
+		$_SESSION["cookie_lifetime"] = (int) ini_get("session.cookie_lifetime");
+		$_SESSION["gc_maxlifetime"] = (int) ini_get("session.gc_maxlifetime");
+
 		
 		
 		$this->mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
@@ -61,7 +63,7 @@ class class_ControlAcceso
 	$sql.= ", organismo_area_id";
 	$sql.= " FROM";
 	$sql.= "  sistemas_perfiles_usuarios_oas
-        INNER JOIN _sistemas_perfiles ON sistemas_perfiles_usuarios_oas.perfil_id = _sistemas_perfiles.perfil_id AND _sistemas_perfiles.perfil_id = '" . "acp001" . "'
+        INNER JOIN _sistemas_perfiles ON sistemas_perfiles_usuarios_oas.perfil_id = _sistemas_perfiles.perfil_id AND _sistemas_perfiles.perfil_id = '" . "acm001" . "'
         INNER JOIN _sistemas_usuarios ON sistemas_perfiles_usuarios_oas.id_sistema_usuario = _sistemas_usuarios.id_sistema_usuario
         INNER JOIN oas_usuarios ON sistemas_perfiles_usuarios_oas.id_oas_usuario = oas_usuarios.id_oas_usuario
         INNER JOIN _usuarios ON _sistemas_usuarios.SYSusuario = _usuarios.SYSusuario AND oas_usuarios.SYSusuario = _usuarios.SYSusuario AND _usuarios.SYSusuario = '" . $p->usuario . "' AND _usuarios.SYSpassword = '" . md5($p->password) . "'

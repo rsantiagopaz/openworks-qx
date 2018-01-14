@@ -33,7 +33,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		
 		var p = {};
 		
-		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
@@ -57,6 +57,8 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		tblPrestacion.blur();
 		tblPrestacion.setFocusedCell();
 		
+		txtBuscar.setValue("");
+		
 		commandAgregarPrestacion.setEnabled(true);
 		menuPrestacion.memorizar([commandAgregarPrestacion]);
 		
@@ -64,7 +66,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		p.texto = "";
 		p.phpParametros = {id_prestacion_tipo: rowDataPrestaciones_tipo.id_prestacion_tipo};
 		
-		var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
+		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.addListener("completed", function(e){
 			var data = e.getData();
 			
@@ -82,6 +84,37 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 
 		return rpc;
 	}
+	
+	
+	var functionBuscar = function(keySequence){
+		var value = txtBuscar.getValue().trim().toUpperCase();
+		
+		if (value.length >=2) {
+			var desde;
+			
+			if (keySequence == null) {
+				desde = 0;
+				tblPrestacion.setFocusedCell();
+			} else if (! keySequence.isPrintable() && keySequence.getKeyIdentifier() == "Enter") {
+				var focusedRow = tblPrestacion.getFocusedRow();
+				desde = (focusedRow == null) ? 0 : focusedRow + 1;				
+			}
+			
+			var rowData;
+			var rowCount = tableModelPrestacion.getRowCount();
+			
+			for (var x = desde; x < rowCount; x++) {
+				rowData = tableModelPrestacion.getRowData(x);
+				if (rowData["codigo"].includes(value) || rowData["denominacion"].includes(value)) {
+					tblPrestacion.setFocusedCell(0, x, true);
+					
+					break;
+				}
+			}
+		} else {
+			tblPrestacion.setFocusedCell();
+		}
+	};
 	
 	
 
@@ -234,6 +267,21 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	
 	
 	
+	var txtBuscar = new qx.ui.form.TextField("");
+	txtBuscar.setWidth(250);
+	txtBuscar.setLiveUpdate(true);
+	txtBuscar.addListener("changeValue", function(e){
+		functionBuscar();
+	})
+	txtBuscar.addListener("keypress", function(e){
+		functionBuscar(e);
+	})
+	this.add(txtBuscar, {left: "61%", top: 0});
+	
+	
+	
+	
+	
 	
 	// Menu
 
@@ -289,7 +337,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	
 	
 	var tableModelPrestacion = new qx.ui.table.model.Simple();
-	tableModelPrestacion.setColumns(["Código", "Descripción", "Valor"], ["codigo", "denominacion", "valor"]);
+	tableModelPrestacion.setColumns(["Código", "Descripción", "Valor", "Cronograma"], ["codigo", "denominacion", "valor", "cronograma_tipo"]);
 	tableModelPrestacion.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrestacion.getRowCount();
 		
@@ -311,8 +359,18 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
 
 	resizeBehaviorPrestacion.set(0, {width:"15%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"75%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"65%", minWidth:100});
 	resizeBehaviorPrestacion.set(2, {width:"10%", minWidth:100});
+	resizeBehaviorPrestacion.set(3, {width:"10%", minWidth:100});
+	
+	
+	var cellrendererReplace = new qx.ui.table.cellrenderer.Replace();
+	cellrendererReplace.setReplaceMap({
+		"SE" : "Semanal",
+		"ME" : "Mensual",
+		"RK" : "Ranking"
+	});
+	tableColumnModelPrestacion.setDataCellRenderer(3, cellrendererReplace);
 
 	
 	
@@ -330,13 +388,16 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		menuPrestacion.memorizar([commandEditarPrestacion]);
 	});
 
-	this.add(tblPrestacion, {left: "53%", top: 20, right: 0, bottom: 0});
+	this.add(tblPrestacion, {left: "53%", top: 30, right: 0, bottom: 0});
 	
-	this.add(new qx.ui.basic.Label("Prestación"), {left: "53%", top: 0});
+	this.add(new qx.ui.basic.Label("Buscar prestación:"), {left: "53%", top: 3});
 	
 	
 	
 
+	tblTipo_prestacion.setTabIndex(1);
+	txtBuscar.setTabIndex(2);
+	tblPrestacion.setTabIndex(3);
 	
 	
 	
