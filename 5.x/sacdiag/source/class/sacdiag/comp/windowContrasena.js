@@ -7,8 +7,8 @@ qx.Class.define("sacdiag.comp.windowContrasena",
 
 	this.set({
 		caption: "Cambiar contraseña",
-		width: 210,
-		height: 200,
+		width: 250,
+		height: 170,
 		showMinimize: false,
 		showMaximize: false
 	});
@@ -27,6 +27,7 @@ qx.Class.define("sacdiag.comp.windowContrasena",
 	
 	var txtPassword = new qx.ui.form.PasswordField("");
 	txtPassword.setRequired(true);
+	txtPassword.setMinWidth(130);
 	txtPassword.addListener("blur", function(e){
 		txtPassword.setValue(txtPassword.getValue().trim());
 	});
@@ -46,9 +47,9 @@ qx.Class.define("sacdiag.comp.windowContrasena",
 	});
 	form.add(txtPassrepetir, "Repetir nueva", null, "passrepetir");
 	
-	var formView = new qx.ui.form.renderer.Single(form);
+	//var formView = new qx.ui.form.renderer.Single(form);
 	
-	this.add(formView, {left: 0, top: 0})
+	//this.add(formView, {left: 0, top: 0})
 	
 	var controllerForm = new qx.data.controller.Form(null, form);
 	var modelForm = controllerForm.createModel(true);
@@ -78,18 +79,31 @@ qx.Class.define("sacdiag.comp.windowContrasena",
 		if (form.validate()) {
 			var p = {};
 			p.model = qx.util.Serializer.toNativeObject(modelForm);
-			p.model.id_usuario = application.usuario.id_usuario;
-
-			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
-			try {
-				var resultado = rpc.callSync("escribir_contrasena", p);
+			p.model.usuario = application.login.usuario;
+			
+			//alert(qx.lang.Json.stringify(p, null, 2));
+			
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+			rpc.addListener("completed", function(e){
+				var data = e.getData();
 				
-				btnCancelar.fireEvent("execute");
-			} catch (ex) {
-				txtPassword.setInvalidMessage("Contraseña incorrecta")
-				txtPassword.setValid(false);
-				txtPassword.focus();
-			}
+				//alert(qx.lang.Json.stringify(data, null, 2));
+				
+				btnCancelar.execute();
+			});
+			rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				if (data.message == "password") {
+					txtPassword.setInvalidMessage("Contraseña incorrecta")
+					txtPassword.setValid(false);
+					txtPassword.focus();
+				} else {
+					alert(qx.lang.Json.stringify(data, null, 2));
+				}
+			});
+			rpc.callAsyncListeners(true, "escribir_contrasena", p);
+			
 		} else {
 			var items = form.getItems();
 			for (var item in items) {
@@ -106,10 +120,17 @@ qx.Class.define("sacdiag.comp.windowContrasena",
 		this.destroy();
 	}, this);
 	
-	this.add(btnAceptar, {left: 20, bottom: 0});
-	this.add(btnCancelar, {left: 100, bottom: 0});
+	//this.add(btnAceptar, {left: 20, bottom: 0});
+	//this.add(btnCancelar, {left: 100, bottom: 0});
+	
+	form.addButton(btnAceptar);
+	form.addButton(btnCancelar);
 
-		
+
+	var formView = new qx.ui.form.renderer.Single(form);
+	
+	this.add(formView, {left: 0, top: 0})
+	
 		
 	},
 	members : 

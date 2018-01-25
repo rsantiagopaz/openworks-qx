@@ -48,7 +48,7 @@ class class_Parametros extends class_Base
 
 		
 		$sig_semanal = "NULL";
-		
+		/*
 		if ($p->model->cronograma_semanal) {
 			$sql = "SELECT * FROM cronograma_semanal";
 			$rs = $this->mysqli->query($sql);
@@ -70,12 +70,71 @@ class class_Parametros extends class_Base
 				}
 			}
 		}
+		*/
+		
+		
+		
+		
+		
+		if ($p->model->cronograma_semanal) {
+			do {
+				$sql = "SELECT * FROM cronograma_semanal";
+				$rs = $this->mysqli->query($sql);
+				for ($i = 1; $i <= $rs->num_rows; $i++) {
+					$row = $rs->fetch_object();
+					if ($fecha >= $row->fecha_desde && $fecha <= $row->fecha_hasta) {
+						$sig_semanal = "'" . $row->id_prestador . "'";
+						break;
+					}
+					
+				}
+	
+				if (($sig_semanal == "NULL")) {
+					$datetime = new DateTime($row->fecha_hasta);
+					
+					$datetime = $datetime->add(new DateInterval("P1D"));
+					$fecha_desde = $datetime->format("Y-m-d");
+					
+					$datetime = new DateTime($row->fecha_hasta);
+					
+					$datetime = $datetime->add(new DateInterval("P1W"));
+					$fecha_hasta = $datetime->format("Y-m-d");
+					
+					$sql = "SELECT * FROM prestador_datos WHERE organismo_area_id='" . $row->id_prestador . "'";
+					$rsPD = $this->mysqli->query($sql);
+					$rowPD = $rsPD->fetch_object();
+					
+					$sql = "INSERT cronograma_semanal SET id_prestador='" . $rowPD->sig_semanal . "', fecha_desde='" . $fecha_desde . "', fecha_hasta='" . $fecha_hasta . "'";
+					$this->mysqli->query($sql);
+				}
+				
+			} while ($sig_semanal == "NULL");
+			
+			
+			$sql = "SELECT * FROM prestador_datos WHERE sig_semanal=" . $sig_semanal;
+			$rs = $this->mysqli->query($sql);
+			if ($rs->num_rows > 0) {
+				$row = $rs->fetch_object();
+			
+				$sql = "UPDATE prestador_datos SET sig_semanal='" . $organismo_area_id . "' WHERE organismo_area_id='" . $row->organismo_area_id . "'";
+				$this->mysqli->query($sql);
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
 		
 		$sig_mensual = "NULL";
-		
+		/*
 		if ($p->model->cronograma_mensual) {
 			$sql = "SELECT * FROM cronograma_mensual";
 			$rs = $this->mysqli->query($sql);
@@ -97,10 +156,48 @@ class class_Parametros extends class_Base
 				}
 			}
 		}
+		*/
 		
 		
 		
-		
+		if ($p->model->cronograma_mensual) {
+			do {
+				$sql = "SELECT * FROM cronograma_mensual";
+				$rs = $this->mysqli->query($sql);
+				for ($i = 1; $i <= $rs->num_rows; $i++) {
+					$row = $rs->fetch_object();
+					
+					if ((int) substr($fecha, 5, 2) == (int) $row->mes) {
+						$sig_mensual = "'" . $row->id_prestador . "'";
+						break;
+					}
+					
+				}
+	
+				if (($sig_mensual == "NULL")) {
+					$mes = (int) $row->mes;
+					$mes = $mes + 1;
+					
+					$sql = "SELECT * FROM prestador_datos WHERE organismo_area_id='" . $row->id_prestador . "'";
+					$rsPD = $this->mysqli->query($sql);
+					$rowPD = $rsPD->fetch_object();
+					
+					$sql = "INSERT cronograma_mensual SET id_prestador='" . $rowPD->sig_mensual . "', mes='" . $mes . "'";
+					$this->mysqli->query($sql);
+				}
+				
+			} while ($sig_mensual == "NULL");
+			
+			
+			$sql = "SELECT * FROM prestador_datos WHERE sig_mensual=" . $sig_mensual;
+			$rs = $this->mysqli->query($sql);
+			if ($rs->num_rows > 0) {
+				$row = $rs->fetch_object();
+			
+				$sql = "UPDATE prestador_datos SET sig_mensual='" . $organismo_area_id . "' WHERE organismo_area_id='" . $row->organismo_area_id . "'";
+				$this->mysqli->query($sql);
+			}
+		}
 		
 		
 		
@@ -351,13 +448,11 @@ class class_Parametros extends class_Base
   public function method_escribir_contrasena($params, $error) {
   	$p = $params[0];
   	
-	$set = $this->prepararCampos($p->model);
-	
-	$sql = "SELECT * FROM usuario WHERE id_usuario=" . $p->model->id_usuario . " AND password=MD5('" . $p->model->password . "')";
-	$rs = mysql_query($sql);
-	if (mysql_num_rows($rs) > 0) {
-  		$sql = "UPDATE usuario SET password=MD5('" . $p->model->passnueva . "') WHERE id_usuario=" . $p->model->id_usuario;
-  		mysql_query($sql);
+	$sql = "SELECT * FROM _usuarios WHERE SYSusuario='" . $p->model->usuario . "' AND SYSpassword=MD5('" . $p->model->password . "')";
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows > 0) {
+  		$sql = "UPDATE _usuarios SET SYSpassword=MD5('" . $p->model->passnueva . "') WHERE SYSusuario='" . $p->model->usuario . "'";
+  		$this->mysqli->query($sql);
 	} else {
 		$error->SetError(0, "password");
 		return $error;

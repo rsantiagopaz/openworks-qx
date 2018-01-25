@@ -7,7 +7,7 @@ qx.Class.define("gbio.comp.parametros.windowTurno",
 
 	this.set({
 		width: 380,
-		height: 330,
+		height: 400,
 		allowMaximize: false,
 		showMinimize: false,
 		showMaximize: false
@@ -31,17 +31,17 @@ qx.Class.define("gbio.comp.parametros.windowTurno",
 	txtDescrip.addListener("blur", function(e){
 		txtDescrip.setValue(txtDescrip.getValue().trim());
 	})
-	form.add(txtDescrip, "Descripción", null, "descrip", null, {item: {row: 0, column: 1, colSpan: 5}});
+	form.add(txtDescrip, "Descripción", null, "descrip", null, {grupo: 1, item: {row: 0, column: 1, colSpan: 5}});
 	
 	var slbLugarTrabajo = new qx.ui.form.SelectBox();
 	slbLugarTrabajo.setRequired(true);
 	for (var x in application.usuario.lugar_trabajo) {
 		slbLugarTrabajo.add(new qx.ui.form.ListItem(application.usuario.lugar_trabajo[x].descrip, null, application.usuario.lugar_trabajo[x].id_lugar_trabajo));
 	}
-	form.add(slbLugarTrabajo, "Lugar de trabajo", null, "id_lugar_trabajo", null, {item: {row: 1, column: 1, colSpan: 5}});
+	form.add(slbLugarTrabajo, "Lugar de trabajo", null, "id_lugar_trabajo", null, {grupo: 1, item: {row: 1, column: 1, colSpan: 5}});
 	
 	var chkActivo = new qx.ui.form.CheckBox();
-	form.add(chkActivo, "Activo", null, "activo", null, {item: {row: 1, column: 8, colSpan: 1}});
+	form.add(chkActivo, "Activo", null, "activo", null, {grupo: 1, item: {row: 1, column: 8, colSpan: 1}});
 	
 	var slbTipo = new qx.ui.form.SelectBox();
 	slbTipo.add(new qx.ui.form.ListItem("Fijo", null, "F"))
@@ -103,11 +103,16 @@ qx.Class.define("gbio.comp.parametros.windowTurno",
 			chkDo.setEnabled(false);
 		}
 	});
-	form.add(slbTipo, "Tipo", null, "tipo", null, {item: {row: 2, column: 1, colSpan: 3}});
+	form.add(slbTipo, "Tipo", null, "tipo", null, {grupo: 1, item: {row: 2, column: 1, colSpan: 3}});
 	
 	var txtCant_horas = new qx.ui.form.Spinner(0, 0, 100);
 	txtCant_horas.setEnabled(false);
-	form.add(txtCant_horas, "Cant.horas", null, "cant_horas", null, {item: {row: 2, column: 8, colSpan: 2}});
+	txtCant_horas.setNumberFormat(application.numberformatEntero);
+	txtCant_horas.getChildControl("upbutton").setVisibility("excluded");
+	txtCant_horas.getChildControl("downbutton").setVisibility("excluded");
+	txtCant_horas.setSingleStep(0);
+	txtCant_horas.setPageStep(0);
+	form.add(txtCant_horas, "Cant.horas", null, "cant_horas", null, {grupo: 1, item: {row: 2, column: 8, colSpan: 2}});
 	
 	var txtEntrada = new qx.ui.form.TextField("");
 	txtEntrada.setPlaceholder("00:00");
@@ -124,7 +129,7 @@ qx.Class.define("gbio.comp.parametros.windowTurno",
 	});
 	form.add(txtEntrada, "Entrada", function(value) {
 		if (txtEntrada.getEnabled() && txtEntrada.getValue()=="") throw new qx.core.ValidationError("Validation Error", "Debe ingresar hora de entrada");
-	}, "entrada", null, {item: {row: 3, column: 1, colSpan: 2}});
+	}, "entrada", null, {grupo: 1, item: {row: 3, column: 1, colSpan: 2}});
 	
 	
 	var txtSalida = new qx.ui.form.TextField("");
@@ -142,37 +147,39 @@ qx.Class.define("gbio.comp.parametros.windowTurno",
 	});
 	form.add(txtSalida, "Salida", function(value) {
 		if (txtSalida.getEnabled() && txtSalida.getValue()=="") throw new qx.core.ValidationError("Validation Error", "Debe ingresar hora de salida");
-	}, "salida", null, {item: {row: 3, column: 8, colSpan: 2}});
+	}, "salida", null, {grupo: 1, item: {row: 3, column: 8, colSpan: 2}});
 	
 	
 	var chkLu = new qx.ui.form.CheckBox();
-	form.add(chkLu, "Lunes", null, "lu", null, {item: {row: 6, column: 1, colSpan: 1}});
+	form.add(chkLu, "Lunes", null, "lu", null, {grupo: 1, item: {row: 6, column: 1, colSpan: 1}});
 	
 	var chkMa = new qx.ui.form.CheckBox();
-	form.add(chkMa, "Martes", null, "ma", null, {item: {row: 7, column: 1, colSpan: 1}});
+	form.add(chkMa, "Martes", null, "ma", null, {grupo: 1, item: {row: 7, column: 1, colSpan: 1}});
 	
 	var chkMi = new qx.ui.form.CheckBox();
-	form.add(chkMi, "Miércoles", null, "mi", null, {item: {row: 8, column: 1, colSpan: 1}});
+	form.add(chkMi, "Miércoles", null, "mi", null, {grupo: 1, item: {row: 8, column: 1, colSpan: 1}});
 	
 	var chkJu = new qx.ui.form.CheckBox();
-	form.add(chkJu, "Jueves", null, "ju", null, {item: {row: 9, column: 1, colSpan: 1}});
+	form.add(chkJu, "Jueves", null, "ju", null, {grupo: 1, item: {row: 9, column: 1, colSpan: 1}});
 	
 	var chkVi = new qx.ui.form.CheckBox();
-	form.add(chkVi, "Viernes", null, "vi", null, {item: {row: 6, column: 8, colSpan: 1}});
+	form.add(chkVi, "Viernes", null, "vi", null, {grupo: 1, item: {row: 10, column: 1, colSpan: 1}});
 	
 	var chkSa = new qx.ui.form.CheckBox();
-	form.add(chkSa, "Sábado", null, "sa", null, {item: {row: 7, column: 8, colSpan: 1}});
+	form.add(chkSa, "Sábado", null, "sa", null, {grupo: 1, item: {row: 11, column: 1, colSpan: 1}});
 	
 	var chkDo = new qx.ui.form.CheckBox();
-	form.add(chkDo, "Domingo", null, "do", null, {item: {row: 8, column: 8, colSpan: 1}});
+	form.add(chkDo, "Domingo", null, "do", null, {grupo: 1, item: {row: 12, column: 1, colSpan: 1}});
 	
 	
+	
+
 	
 	
 
 
 	//var formView = new qx.ui.form.renderer.Double(form);
-	var formView = new componente.comp.ui.ramon.abstractrenderer.Grid(form, 13, 13);
+	var formView = new componente.comp.ui.ramon.abstractrenderer.Grid(form, 13, 13, 1);
 	
 	this.add(formView, {left: 0, top: 0})
 	
@@ -180,7 +187,11 @@ qx.Class.define("gbio.comp.parametros.windowTurno",
 	
 	
 	
-	if (model==null) {
+
+	
+	
+	
+	if (model == null) {
 		this.setCaption("Alta de turno");
 		
 		modelForm = controllerForm.createModel(true);

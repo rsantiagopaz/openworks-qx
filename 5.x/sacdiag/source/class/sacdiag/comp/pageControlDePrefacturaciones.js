@@ -242,10 +242,10 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	var resizeBehaviorPrefac = tableColumnModelPrefac.getBehavior();
 
 	resizeBehaviorPrefac.set(0, {width:"12%", minWidth:100});
-	resizeBehaviorPrefac.set(1, {width:"45%", minWidth:100});
+	resizeBehaviorPrefac.set(1, {width:"43%", minWidth:100});
 	resizeBehaviorPrefac.set(2, {width:"12%", minWidth:100});
 	resizeBehaviorPrefac.set(3, {width:"10%", minWidth:100});
-	resizeBehaviorPrefac.set(4, {width:"10%", minWidth:100});
+	resizeBehaviorPrefac.set(4, {width:"12%", minWidth:100});
 	resizeBehaviorPrefac.set(5, {width:"11%", minWidth:100});
 
 	
@@ -253,6 +253,11 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	var cellrendererDate = new qx.ui.table.cellrenderer.Date();
 	cellrendererDate.setDateFormat(new qx.util.format.DateFormat("y-MM-dd"));
 	tableColumnModelPrefac.setDataCellRenderer(0, cellrendererDate);
+	
+	
+	var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
+	cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
+	tableColumnModelPrefac.setDataCellRenderer(4, cellrendererNumber);
 	
 	
 	var cellrendererReplace = new qx.ui.table.cellrenderer.Replace();
@@ -602,6 +607,12 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	resizeBehaviorPrestacion.set(1, {width:"46%", minWidth:100});
 	resizeBehaviorPrestacion.set(2, {width:"18%", minWidth:100});
 	resizeBehaviorPrestacion.set(3, {width:"18%", minWidth:100});
+	
+	
+	
+	var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
+	cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
+	tableColumnModelPrestacion.setDataCellRenderer(2, cellrendererNumber);
 
 	
 	

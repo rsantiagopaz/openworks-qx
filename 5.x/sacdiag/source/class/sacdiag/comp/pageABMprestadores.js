@@ -357,9 +357,14 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
 	resizeBehaviorPrestacion.set(0, {width:"15%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"63%", minWidth:100});
-	resizeBehaviorPrestacion.set(2, {width:"10%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"61%", minWidth:100});
+	resizeBehaviorPrestacion.set(2, {width:"12%", minWidth:100});
 	resizeBehaviorPrestacion.set(3, {width:"12%", minWidth:100});
+	
+	
+	var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
+	cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
+	tableColumnModelPrestacion.setDataCellRenderer(2, cellrendererNumber);
 
 
 	var cellrendererReplace = new qx.ui.table.cellrenderer.Replace();

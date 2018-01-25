@@ -91,10 +91,16 @@ class class_Parametros extends class_Base
   	$opciones->e_fichada = "int";
   	$opciones->e_tolerable = "int";
   	$opciones->e_tardanza = "int";
+  	$opciones->e_30minutos = "int";
+  	$opciones->e_60minutos = "int";
   	$opciones->salida_extras = "bool";
   	$opciones->s_fichada = "int";
   	$opciones->s_tolerable = "int";
   	$opciones->s_abandono = "int";
+  	$opciones->control_entrada = "bool";
+  	$opciones->control_salida = "bool";
+  	$opciones->total_minutos = "int";
+  	$opciones->limite_tardanzas = "int";
   	
   	return $this->toJson("SELECT tolerancia.*, lugar_trabajo.descrip AS lugar_trabajo_descrip FROM tolerancia INNER JOIN lugar_trabajo USING(id_lugar_trabajo) WHERE tolerancia.id_lugar_trabajo IN (" . implode(", ", $p->id_lugar_trabajo) . ") ORDER BY descrip", $opciones);
   }
@@ -189,7 +195,7 @@ class class_Parametros extends class_Base
   		$row->$col = substr($row->$col, 0, 5);
   	};
   	
-  	$opciones = array("cant_horas"=>"int", "activo"=>"bool", "lu"=>"bool", "ma"=>"bool", "mi"=>"bool", "ju"=>"bool", "vi"=>"bool", "sa"=>"bool", "do"=>"bool", "entrada"=>functionAux, "salida"=>functionAux);
+  	$opciones = array("cant_horas"=>"int", "activo"=>"bool", "lu"=>"bool", "ma"=>"bool", "mi"=>"bool", "ju"=>"bool", "vi"=>"bool", "sa"=>"bool", "do"=>"bool", "entrada"=>functionAux, "salida"=>functionAux, "control_entrada"=>"bool", "control_salida"=>"bool", "total_minutos"=>"int");
 	if ($p->todos) {
 		$respuesta = $this->toJson("SELECT turno.*, lugar_trabajo.descrip AS lugar_trabajo_descrip FROM turno INNER JOIN lugar_trabajo USING(id_lugar_trabajo) WHERE TRUE AND turno.id_lugar_trabajo IN (" . implode(", ", $p->id_lugar_trabajo) . ")", $opciones);
 	} else {

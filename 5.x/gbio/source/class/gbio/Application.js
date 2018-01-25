@@ -66,6 +66,23 @@ qx.Class.define("gbio.Application",
      
      
      
+	var numberformatMontoEs = this.numberformatMontoEs = new qx.util.format.NumberFormat("es");
+	numberformatMontoEs.setGroupingUsed(true);
+	numberformatMontoEs.setMaximumFractionDigits(2);
+	numberformatMontoEs.setMinimumFractionDigits(2);
+	
+	var numberformatMontoEn = this.numberformatMontoEn = new qx.util.format.NumberFormat("en");
+	numberformatMontoEn.setGroupingUsed(false);
+	numberformatMontoEn.setMaximumFractionDigits(2);
+	numberformatMontoEn.setMinimumFractionDigits(2);
+	
+	var numberformatEntero = this.numberformatEntero = new qx.util.format.NumberFormat("en");
+	numberformatEntero.setGroupingUsed(false);
+	numberformatEntero.setMaximumFractionDigits(0);
+	numberformatEntero.setMinimumFractionDigits(0);
+     
+     
+     
 	//qx.locale.Manager.getInstance().addLocale("es", {"cldr_date_format_medium": "d/M/yyyy"});
      
      
@@ -106,8 +123,8 @@ qx.Class.define("gbio.Application",
 			callback    : finalCallback
 		});
 		
-		//loginWidget._username.setValue("root");
-		//loginWidget._password.setValue("root");
+		loginWidget._username.setValue("root");
+		loginWidget._password.setValue("root");
 		
 		loginWidget._username.getLayoutParent().getLayout().getCellWidget(0, 0).setValue("Usuario:");
 		loginWidget._username.getLayoutParent().getLayout().getCellWidget(1, 0).setValue("Contraseña:");
@@ -222,6 +239,13 @@ qx.Class.define("gbio.Application",
         win.open();
     }, this);
     mnuListados.add(btnLisMensualDetallado);
+    
+    
+    var btnLisPermisos = new qx.ui.menu.Button("Permisos");
+    btnLisPermisos.addListener("execute", function (e) {
+		window.open("services/class/comp/Impresion.php?rutina=permisos");
+    });
+    mnuListados.add(btnLisPermisos);
 	
 	
 	var btnParRelojes = new qx.ui.menu.Button("Relojes");

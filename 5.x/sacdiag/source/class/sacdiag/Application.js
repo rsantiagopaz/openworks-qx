@@ -105,6 +105,7 @@ qx.Class.define("sacdiag.Application",
 	var pageControlDePrefacturaciones;
 	var pageABMprestaciones;
 	var pageABMprestadores;
+	var pageParametros;
 
 	
 	
@@ -217,11 +218,18 @@ qx.Class.define("sacdiag.Application",
 	
 	var mnuVer = new qx.ui.menu.Menu();
 	
-	var btnEstadisticas = new qx.ui.menu.Button("Estadisticas...");
+	var btnEstadisticas = new qx.ui.menu.Button("Estadísticas...");
 	btnEstadisticas.addListener("execute", function(){
-
+		if (pageParametros == null) {
+			pageParametros = new sacdiag.comp.pageParametros();
+			pageParametros.addListenerOnce("close", function(e){
+				pageParametros = null;
+			});
+			tabviewMain.add(pageParametros);
+		}
+		tabviewMain.setSelection([pageParametros]);
 	});
-	//mnuVer.add(btnEstadisticas);
+	mnuVer.add(btnEstadisticas);
 	
 	
 
@@ -233,10 +241,14 @@ qx.Class.define("sacdiag.Application",
 	
 	var btnContrasena = new qx.ui.menu.Button("Cambiar contraseña");
 	btnContrasena.addListener("execute", function(e){
-
+		var win = new sacdiag.comp.windowContrasena();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
 	});
-	//mnuSesion.add(btnContrasena);
-	//mnuSesion.addSeparator();
+	mnuSesion.add(btnContrasena);
+	mnuSesion.addSeparator();
 
 	var btnCerrar = new qx.ui.menu.Button("Cerrar");
 	btnCerrar.addListener("execute", function(e){

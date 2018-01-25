@@ -260,11 +260,13 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 
 	
 	
+	var aux = new qx.ui.layout.HBox(6).set({alignY: "middle"});
+	//aux.setAlignY("middle");
+	var composite = new qx.ui.container.Composite(aux);
+	this.add(composite, {left: "53%", top: 3});
 	
-	
-	
-	
-	
+	composite.add(new qx.ui.basic.Label("Buscar prestación:"));
+	//this.add(new qx.ui.basic.Label("Buscar prestación:"), {left: "53%", top: 3});
 	
 	
 	var txtBuscar = new qx.ui.form.TextField("");
@@ -276,10 +278,35 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	txtBuscar.addListener("keypress", function(e){
 		functionBuscar(e);
 	})
-	this.add(txtBuscar, {left: "61%", top: 0});
+	//this.add(txtBuscar, {left: "61%", top: 0});
+	composite.add(txtBuscar);
 	
 	
-	
+	var btnBuscar = new qx.ui.form.Button("Buscar");
+	btnBuscar.addListener("execute", function(e){
+		var value = txtBuscar.getValue().trim().toUpperCase();
+		
+		if (value.length >=2) {
+			var focusedRow = tblPrestacion.getFocusedRow();
+			var desde = (focusedRow == null) ? 0 : focusedRow + 1;				
+			
+			var rowData;
+			var rowCount = tableModelPrestacion.getRowCount();
+			
+			for (var x = desde; x < rowCount; x++) {
+				rowData = tableModelPrestacion.getRowData(x);
+				if (rowData["codigo"].includes(value) || rowData["denominacion"].includes(value)) {
+					tblPrestacion.setFocusedCell(0, x, true);
+					
+					break;
+				}
+			}
+		} else {
+			tblPrestacion.setFocusedCell();
+		}
+	});
+	composite.add(btnBuscar);
+	//this.add(txtBuscar, {left: "61%", top: 0});
 	
 	
 	
@@ -359,9 +386,14 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
 
 	resizeBehaviorPrestacion.set(0, {width:"15%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"65%", minWidth:100});
-	resizeBehaviorPrestacion.set(2, {width:"10%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"63%", minWidth:100});
+	resizeBehaviorPrestacion.set(2, {width:"12%", minWidth:100});
 	resizeBehaviorPrestacion.set(3, {width:"10%", minWidth:100});
+	
+	
+	var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
+	cellrendererNumber.setNumberFormat(application.numberformatMontoEs);
+	tableColumnModelPrestacion.setDataCellRenderer(2, cellrendererNumber);	
 	
 	
 	var cellrendererReplace = new qx.ui.table.cellrenderer.Replace();
@@ -390,7 +422,7 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 
 	this.add(tblPrestacion, {left: "53%", top: 30, right: 0, bottom: 0});
 	
-	this.add(new qx.ui.basic.Label("Buscar prestación:"), {left: "53%", top: 3});
+	//this.add(new qx.ui.basic.Label("Buscar prestación:"), {left: "53%", top: 3});
 	
 	
 	
