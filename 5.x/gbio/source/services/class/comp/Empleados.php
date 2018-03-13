@@ -21,7 +21,7 @@ class class_Empleados extends class_Base
   		}
   	}
   	
-  	$q = mysql_query("
+  	$q = $this->mysqli->query("
   	SELECT id_empleado,
   	name
   	FROM empleado
@@ -35,7 +35,7 @@ class class_Empleados extends class_Base
 //   	WHERE id_lugar_trabajo IN ('" . $lugar_trabajo . "')";
   	
   	$res = array();
-  	while ($r = mysql_fetch_object($q)) {
+  	while ($r = $q->fetch_object()) {
   		$res []= $r;
   	}
   	
@@ -63,7 +63,7 @@ class class_Empleados extends class_Base
 		foreach ($p->id_reloj as $id_reloj) {
 			$sql = "SELECT id_empleado_reloj FROM empleado_reloj WHERE id_empleado=" . $id_empleado . " AND id_reloj=" . $id_reloj;
 			$rs = $this->sql_query($sql);
-			if (mysql_num_rows($rs) == 0) {
+			if ($rs->num_rows == 0) {
 				$sql = "INSERT empleado_reloj SET id_empleado=" . $id_empleado . ", id_reloj=" . $id_reloj;
 				$this->sql_query($sql);
 			}
@@ -96,7 +96,7 @@ class class_Empleados extends class_Base
 	
 	$sql = "SELECT * FROM permiso WHERE id_permiso=" . $p->id_permiso;
 	$rsPermiso = $this->sql_query($sql);
-	$rowPermiso = mysql_fetch_object($rsPermiso);
+	$rowPermiso = $rsPermiso->fetch_object();
 	$rowPermiso->primer_aviso = (int) $rowPermiso->primer_aviso;
 	$rowPermiso->segundo_aviso = (int) $rowPermiso->segundo_aviso;
 	
@@ -105,15 +105,15 @@ class class_Empleados extends class_Base
 	foreach ($p->id_empleado_turno as $id_empleado_turno) {
 		$sql = "SELECT id_empleado_permiso FROM empleado_permiso WHERE id_empleado_turno=" . $id_empleado_turno . " AND id_permiso=" . $p->id_permiso . " AND fecha='" . substr($p->fecha, 0, 10) . "'";
 		$rs = $this->sql_query($sql);
-		if (mysql_num_rows($rs) == 0) {
+		if ($rs->num_rows == 0) {
 			$sql = "SELECT empleado.id_empleado, CONCAT(empleado.apellido, ', ', empleado.nombre) AS apenom FROM empleado_turno INNER JOIN empleado USING(id_empleado) WHERE id_empleado_turno=" . $id_empleado_turno;
 			$rsEmpleado = $this->sql_query($sql);
-			$rowEmpleado = mysql_fetch_object($rsEmpleado);
+			$rowEmpleado = $rsEmpleado->fetch_object();
 			
 			
 			$sql = "INSERT empleado_permiso SET id_empleado_turno=" . $id_empleado_turno . ", id_permiso=" . $p->id_permiso . ", fecha='" . $p->fecha . "'";
 			$this->sql_query($sql);
-			$insert_id = mysql_insert_id();
+			$insert_id = $this->mysqli->insert_id;
 			
 			$json = new stdClass;
 			$json->permiso = $rowPermiso;
@@ -126,9 +126,9 @@ class class_Empleados extends class_Base
 			$sql = "SELECT id_empleado_permiso FROM empleado_permiso INNER JOIN empleado_turno USING(id_empleado_turno) WHERE id_empleado=" . $rowEmpleado->id_empleado . " AND id_permiso=" . $p->id_permiso . " AND YEAR(empleado_permiso.fecha)=" . substr($p->fecha, 0, 4);
 			$rs = $this->sql_query($sql);
 
-			if (mysql_num_rows($rs) == $rowPermiso->primer_aviso) {
+			if ($rs->num_rows == $rowPermiso->primer_aviso) {
 				$resultado->primer_aviso[] = $rowEmpleado;
-			} else if (mysql_num_rows($rs) == $rowPermiso->segundo_aviso) {
+			} else if ($rs->num_rows == $rowPermiso->segundo_aviso) {
 				$resultado->segundo_aviso[] = $rowEmpleado;
 			}
 		}		
@@ -161,7 +161,7 @@ class class_Empleados extends class_Base
 		$sql.= "  AND desde='" . substr($p->desde, 0, 10) . "'";
 		$sql.= "  AND " . ((is_null($p->hasta)) ? "ISNULL(hasta)" : "hasta='" . substr($p->hasta, 0, 10) . "'");
 		$rs = $this->sql_query($sql);
-		if (mysql_num_rows($rs) == 0) {
+		if ($rs->num_rows == 0) {
 			$sql = "INSERT empleado_turno SET id_empleado=" . $id_empleado . ", id_turno=" . $p->id_turno . ", desde='" . $p->desde . "', hasta=" . ((is_null($p->hasta)) ? "NULL" : "'" . $p->hasta . "'");
 			$this->sql_query($sql);
 		}			
@@ -190,7 +190,7 @@ class class_Empleados extends class_Base
 	$sql.= " ORDER BY apenom, name, enroll_number";
 
 	$rs = $this->sql_query($sql);
-	while ($row = mysql_fetch_object($rs)) {
+	while ($row = $rs->fetch_object()) {
 		$sql = "SELECT empleado_turno.*, turno.descrip AS turno FROM empleado_turno INNER JOIN turno USING(id_turno) WHERE id_empleado=" . $row->id_empleado . " ORDER BY id_empleado_turno DESC";
 		$row->turnos = $this->toJson($sql);
 		
@@ -249,7 +249,7 @@ class class_Empleados extends class_Base
 	if ($p->id_empleado=="0") {
 		$sql = "INSERT empleado SET " . $set;
 		$this->sql_query($sql);
-		$resultado = mysql_insert_id();
+		$resultado = $this->mysqli->insert_id;
   	} else {
   		if ($p->cambio_lugar_trabajo) {
 			$sql = "DELETE FROM empleado_permiso WHERE id_empleado_turno IN (SELECT id_empleado_turno FROM empleado_turno WHERE id_empleado = " . $p->id_empleado . ")";

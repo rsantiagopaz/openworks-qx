@@ -24,8 +24,8 @@ class class_Relojes extends class_Base
 		$fp = fopen("userinfobatch.dat", "w");
 		
 		$sql = "SELECT empleado.* FROM empleado INNER JOIN empleado_reloj USING(id_empleado) WHERE id_reloj=" . $rowReloj->id_reloj;
-		$rsEmpleado = mysql_query($sql);
-		while ($rowEmpleado = mysql_fetch_object($rsEmpleado)) {
+		$rsEmpleado = $this->mysqli->query($sql);
+		while ($rowEmpleado = $rsEmpleado->fetch_object()) {
 			fwrite($fp, '<row');
 			fwrite($fp, ' enroll_number="' . $rowEmpleado->enroll_number . '"');
 			fwrite($fp, ' name="' . $rowEmpleado->name . '"');
@@ -36,8 +36,8 @@ class class_Relojes extends class_Base
 			fwrite($fp, '>');
 			
 			$sql = "SELECT * FROM huella WHERE id_empleado=" . $rowEmpleado->id_empleado;
-			$rsHuella = mysql_query($sql);
-			while ($rowHuella = mysql_fetch_object($rsHuella)) {
+			$rsHuella = $this->mysqli->query($sql);
+			while ($rowHuella = $rsHuella->fetch_object()) {
 				fwrite($fp, '<row');
 				fwrite($fp, ' finger_index="' . $rowHuella->finger_index . '"');
 				fwrite($fp, ' flag="' . $rowHuella->flag . '"');
@@ -80,8 +80,8 @@ class class_Relojes extends class_Base
 			$xml = new SimpleXMLElement($linea);
 			
 			$sql = "SELECT id_empleado FROM empleado WHERE enroll_number=" . $xml['enroll_number'];
-			$rsEmpleado = mysql_query($sql);
-			if (mysql_num_rows($rsEmpleado) == 0) {
+			$rsEmpleado = $this->mysqli->query($sql);
+			if ($rsEmpleado->num_rows == 0) {
 				$sql = "INSERT empleado SET";
 				$sql.= " enroll_number=" . $xml['enroll_number'];
 				$sql.= ", name='" . $xml['name'] . "'";
@@ -89,10 +89,10 @@ class class_Relojes extends class_Base
 				$sql.= ", privilege=" . $xml['privilege'];
 				$sql.= ", enabled=" . (($xml['enabled']=="True") ? "TRUE" : "FALSE");
 				
-				mysql_query($sql);
-				$id_empleado = mysql_insert_id();
+				$this->mysqli->query($sql);
+				$id_empleado = $this->mysqli->insert_id;
 			} else {
-				$rowEmpleado = mysql_fetch_object($rsEmpleado);
+				$rowEmpleado = $rsEmpleado->fetch_object();
 				$id_empleado = $rowEmpleado->id_empleado;
 				
 				$sql = "UPDATE empleado SET";
@@ -103,13 +103,13 @@ class class_Relojes extends class_Base
 				$sql.= ", enabled=" . (($xml['enabled']=="True") ? "TRUE" : "FALSE");
 				$sql.= " WHERE id_empleado=" . $id_empleado;
 				
-				mysql_query($sql);
+				$this->mysqli->query($sql);
 			}
 			
 			foreach ($xml->row as $row) {
 				$sql = "SELECT id_huella FROM huella WHERE id_empleado=" . $id_empleado . " AND finger_index=" . $row['finger_index'];
-				$rsHuella = mysql_query($sql);
-				if (mysql_num_rows($rsHuella) == 0) {
+				$rsHuella = $this->mysqli->query($sql);
+				if ($rsHuella->num_rows == 0) {
 					$sql = "INSERT huella SET";
 					$sql.= " id_empleado=" . $id_empleado;
 					$sql.= ", finger_index=" . $row['finger_index'];
@@ -117,9 +117,9 @@ class class_Relojes extends class_Base
 					$sql.= ", tmp_length=" . $row['tmp_length'];
 					$sql.= ", tmp_data='" . $row['tmp_data'] . "'";
 					
-					mysql_query($sql);
+					$this->mysqli->query($sql);
 				} else {
-					$rowHuella = mysql_fetch_object($rsHuella);
+					$rowHuella = $rsHuella->fetch_object();
 					
 					$sql = "UPDATE huella SET";
 					$sql.= " id_empleado=" . $id_empleado;
@@ -129,15 +129,15 @@ class class_Relojes extends class_Base
 					$sql.= ", tmp_data='" . $row['tmp_data'] . "'";
 					$sql.= " WHERE id_huella=" . $rowHuella->id_huella;
 					
-					mysql_query($sql);
+					$this->mysqli->query($sql);
 				}
 			}
 			
 			$sql = "SELECT id_empleado_reloj FROM empleado_reloj WHERE id_empleado=" . $id_empleado . " AND id_reloj=" . $rowReloj->id_reloj;
-			$rsHuella = mysql_query($sql);
-			if (mysql_num_rows($rsHuella) == 0) {
+			$rsHuella = $this->mysqli->query($sql);
+			if ($rsHuella->num_rows == 0) {
 				$sql = "INSERT empleado_reloj SET id_empleado=" . $id_empleado . ", id_reloj=" . $rowReloj->id_reloj;
-				mysql_query($sql);
+				$this->mysqli->query($sql);
 			}
 	    }
 	    
@@ -164,14 +164,14 @@ class class_Relojes extends class_Base
 			$xml = new SimpleXMLElement($linea);
 			
 			$sql = "SELECT empleado_reloj.* FROM empleado INNER JOIN empleado_reloj USING(id_empleado) WHERE empleado.enroll_number='" . $xml['enroll_number'] . "' AND empleado_reloj.id_reloj='" . $row->id_reloj . "'";
-			$rs = mysql_query($sql);
-			if (mysql_num_rows($rs) > 0) {
-				$rowEmpleado_reloj = mysql_fetch_object($rs);
+			$rs = $this->mysqli->query($sql);
+			if ($rs->num_rows > 0) {
+				$rowEmpleado_reloj = $rs->fetch_object();
 				
 				$sql = "SELECT fichaje.id_fichaje FROM fichaje INNER JOIN empleado_reloj USING(id_empleado_reloj) WHERE empleado_reloj.id_empleado='" . $rowEmpleado_reloj->id_empleado . "' AND empleado_reloj.id_reloj='" . $row->id_reloj . "' AND fichaje.fecha_hora='" . $xml['fecha_hora'] . "'";
-				$rs = mysql_query($sql);
-				$resultado[] = mysql_error();
-				if (mysql_num_rows($rs) == 0) {
+				$rs = $this->mysqli->query($sql);
+				$resultado[] = $this->mysqli->error;
+				if ($rs->num_rows == 0) {
 					$sql = "INSERT fichaje SET";
 					$sql.= " id_empleado_reloj='" . $rowEmpleado_reloj->id_empleado_reloj . "'";
 					$sql.= ", verify_mode='" . $xml['verify_mode'] . "'";
@@ -180,7 +180,7 @@ class class_Relojes extends class_Base
 					$sql.= ", workcode='" . $xml['workcode'] . "'";
 					$sql.= ", tipo='R'";
 					
-					mysql_query($sql);
+					$this->mysqli->query($sql);
 				}
 			}
 	    }

@@ -33,20 +33,6 @@ qx.Class.define("gbio.comp.parametros.windowTolerancias",
 			alert("Sync exception: " + ex);
 		}
 		
-		/*
-		var ano, mes, dia;
-		for (var x in resultado) {
-			ano = parseInt(resultado[x].desde.substr(0, 4));
-			mes = parseInt(resultado[x].desde.substr(5, 2)) - 1;
-			dia = parseInt(resultado[x].desde.substr(8, 2));
-			resultado[x].desde = new Date(ano, mes, dia);
-			
-			ano = parseInt(resultado[x].hasta.substr(0, 4));
-			mes = parseInt(resultado[x].hasta.substr(5, 2)) - 1;
-			dia = parseInt(resultado[x].hasta.substr(8, 2));
-			resultado[x].hasta = new Date(ano, mes, dia);
-		}
-		*/
 
 		tbl.setFocusedCell();
 		tableModel.setDataAsMapArray(resultado, true);

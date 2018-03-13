@@ -9,14 +9,14 @@ class class_Maestros extends class_Base {
 	function method_getEmpleados ($params, $error) {
 		$p = $params[0];
 		
-		$q = mysql_query("
+		$q = $this->mysqli->query("
 		SELECT id_empleado as value, name as label
 		FROM empleado
 		ORDER BY name
 		");
 		
 		$res = "";
-		while ($r = mysql_fetch_object($q)) {
+		while ($r = $q->fetch_object()) {
 			if ($res == "") {
 				$row = new stdClass();
 				$row->id = '';

@@ -418,7 +418,7 @@ class class_Vehiculo extends class_Base
   	$asu = 0;
   	$dif = 0;
  	
-	$sql = "SELECT id_entsal, organismo_area_id, nro_patente, CONCAT(nro_patente, '  ', marca) AS vehiculo, f_ent, f_sal, asunto, entsal.estado, entsal.diferido FROM entsal INNER JOIN vehiculo USING(id_vehiculo) WHERE vehiculo.id_parque=" . $_SESSION['parque']->id_parque . " AND (entsal.estado='E' OR entsal.estado='T' OR entsal.asunto OR entsal.diferido) ORDER BY f_ent DESC";
+	$sql = "SELECT id_entsal, organismo_area_id, nro_patente, CONCAT(nro_patente, '  ', marca) AS vehiculo, f_ent, f_sal, asunto, entsal.estado, entsal.diferido FROM entsal INNER JOIN vehiculo USING(id_vehiculo) WHERE vehiculo.id_parque=" . $_SESSION['parque']->id_parque . " AND entsal.estado<>'A' AND (entsal.estado='E' OR entsal.estado='T' OR entsal.asunto OR entsal.diferido) ORDER BY f_ent DESC";
 	$rs = mysql_query($sql);
 	while ($row = mysql_fetch_object($rs)) {
 		$row->asunto = (bool) $row->asunto;

@@ -167,22 +167,22 @@ class class_Parametros extends class_Base
 				for ($i = 1; $i <= $rs->num_rows; $i++) {
 					$row = $rs->fetch_object();
 					
-					if ((int) substr($fecha, 5, 2) == (int) $row->mes) {
+					if (substr($fecha, 0, 4) == substr($row->fecha, 0, 4) && substr($fecha, 5, 2) == substr($row->fecha, 5, 2)) {
 						$sig_mensual = "'" . $row->id_prestador . "'";
 						break;
 					}
-					
 				}
 	
 				if (($sig_mensual == "NULL")) {
-					$mes = (int) $row->mes;
-					$mes = $mes + 1;
+					$datetime = new DateTime(substr($row->fecha, 0, 4) . "-" . substr($row->fecha, 5, 2) . "-" . "01");
+					$datetime->add(new DateInterval("P1M"));
+					$fecha_desde = $datetime->format("Y") . "-" . $datetime->format("m") . "-" . "01";
 					
 					$sql = "SELECT * FROM prestador_datos WHERE organismo_area_id='" . $row->id_prestador . "'";
 					$rsPD = $this->mysqli->query($sql);
 					$rowPD = $rsPD->fetch_object();
 					
-					$sql = "INSERT cronograma_mensual SET id_prestador='" . $rowPD->sig_mensual . "', mes='" . $mes . "'";
+					$sql = "INSERT cronograma_mensual SET id_prestador='" . $rowPD->sig_mensual . "', fecha='" . $fecha_desde . "'";
 					$this->mysqli->query($sql);
 				}
 				

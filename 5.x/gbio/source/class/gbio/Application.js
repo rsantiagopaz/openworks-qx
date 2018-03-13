@@ -123,8 +123,8 @@ qx.Class.define("gbio.Application",
 			callback    : finalCallback
 		});
 		
-		loginWidget._username.setValue("root");
-		loginWidget._password.setValue("root");
+		//loginWidget._username.setValue("root");
+		//loginWidget._password.setValue("root");
 		
 		loginWidget._username.getLayoutParent().getLayout().getCellWidget(0, 0).setValue("Usuario:");
 		loginWidget._username.getLayoutParent().getLayout().getCellWidget(1, 0).setValue("Contraseña:");
@@ -241,9 +241,12 @@ qx.Class.define("gbio.Application",
     mnuListados.add(btnLisMensualDetallado);
     
     
-    var btnLisPermisos = new qx.ui.menu.Button("Permisos");
+    var btnLisPermisos = new qx.ui.menu.Button("Tiempo de Permiso");
     btnLisPermisos.addListener("execute", function (e) {
-		window.open("services/class/comp/Impresion.php?rutina=permisos");
+        var win = new gbio.comp.listados.windowListado();
+        win.setModal(true);
+        win.center();
+        win.open();
     });
     mnuListados.add(btnLisPermisos);
 	

@@ -25,7 +25,7 @@ case "general" : {
 	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
 	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td align="center" colspan="6"><big><b>ESTADO GENERAL</b></big></td></tr>
 	<tr><td align="center" colspan="6"><big><?php echo date("Y-m-d H:i:s"); ?></big></td></tr>
@@ -176,7 +176,7 @@ case "gastos" : {
 	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
 	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td align="center" colspan="6"><big><b>LISTADO GASTOS</b></big></td></tr>
 	<tr><td align="center" colspan="6"><big><?php echo date("Y-m-d H:i:s"); ?></big></td></tr>
@@ -299,7 +299,7 @@ case "incidentes" : {
 	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
 	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td align="center" colspan="6"><big><b>LISTADO INCIDENTES</b></big></td></tr>
 	<tr><td align="center" colspan="6"><big><?php echo date("Y-m-d H:i:s"); ?></big></td></tr>
@@ -408,7 +408,7 @@ case "choferes" : {
 	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
 	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td align="center" colspan="6"><big><b>LISTADO DE CHOFERES</b></big></td></tr>
 	<tr><td align="center" colspan="6"><big><?php echo date("Y-m-d H:i:s"); ?></big></td></tr>
@@ -534,7 +534,7 @@ case "historial" : {
 	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
 	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td><b>Historial Vehiculo: <?php echo $rowVehiculo->nro_patente . "  " . $rowVehiculo->marca; ?></b></td></tr>
@@ -669,7 +669,7 @@ case "salida_vehiculo" : {
 	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
 	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td align="center" colspan="6"><big><b>FORMULARIO DE CONFORMIDAD</b></big></td></tr>
 	<tr><td align="center" colspan="6"><big><?php echo date("Y-m-d H:i:s"); ?></big></td></tr>
@@ -815,13 +815,13 @@ case "entrada_taller" : {
 	<table border="0" cellpadding="0" cellspacing="0" width="800" align="center">
 	<tr><td align="center" colspan="6"><big><b>Parque Automotor</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud y Desarrollo Social</b></big></td></tr>
+	<tr><td align="center" colspan="6"><big><b>Ministerio de Salud</b></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td align="center" colspan="6"><big><b>ORDEN DE TRABAJO # <?php echo $_REQUEST['id_movimiento']; ?></b></big></td></tr>
-	<tr><td align="center" colspan="6"><big><?php echo date("Y-m-d H:i:s"); ?></big></td></tr>
+	<tr><td align="center" colspan="6"><big><?php echo date("d/m/Y H:i:s"); ?></big></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td><b>Vehiculo: <?php echo $rowEntsal->nro_patente . "  " . $rowEntsal->marca; ?></b></td><td>Entrada: <?php echo $rowMovimiento->f_ent; ?></td></tr>
+	<tr><td><b>Vehiculo: <?php echo $rowEntsal->nro_patente . "  " . $rowEntsal->marca; ?></b></td><td>Entrada: <?php $aux = new DateTime($rowMovimiento->f_ent); echo $aux->format("d/m/Y H:i:s"); ?></td></tr>
 	<tr><td colspan="20">Dependencia: <?php echo $rowEntsal->dependencia; ?></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr><td>Usuario: <?php echo $_SESSION['usuario']; ?></td></tr>

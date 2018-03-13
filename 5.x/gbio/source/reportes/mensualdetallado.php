@@ -4,10 +4,10 @@ if( !ini_get('safe_mode') ) {
 }
 
 require("../services/class/comp/Conexion.php");
-$con = @mysql_connect($servidor, $usuario, $password);
-@mysql_select_db($base, $con);
-mysql_query("SET NAMES 'UTF8'");
-if (mysql_error()) die(mysql_error());
+$mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+$mysqli->query("SET NAMES 'utf8'");
+
+if ($mysqli->error) die($mysqli->error);
 
 ?>
 <input type="button" value="Imprimir" onclick="window.print()" /><br /><br />
@@ -23,17 +23,17 @@ $_REQUEST["id_turno"] = 1;
 $ENTRADA = 0;
 $SALIDA = 1;
 
-$qTO = mysql_query("
+$qTO = $mysqli->query("
 SELECT * FROM tolerancia
 LIMIT 1
 ");
-$rTO = mysql_fetch_object($qTO);
+$rTO = $qTO->fetch_object();
 
-$qTURNO = mysql_query("
+$qTURNO = $mysqli->query("
 SELECT * FROM turno
 WHERE id_turno = '" . $_REQUEST["id_turno"] . "'
 ");
-$rTURNO = mysql_fetch_object($qTURNO);
+$rTURNO = $qTURNO->fetch_object();
 
 ?>
 LISTANDO ASISTENCIA DE LA FECHA 01/<?php echo $_REQUEST["MES"] . "/" . $_REQUEST["ANO"]; ?> AL 31/<?php echo $_REQUEST["MES"] . "/" . $_REQUEST["ANO"]; ?>
@@ -99,7 +99,7 @@ if ($_REQUEST["empleados"] != "TODOS") {
 } else {
 	$EMPLEADOS = "";
 }
-$qEmp = mysql_query("
+$qEmp = $mysqli->query("
 SELECT DISTINCT empleado.*
 FROM empleado
 INNER JOIN empleado_turno USING(id_empleado)
@@ -109,23 +109,23 @@ AND empleado_turno.id_turno = '" . $_REQUEST["id_turno"] . "'
 ORDER BY name
 ");
 
-while ($rEmp = mysql_fetch_object($qEmp)) {
+while ($rEmp = $qEmp->fetch_object()) {
 	
-	$qER = mysql_query("
+	$qER = $mysqli->query("
 	SELECT GROUP_CONCAT(id_empleado_reloj SEPARATOR ',') as id_empleado_reloj
 	FROM empleado_reloj
 	WHERE id_empleado = '" . $rEmp->id_empleado . "'
 	");
-	$rER = mysql_fetch_object($qER);
+	$rER = $qER->fetch_object();
 	
-	$qET = mysql_query("
+	$qET = $mysqli->query("
 	SELECT GROUP_CONCAT(id_empleado_turno SEPARATOR ',') as id_empleado_turno
 	FROM empleado_turno
 	WHERE id_empleado = '" . $rEmp->id_empleado . "'
 	AND desde <= '" . $DESDE . "'
 	AND IFNULL(hasta,'3000-12-31') >= '" . $HASTA . "'
 	");
-	$rET = mysql_fetch_object($qET);
+	$rET = $qET->fetch_object();
 	
 // 	echo $rEmp->name . " - EmpleadoReloj: " . $rER->id_empleado_reloj . " - EmpleadoTurno: " . $rET->id_empleado_turno . "<br />";
 	?>
@@ -165,7 +165,7 @@ while ($rEmp = mysql_fetch_object($qEmp)) {
 			<?php
 		} else {
 		
-		$qFiE = mysql_query("
+		$qFiE = $mysqli->query("
 		SELECT *, CONCAT(HOUR(fichaje.fecha_hora), ':', if(MINUTE(fichaje.fecha_hora)<10, CONCAT('0', MINUTE(fichaje.fecha_hora)), MINUTE(fichaje.fecha_hora))) as asistencia 
 		FROM fichaje
 		WHERE id_empleado_reloj IN (" . $rER->id_empleado_reloj . ")
@@ -174,9 +174,9 @@ while ($rEmp = mysql_fetch_object($qEmp)) {
 		ORDER BY id_fichaje ASC
 		LIMIT 1
 		");
-		if (mysql_error()) die(mysql_error());
+		if ($mysqli->error) die($mysqli->error);
 
-		$qFiS = mysql_query("
+		$qFiS = $mysqli->query("
 		SELECT *, CONCAT(HOUR(fichaje.fecha_hora), ':', if(MINUTE(fichaje.fecha_hora)<10, CONCAT('0', MINUTE(fichaje.fecha_hora)), MINUTE(fichaje.fecha_hora))) as asistencia
 		FROM fichaje
 		WHERE id_empleado_reloj IN (" . $rER->id_empleado_reloj . ")
@@ -185,9 +185,9 @@ while ($rEmp = mysql_fetch_object($qEmp)) {
 		ORDER BY id_fichaje DESC
 		LIMIT 1
 		");
-		if (mysql_error()) die(mysql_error());
+		if ($mysqli->error) die($mysqli->error);
 
-		$rFiE = mysql_fetch_object($qFiE);
+		$rFiE = $qFiE->fetch_object();
 		if ($rFiE) {
 			$cant_entradas++;
 // 			echo "E: " . $rFiE->asistencia . "<br />";
@@ -235,15 +235,15 @@ while ($rEmp = mysql_fetch_object($qEmp)) {
 			$permiso = false;
 			$entrada_ok = false;
 			if ($rET->id_empleado_turno) {
-				$qEPT = mysql_query("
+				$qEPT = $mysqli->query("
 				SELECT permiso.descrip as permiso
 				FROM empleado_permiso
 				INNER JOIN permiso USING(id_permiso)
 				WHERE id_empleado_turno IN (" . $rET->id_empleado_turno . ")
 				AND fecha = '" . $_REQUEST["ANO"] . "-". $_REQUEST["MES"] . "-" . $dia . "'
 				");
-				if (mysql_error()) die(mysql_error());
-				while ($rEPT = mysql_fetch_object($qEPT)) {
+				if ($mysqli->error) die($mysqli->error);
+				while ($rEPT = $qEPT->fetch_object()) {
 					echo '<td bgcolor="#89FFED" title="' . $rEPT->permiso . '">&nbsp;</td>';
 					$permiso = true;
 				}
@@ -256,7 +256,7 @@ while ($rEmp = mysql_fetch_object($qEmp)) {
 			}
 		}
 		
-		$rFiS = mysql_fetch_object($qFiS);
+		$rFiS = $qFiS->fetch_object();
 		if ($rFiS) {
 			$cant_salidas++;
 // 			echo "S: " . $rFiS->asistencia . "<br />";
@@ -296,15 +296,15 @@ while ($rEmp = mysql_fetch_object($qEmp)) {
 			$salida_ok = false;
 			$permiso = false;
 			if ($rET->id_empleado_turno) {
-				$qEPT = mysql_query("
+				$qEPT = $mysqli->query("
 						SELECT permiso.descrip as permiso
 						FROM empleado_permiso
 						INNER JOIN permiso USING(id_permiso)
 						WHERE id_empleado_turno IN (" . $rET->id_empleado_turno . ")
 						AND fecha = '" . $_REQUEST["ANO"] . "-". $_REQUEST["MES"] . "-" . $dia . "'
 						");
-				if (mysql_error()) die(mysql_error());
-				while ($rEPT = mysql_fetch_object($qEPT)) {
+				if ($mysqli->error) die($mysqli->error);
+				while ($rEPT = $qEPT->fetch_object()) {
 					echo '<td bgcolor="#89FFED" title="' . $rEPT->permiso . '">&nbsp;</td>';
 					$permiso = true;
 				}

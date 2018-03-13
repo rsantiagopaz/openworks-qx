@@ -15,10 +15,10 @@ class class_Parametros extends class_Base
 	$set = $this->prepararCampos($p->model);
 	
 	$sql = "SELECT * FROM usuario WHERE id_usuario=" . $p->model->id_usuario . " AND password=MD5('" . $p->model->password . "')";
-	$rs = mysql_query($sql);
-	if (mysql_num_rows($rs) > 0) {
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows > 0) {
   		$sql = "UPDATE usuario SET password=MD5('" . $p->model->passnueva . "') WHERE id_usuario=" . $p->model->id_usuario;
-  		mysql_query($sql);
+  		$this->mysqli->query($sql);
 	} else {
 		$error->SetError(0, "password");
 		return $error;
@@ -30,9 +30,9 @@ class class_Parametros extends class_Base
 	$p = $params[0];
 	
 	$sql = "SELECT * FROM usuario WHERE usuario LIKE '" . $p->nick . "'";
-	$rs = mysql_query($sql);
-	if (mysql_num_rows($rs) > 0) {
-		$row = mysql_fetch_object($rs);
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows > 0) {
+		$row = $rs->fetch_object();
 		if ($row->password == md5($p->password)) {
 			
 			unset($row->password);
@@ -41,8 +41,8 @@ class class_Parametros extends class_Base
 			$row->id_lugar_trabajo = array();
 			
 			$sql = "SELECT lugar_trabajo.id_lugar_trabajo, lugar_trabajo.descrip FROM usuario_lugar_trabajo INNER JOIN lugar_trabajo USING(id_lugar_trabajo) WHERE id_usuario=" . $row->id_usuario . " ORDER BY descrip";
-			$rsLugar_trabajo = mysql_query($sql);
-			while ($rowLugar_trabajo = mysql_fetch_object($rsLugar_trabajo)) {
+			$rsLugar_trabajo = $this->mysqli->query($sql);
+			while ($rowLugar_trabajo = $rsLugar_trabajo->fetch_object()) {
 				$row->lugar_trabajo[] = $rowLugar_trabajo;
 				$row->id_lugar_trabajo[] = $rowLugar_trabajo->id_lugar_trabajo;
 			}
@@ -65,16 +65,16 @@ class class_Parametros extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT * FROM ubicacion WHERE id_ubicacion=" . $p->id_ubicacion;
-  	$rs = mysql_query($sql);
-	$nodo = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+	$nodo = $rs->fetch_object();
 	
 	$nodo->padre = "";
 	$nodo->labelLargo = "";
 	$nodo->hijos = array();
 	
   	$sql = "SELECT id_ubicacion FROM ubicacion WHERE id_padre=" . $p->id_ubicacion . " ORDER BY descrip";
-  	$rs = mysql_query($sql);
-  	while ($row = mysql_fetch_object($rs)) {
+  	$rs = $this->mysqli->query($sql);
+  	while ($row = $rs->fetch_object()) {
   		$p->id_ubicacion = $row->id_ubicacion;
   		$nodo->hijos[] = $this->method_leer_ubicaciones($params, $error);
   	}
@@ -113,11 +113,11 @@ class class_Parametros extends class_Base
   	
   	if (is_null($p->model->id_tolerancia)) {
   		$sql = "INSERT tolerancia SET " . $set . "";
-  		mysql_query($sql);
-		$id_tolerancia = mysql_insert_id();
+  		$this->mysqli->query($sql);
+		$id_tolerancia = $this->mysqli->insert_id;
   	} else{
   		$sql = "UPDATE tolerancia SET " . $set . " WHERE id_tolerancia=" . $p->model->id_tolerancia . "";
-  		mysql_query($sql);
+  		$this->mysqli->query($sql);
   		$id_tolerancia = $p->model->id_tolerancia;
   	}
   	
@@ -158,11 +158,11 @@ class class_Parametros extends class_Base
   	
   	if (is_null($p->model->id_permiso)) {
   		$sql = "INSERT permiso SET " . $set . "";
-  		mysql_query($sql);
-		$id_permiso = mysql_insert_id();
+  		$this->mysqli->query($sql);
+		$id_permiso = $this->mysqli->insert_id;
   	} else{
   		$sql = "UPDATE permiso SET " . $set . " WHERE id_permiso=" . $p->model->id_permiso . "";
-  		mysql_query($sql);
+  		$this->mysqli->query($sql);
   		$id_permiso = $p->model->id_permiso;
   	}
   	
@@ -179,10 +179,10 @@ class class_Parametros extends class_Base
   	
   	if (is_null($p->model->id_turno)) {
   		$sql = "INSERT turno SET " . $set . "";
-  		mysql_query($sql);
+  		$this->mysqli->query($sql);
   	} else{
   		$sql = "UPDATE turno SET " . $set . " WHERE id_turno=" . $p->model->id_turno . "";
-  		mysql_query($sql);
+  		$this->mysqli->query($sql);
   	}
   }
   
@@ -223,30 +223,30 @@ class class_Parametros extends class_Base
   	
   	
   	try {
-		mysql_query("START TRANSACTION");
+		$this->mysqli->query("START TRANSACTION");
 		
 	  	if (is_null($p->model->id_usuario)) {
 	  		$sql = "INSERT usuario SET usuario='" . $p->model->usuario . "', password=MD5('" . $p->model->password . "'), tipo='" . $p->model->tipo . "'";
-	  		mysql_query($sql);
+	  		$this->mysqli->query($sql);
 	  		
-	  		$p->model->id_usuario = mysql_insert_id();
+	  		$p->model->id_usuario = $this->mysqli->insert_id;
 	  	} else{
 	  		$sql = "DELETE FROM usuario_lugar_trabajo WHERE id_usuario=" . $p->model->id_usuario;
-	  		mysql_query($sql);
+	  		$this->mysqli->query($sql);
 	  		
 	  		$sql = "UPDATE usuario SET usuario='" . $p->model->usuario . "', tipo='" . $p->model->tipo . "' WHERE id_usuario=" . $p->model->id_usuario;
-	  		mysql_query($sql);
+	  		$this->mysqli->query($sql);
 	  	}
 	  	
 	  	foreach ($p->lugar_trabajo as $item) {
 			$sql = "INSERT usuario_lugar_trabajo SET id_usuario=" . $p->model->id_usuario . ", id_lugar_trabajo=" . $item;
-			mysql_query($sql);
+			$this->mysqli->query($sql);
 	  	}
 	
-		mysql_query("COMMIT");
+		$this->mysqli->query("COMMIT");
 	
 	} catch (Exception $e) {
-		mysql_query("ROLLBACK");
+		$this->mysqli->query("ROLLBACK");
 	}
   }
   
@@ -264,22 +264,22 @@ class class_Parametros extends class_Base
   	$cambios = $p->cambios;
   	
   	try {
-		mysql_query("START TRANSACTION");
+		$this->mysqli->query("START TRANSACTION");
 		
 		foreach ($cambios->altas as $item) {
 			$sql="INSERT INTO lugar_trabajo SET descrip='" . $item->descrip . "'";
-			mysql_query($sql);
+			$this->mysqli->query($sql);
 		}
 	
 		foreach ($cambios->modificados as $item) {
 			$sql="UPDATE lugar_trabajo SET descrip='" . $item->descrip . "' WHERE id_lugar_trabajo='" . $item->id_lugar_trabajo . "'";
-			mysql_query($sql);
+			$this->mysqli->query($sql);
 		}	
 	
-		mysql_query("COMMIT");
+		$this->mysqli->query("COMMIT");
 	
 	} catch (Exception $e) {
-		mysql_query("ROLLBACK");
+		$this->mysqli->query("ROLLBACK");
 	}
   }
   
@@ -297,22 +297,22 @@ class class_Parametros extends class_Base
   	$cambios = $p->cambios;
   	
   	try {
-		mysql_query("START TRANSACTION");
+		$this->mysqli->query("START TRANSACTION");
 		
 		foreach ($cambios->altas as $item) {
 			$sql="INSERT INTO reloj SET descrip='" . $item->descrip . "', host='" . $item->host . "'";
-			mysql_query($sql);
+			$this->mysqli->query($sql);
 		}
 	
 		foreach ($cambios->modificados as $item) {
 			$sql="UPDATE reloj SET descrip='" . $item->descrip . "', host='" . $item->host . "' WHERE id_reloj='" . $item->id_reloj . "'";
-			mysql_query($sql);
+			$this->mysqli->query($sql);
 		}	
 	
-		mysql_query("COMMIT");
+		$this->mysqli->query("COMMIT");
 	
 	} catch (Exception $e) {
-		mysql_query("ROLLBACK");
+		$this->mysqli->query("ROLLBACK");
 	}
   }
   
@@ -321,8 +321,8 @@ class class_Parametros extends class_Base
   	$p = $params[0];
   	
 	$sql = "SELECT json FROM paramet WHERE id_paramet = 1";
-	$rs = mysql_query($sql);
-	$row = mysql_fetch_object($rs);
+	$rs = $this->mysqli->query($sql);
+	$row = $rs->fetch_object();
 	$json = $row->json;
 	
 	$json = json_decode($json);
@@ -334,7 +334,7 @@ class class_Parametros extends class_Base
 	$json = json_encode($json);
 	
 	$sql = "UPDATE paramet SET json='" . $json . "'" . " WHERE id_paramet = 1";
-	mysql_query($sql);
+	$this->mysqli->query($sql);
 
   }
   
@@ -342,8 +342,8 @@ class class_Parametros extends class_Base
   public function method_leer_paramet($params, $error) {
 	
 	$sql = "SELECT * FROM paramet WHERE id_paramet = 1";
-	$rs = mysql_query($sql);
-	$row = mysql_fetch_object($rs);
+	$rs = $this->mysqli->query($sql);
+	$row = $rs->fetch_object();
 	$row->json = json_decode($row->json);
 	
 	return $row;
@@ -356,6 +356,14 @@ class class_Parametros extends class_Base
   	$resultado->hora = date("H:i");
 	
 	return $resultado;
+  }
+  
+  
+  public function method_autocompletarEmpleado($params, $error) {
+  	$p = $params[0];
+  	
+	$sql = "SELECT name AS label, id_empleado AS model FROM empleado WHERE name LIKE '%" . $p->texto . "%' OR apellido LIKE '%" . $p->texto . "%' OR nombre LIKE '%" . $p->texto . "%' ORDER BY label";
+	return $this->toJson($sql);
   }
 }
 

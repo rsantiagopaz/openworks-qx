@@ -85,6 +85,12 @@ qx.Class.define("componente.comp.ui.ramon.combobox.ComboBoxAuto",
 
                         this.open();
 					}, this));
+					
+					this.rpc.addListener("failed", qx.lang.Function.bind(function(e){
+						var data = e.getData();
+
+						//alert(qx.lang.Json.stringify(data, null, 2));
+					}, this));
 
 					this.opaqueCallRef = this.rpc.callAsyncListeners(true, rpcParametros.methodName, p);
 				}

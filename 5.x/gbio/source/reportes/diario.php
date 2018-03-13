@@ -1,8 +1,8 @@
 <?php
 require("../services/class/comp/Conexion.php");
-$con = mysql_connect($servidor, $usuario, $password);
-mysql_select_db($base, $con);
-mysql_query("SET NAMES 'UTF8'");
+$mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+$mysqli->query("SET NAMES 'utf8'");
+
 
 ?>
 <input type="button" value="Imprimir" onclick="window.print()" /><br /><br />
@@ -25,7 +25,7 @@ IF (($_REQUEST["DESDE"] != "") && ($_REQUEST["HASTA"] != "")) {
 	$DESDE = $_REQUEST["DESDE"];
 	$HASTA = $_REQUEST["HASTA"];
 
-	$q = mysql_query("
+	$q = $mysqli->query("
 	SELECT empleado.*, GROUP_CONCAT(DISTINCT empleado_reloj.id_empleado_reloj SEPARATOR ', ') as id_empleado_reloj
 	FROM empleado
 	INNER JOIN empleado_reloj USING(id_empleado)
@@ -36,28 +36,28 @@ IF (($_REQUEST["DESDE"] != "") && ($_REQUEST["HASTA"] != "")) {
 	GROUP BY id_empleado
 	ORDER BY empleado.name
 	");
-	if (mysql_error()) { die(mysql_error()); }
+	if ($mysqli->error) { die($mysqli->error); }
 	echo "<b>LISTADO DESDE: " . $_REQUEST["DESDE"] . " - HASTA: " . $_REQUEST["HASTA"] . "</b><br /><br />";
-	while ($r = mysql_fetch_object($q)) {
+	while ($r = $q->fetch_object()) {
 		?>
 		<table border="0" style="font-size:10;">
 			<tr>
 				<td><b>Empleado: <?php echo $r->name; ?></b></td>
 			</tr>
 		<?php
-		$qF = mysql_query("
+		$qF = $mysqli->query("
 		SELECT fichaje.*
 		FROM fichaje
 		WHERE id_empleado_reloj IN (" . $r->id_empleado_reloj . ")
 		AND fecha_hora BETWEEN '" . $DESDE . "' AND '" . $HASTA . "'
 		ORDER BY fecha_hora
 		");
-		if (mysql_error()) { die(mysql_error()); }
+		if ($mysqli->error) { die($mysqli->error); }
 		?>
 		<tr><td align="center">
 			<table border="1" cellpadding="2" cellspacing="0" style="font-size:10;">
 		<?php
-		while ($rF = mysql_fetch_object($qF)) {
+		while ($rF = $qF->fetch_object()) {
 			if ($rF->inout_mode == "0") {
 				$rF->mov_e = "Entrada";
 				$rF->mov_s = "";
@@ -90,10 +90,10 @@ IF (($_REQUEST["DESDE"] != "") && ($_REQUEST["HASTA"] != "")) {
 				<select name="USUARIO">
 				<option value="">TODOS</option>
 				<?php
-				$q = mysql_query("
+				$q = $mysqli->query("
 				SELECT * FROM empleado WHERE empleado.enabled = 1 ORDER BY name
 				");				
-				while ($r = mysql_fetch_object($q)) {
+				while ($r = $q->fetch_object()) {
 					?>
 						<option value="<?php echo $r->id_empleado; ?>"><?php echo $r->name; ?></option>
 					<?php

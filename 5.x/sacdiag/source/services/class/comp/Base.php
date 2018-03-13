@@ -104,10 +104,12 @@ class class_Base
 	foreach($model as $key => $value) {
 		if ($chequear) {
 			if (!is_null($campos[$tabla][$key])) {
-				$set[] = $key . "='" . $value . "'";
+				//$set[] = $key . "='" . $value . "'";
+				$set[] = $key . "=" . ((is_null($value)) ? "NULL" : "'" . $value . "'");
 			}			
 		} else {
-			$set[] = $key . "='" . $value . "'";
+			//$set[] = $key . "='" . $value . "'";
+			$set[] = $key . "=" . ((is_null($value)) ? "NULL" : "'" . $value . "'");
 		}
 	}
 	return implode(", ", $set);

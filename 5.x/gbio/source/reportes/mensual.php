@@ -10,10 +10,10 @@ $PASSWORD = "3sp3r4nz4iea!";
 $BASE = "gbio-defensoria";
 */
 require("../services/class/comp/Conexion.php");
-$con = @mysql_connect($servidor, $usuario, $password);
-@mysql_select_db($base, $con);
-mysql_query("SET NAMES 'UTF8'");
-if (mysql_error()) die(mysql_error());
+$mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+$mysqli->query("SET NAMES 'utf8'");
+
+if ($mysqli->error) die($mysqli->error);
 
 ?>
 <input type="button" value="Imprimir" onclick="window.print()" /><br /><br />
@@ -62,12 +62,12 @@ LISTANDO ASISTENCIA DE LA FECHA 01/<?php echo $_REQUEST["MES"] . "/" . $_REQUEST
 			<td align="center"><?php echo $dia . "<br />" . $dia_semana; ?></td>
 		<?php
 		}
-		$qTurnos = mysql_query("
+		$qTurnos = $mysqli->query("
 		SELECT * FROM turno
 		WHERE activo = 1
 		");
 		$TURNOS = array();
-		while ($rTurnos = mysql_fetch_object($qTurnos)) {
+		while ($rTurnos = $qTurnos->fetch_object()) {
 			$TURNOS []=$rTurnos->id_turno;
 			?>
 			<td align="center"><?php echo $rTurnos->descrip; ?>&nbsp;</td>
@@ -76,31 +76,31 @@ LISTANDO ASISTENCIA DE LA FECHA 01/<?php echo $_REQUEST["MES"] . "/" . $_REQUEST
 		?>
 	</tr>
 	<?php
-	$qEmp = mysql_query("
+	$qEmp = $mysqli->query("
 	SELECT *
 	FROM empleado
 	WHERE id_lugar_trabajo IN (" . $_REQUEST["id_lugar_trabajo"] . ")
 	ORDER BY name
 	"); 
-	if (mysql_error()) die(mysql_error());
-	while ($rEmp = mysql_fetch_object($qEmp)) {
+	if ($mysqli->error) die($mysqli->error);
+	while ($rEmp = $qEmp->fetch_object()) {
 	?>
 	<tr>
 		<td style="font-size:10;"><?php echo $rEmp->name; ?>&nbsp;</td>
 		<?php
-		$qER = mysql_query("
+		$qER = $mysqli->query("
 		SELECT GROUP_CONCAT(id_empleado_reloj SEPARATOR ',') as id_empleado_reloj
 		FROM empleado_reloj
 		WHERE id_empleado = '" . $rEmp->id_empleado . "'
 		");
-		$rER = mysql_fetch_object($qER);
+		$rER = $qER->fetch_object();
 		
-		$qET = mysql_query("
+		$qET = $mysqli->query("
 		SELECT GROUP_CONCAT(id_empleado_turno SEPARATOR ',') as id_empleado_turno
 		FROM empleado_turno
 		WHERE id_empleado = '" . $rEmp->id_empleado . "'
 		");
-		$rET = mysql_fetch_object($qET);
+		$rET = $qET->fetch_object();
 		
 		for ($i=1; $i<=31; $i++) {
 		?>
@@ -112,7 +112,7 @@ LISTANDO ASISTENCIA DE LA FECHA 01/<?php echo $_REQUEST["MES"] . "/" . $_REQUEST
 					} else {
 						$dia = $i;
 					}
-					$qFi = mysql_query("
+					$qFi = $mysqli->query("
 					SELECT *, CONCAT(HOUR(fichaje.fecha_hora), ':', if(MINUTE(fichaje.fecha_hora)<10, CONCAT('0', MINUTE(fichaje.fecha_hora)), MINUTE(fichaje.fecha_hora))) as asistencia 
 					FROM fichaje
 					
@@ -120,20 +120,20 @@ LISTANDO ASISTENCIA DE LA FECHA 01/<?php echo $_REQUEST["MES"] . "/" . $_REQUEST
 					AND DATE(fecha_hora) = '" . $_REQUEST["ANO"] . "-". $_REQUEST["MES"] . "-" . $dia . "'
 					ORDER BY fichaje.fecha_hora
 					");
-					while ($rFi = mysql_fetch_object($qFi)) {
+					while ($rFi = $qFi->fetch_object()) {
 // 						echo $rFi->asistencia . " - " . $rFi->id_fichaje . "<br />";
 						echo $rFi->asistencia . "<br />";
 					}
 					if ($rET->id_empleado_turno) {
-						$qEPT = mysql_query("
+						$qEPT = $mysqli->query("
 						SELECT permiso.descrip as permiso
 						FROM empleado_permiso
 						INNER JOIN permiso USING(id_permiso)
 						WHERE id_empleado_turno IN (" . $rET->id_empleado_turno . ")
 						AND fecha = '" . $_REQUEST["ANO"] . "-". $_REQUEST["MES"] . "-" . $dia . "'
 						");
-						if (mysql_error()) die(mysql_error());
-						while ($rEPT = mysql_fetch_object($qEPT)) {
+						if ($mysqli->error) die($mysqli->error);
+						while ($rEPT = $qEPT->fetch_object()) {
 							echo "<label title='" . $rEPT->permiso . "'><b>P</b></label><br />";
 						}
 					}

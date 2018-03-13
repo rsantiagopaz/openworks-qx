@@ -151,25 +151,25 @@ qx.Class.define("gbio.comp.parametros.windowTurno",
 	
 	
 	var chkLu = new qx.ui.form.CheckBox();
-	form.add(chkLu, "Lunes", null, "lu", null, {grupo: 1, item: {row: 6, column: 1, colSpan: 1}});
+	form.add(chkLu, "Lunes", null, "lu", null, {grupo: 1, item: {row: 10, column: 1, colSpan: 1}});
 	
 	var chkMa = new qx.ui.form.CheckBox();
-	form.add(chkMa, "Martes", null, "ma", null, {grupo: 1, item: {row: 7, column: 1, colSpan: 1}});
+	form.add(chkMa, "Martes", null, "ma", null, {grupo: 1, item: {row: 11, column: 1, colSpan: 1}});
 	
 	var chkMi = new qx.ui.form.CheckBox();
-	form.add(chkMi, "Miércoles", null, "mi", null, {grupo: 1, item: {row: 8, column: 1, colSpan: 1}});
+	form.add(chkMi, "Miércoles", null, "mi", null, {grupo: 1, item: {row: 12, column: 1, colSpan: 1}});
 	
 	var chkJu = new qx.ui.form.CheckBox();
-	form.add(chkJu, "Jueves", null, "ju", null, {grupo: 1, item: {row: 9, column: 1, colSpan: 1}});
+	form.add(chkJu, "Jueves", null, "ju", null, {grupo: 1, item: {row: 13, column: 1, colSpan: 1}});
 	
 	var chkVi = new qx.ui.form.CheckBox();
-	form.add(chkVi, "Viernes", null, "vi", null, {grupo: 1, item: {row: 10, column: 1, colSpan: 1}});
+	form.add(chkVi, "Viernes", null, "vi", null, {grupo: 1, item: {row: 14, column: 1, colSpan: 1}});
 	
 	var chkSa = new qx.ui.form.CheckBox();
-	form.add(chkSa, "Sábado", null, "sa", null, {grupo: 1, item: {row: 11, column: 1, colSpan: 1}});
+	form.add(chkSa, "Sábado", null, "sa", null, {grupo: 1, item: {row: 10, column: 8, colSpan: 1}});
 	
 	var chkDo = new qx.ui.form.CheckBox();
-	form.add(chkDo, "Domingo", null, "do", null, {grupo: 1, item: {row: 12, column: 1, colSpan: 1}});
+	form.add(chkDo, "Domingo", null, "do", null, {grupo: 1, item: {row: 11, column: 8, colSpan: 1}});
 	
 	
 	

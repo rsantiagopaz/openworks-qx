@@ -137,7 +137,7 @@ qx.Class.define("gbio.comp.parametros.windowTolerancia",
 	
 	
 
-	var gpb = new qx.ui.groupbox.GroupBox("Tiempo de permisos");
+	var gpb = new qx.ui.groupbox.GroupBox("Tiempo mensual de permisos");
 	gpb.setLayout(new qx.ui.layout.Basic());
 	this.add(gpb, {left: 0, top: 280});
 	
