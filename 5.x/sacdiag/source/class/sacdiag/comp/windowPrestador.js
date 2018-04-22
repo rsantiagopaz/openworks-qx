@@ -33,13 +33,7 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 	txtDescrip.addListener("blur", function(e){
 		this.setValue(this.getValue().trim());
 	})
-	form.add(txtDescrip, "Descripción", null, "denominacion");
-	
-	var txtCuit = new qx.ui.form.TextField("");
-	txtCuit.addListener("blur", function(e){
-		this.setValue(this.getValue().trim());
-	})
-	form.add(txtCuit, "CUIT", null, "cuit");
+	form.add(txtDescrip, "Descripción", null, "nombre");
 	
 	var txtDomicilio = new qx.ui.form.TextField("");
 	txtDomicilio.addListener("blur", function(e){
@@ -82,7 +76,7 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 	if (rowData == null) {
 		this.setCaption("Nuevo prestador");
 		
-		aux = qx.data.marshal.Json.createModel({organismo_area_id: "-1", denominacion: "", cuit: "", domicilio: "", telefonos: "", contacto: "", observaciones: "", cronograma_semanal: false, cronograma_mensual: false}, true);
+		aux = qx.data.marshal.Json.createModel({organismo_area_id: "-1", nombre: "", domicilio: "", telefonos: "", contacto: "", observaciones: "", cronograma_semanal: false, cronograma_mensual: false}, true);
 	} else {
 		this.setCaption("Modificar prestador");
 		
@@ -118,7 +112,7 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				alert(qx.lang.Json.stringify(data, null, 2));
+				//alert(qx.lang.Json.stringify(data, null, 2));
 				
 				if (data.message == "descrip_duplicado") {
 					txtDescrip.focus();

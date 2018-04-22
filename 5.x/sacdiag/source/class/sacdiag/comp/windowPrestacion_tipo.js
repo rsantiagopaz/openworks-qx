@@ -73,12 +73,14 @@ qx.Class.define("sacdiag.comp.windowPrestacion_tipo",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
-				
-				if (data.message == "duplicado") {
-					txtDescrip.focus();
-					txtDescrip.setInvalidMessage("Ya existe un tipo prestacion con la misma descripción");
-					txtDescrip.setValid(false);
+				if (data.message != "sesion_terminada") {
+					if (data.message == "duplicado") {
+						txtDescrip.focus();
+						txtDescrip.setInvalidMessage("Ya existe un tipo prestacion con la misma descripción");
+						txtDescrip.setValid(false);
+					} else {
+						alert(qx.lang.Json.stringify(data, null, 2));
+					}
 				}
 			}, this);
 			rpc.callAsyncListeners(true, "alta_modifica_prestacion_tipo", p);

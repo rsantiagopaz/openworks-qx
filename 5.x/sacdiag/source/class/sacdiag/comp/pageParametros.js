@@ -10,7 +10,7 @@ qx.Class.define("sacdiag.comp.pageParametros",
 	this.toggleShowCloseButton();
 	
 	this.addListenerOnce("appear", function(e){
-		cgb.setValue(false);
+		//gpb1.setValue(false);
 	});
 	
 	
@@ -21,308 +21,305 @@ qx.Class.define("sacdiag.comp.pageParametros",
 
 	
 	var functionSeleccion = function() {
-		chkSinos.setEnabled(rbtFinanciador.isValue());
-		chkFecha.setEnabled(rbtFinanciador.isValue() || rbtProducto.isValue() || (cgb.getValue() && (rbtFinanciador2.isValue() || rbtProducto2.isValue())));
+		/*
+		chkFecha.setEnabled(rbt00.isValue() || rbt01.isValue() || (chk10.isValue() || chk11.isValue()));
 		lblDesde.setEnabled(chkFecha.getEnabled() && chkFecha.getValue());
 		dtfDesde.setEnabled(chkFecha.getEnabled() && chkFecha.getValue());
 		lblHasta.setEnabled(chkFecha.getEnabled() && chkFecha.getValue());
 		dtfHasta.setEnabled(chkFecha.getEnabled() && chkFecha.getValue());
+		*/
+		return;
+		chk10.setEnabled(true);
+		chk11.setEnabled(true);
+		chk12.setEnabled(true);
+		chk13.setEnabled(true);
+		chk14.setEnabled(true);
+		chk15.setEnabled(true);
+		chk16.setEnabled(true);
 	};
 
 	
 	
-	var gpb = new qx.ui.groupbox.GroupBox("Gráficos básicos");
-	var cgb = new qx.ui.groupbox.CheckGroupBox("Variable");
+	var gpb0 = new qx.ui.groupbox.GroupBox("Gráficos básicos");
+	var gpb1 = new qx.ui.groupbox.GroupBox("Variable");
 	
-	var rbtFinanciador = new qx.ui.form.RadioButton("Efector");
-	var chkSinos = new qx.ui.form.CheckBox("Incluir 'sin OS'");
-	var rbtProducto = new qx.ui.form.RadioButton("Médico");
-	var rbtMedico = new qx.ui.form.RadioButton("Prestador");
-	var rbtEtareo = new qx.ui.form.RadioButton("Prestación");
-	var rbtSexo = new qx.ui.form.RadioButton("Paciente");
-	var rbtResultado = new qx.ui.form.RadioButton("Resultado");
-	var rbtCertAnses = new qx.ui.form.RadioButton("Cert.ANSES");
+	var rbt00 = new qx.ui.form.RadioButton("Efector");
+	var rbt01 = new qx.ui.form.RadioButton("Médico");
+	var rbt02 = new qx.ui.form.RadioButton("Prestador");
+	var rbt03 = new qx.ui.form.RadioButton("Prestación");
+	var rbt04 = new qx.ui.form.RadioButton("Paciente");
+	var rbt05 = new qx.ui.form.RadioButton("Resultado");
+	var rbt06 = new qx.ui.form.RadioButton("Cert.ANSES");
 	
-	var chkFecha = new qx.ui.form.CheckBox("Fecha");
-	var lblDesde = new qx.ui.basic.Label("desde");
-	var dtfDesde = new qx.ui.form.DateField();
-	var lblHasta = new qx.ui.basic.Label("hasta");
-	var dtfHasta = new qx.ui.form.DateField();
+
 	
-	var rbtFinanciador2 = new qx.ui.form.RadioButton("Efector");
-	var cboFinanciador = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Parametros", "autocompletarFinanciador");
-	var lstFinanciador = cboFinanciador.getChildControl("list");
-	var rbtProducto2 = new qx.ui.form.RadioButton("Médico");
-	var cboProducto = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Parametros", "autocompletarProducto");
-	var lstProducto = cboProducto.getChildControl("list");
-	var rbtMedico2 = new qx.ui.form.RadioButton("Prestador");
-	var cboMedico = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Parametros", "autocompletarMedico");
-	var lstMedico = cboMedico.getChildControl("list");
-	var rbtEtareo2 = new qx.ui.form.RadioButton("Prestación");
-	var cboEtareo = new qx.ui.form.SelectBox();
-	var rbtSexo2 = new qx.ui.form.RadioButton("Paciente");
-	var cboSexo = new qx.ui.form.SelectBox();
-	var cboPrestacion = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Parametros", "autocompletarMedico");
-	var cboPaciente = new componente.comp.ui.ramon.combobox.ComboBoxAuto("services/", "comp.Parametros", "autocompletarMedico");
-	var rbtResultado2 = new qx.ui.form.RadioButton("Resultado");
-	var cboResultado = new qx.ui.form.SelectBox();
-	var rbtCertAnses2 = new qx.ui.form.RadioButton("Cert.ANSES");
-	var cboCertAnses = new qx.ui.form.SelectBox();
+	var chk10 = new qx.ui.form.CheckBox("Efector");
+	var cbo10 = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarEfector"});
+	cbo10.setEnabled(false);
+	cbo10.setWidth(400);
+	var lst10 = cbo10.getChildControl("list");
+	
+	var chk11 = new qx.ui.form.CheckBox("Médico");
+	var cbo11 = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPersonal"});
+	cbo11.setEnabled(false);
+	var lst11 = cbo11.getChildControl("list");
+	
+	var chk12 = new qx.ui.form.CheckBox("Prestador");
+	var cbo12 = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPrestador"});
+	cbo12.setEnabled(false);
+	var lst12 = cbo12.getChildControl("list");
+	
+	var chk13 = new qx.ui.form.CheckBox("Prestación");
+	var cbo13 = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPrestacion"});
+	cbo13.setEnabled(false);
+	var lst13 = cbo13.getChildControl("list");
+	
+	var chk14 = new qx.ui.form.CheckBox("Paciente");
+	var cbo14 = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPersona"});
+	cbo14.setEnabled(false);
+	var lst14 = cbo14.getChildControl("list");
+	
+	var chk15 = new qx.ui.form.CheckBox("Resultado");
+	var cbo15 = new qx.ui.form.SelectBox();
+	cbo15.setEnabled(false);
+	
+	var chk16 = new qx.ui.form.CheckBox("Cert.ANSES");
+	var cbo16 = new qx.ui.form.SelectBox();
+	cbo16.setEnabled(false);
+	
+	
+	
+	gpb0.setLayout(new qx.ui.layout.Grid(6, 15));
+	gpb1.setLayout(new qx.ui.layout.Grid(6, 6));
+	
+	
+	
+	
+	
+	
+	rbt00.setModel(0);
+	rbt00.addListener("changeValue", function(e){
+		if (rbt00.isValue()) {
+			chk10.setValue(false);
+			chk10.setEnabled(false);
+		} else chk10.setEnabled(true);
+	});
+	
+	rbt01.setModel(1);
+	rbt01.addListener("changeValue", function(e){
+		if (rbt01.isValue()) {
+			chk11.setValue(false);
+			chk11.setEnabled(false);
+		} else chk11.setEnabled(true);
+	});
+	
+	rbt02.setModel(2);
+	rbt02.addListener("changeValue", function(e){
+		if (rbt02.isValue()) {
+			chk12.setValue(false);
+			chk12.setEnabled(false);
+		} else chk12.setEnabled(true);
+	});
+	
+	rbt03.setModel(3);
+	rbt03.addListener("changeValue", function(e){
+		if (rbt03.isValue()) {
+			chk13.setValue(false);
+			chk13.setEnabled(false);
+		} else chk13.setEnabled(true);
+	});
+	
+	rbt04.setModel(4);
+	rbt04.addListener("changeValue", function(e){
+		if (rbt04.isValue()) {
+			chk14.setValue(false);
+			chk14.setEnabled(false);
+		} else chk14.setEnabled(true);
+	});
+	
+	rbt05.setModel(5);
+	rbt05.addListener("changeValue", function(e){
+		if (rbt05.isValue()) {
+			chk15.setValue(false);
+			chk15.setEnabled(false);
+		} else chk15.setEnabled(true);
+	});
+	
+	rbt06.setModel(6);
+	rbt06.addListener("changeValue", function(e){
+		if (rbt06.isValue()) {
+			chk16.setValue(false);
+			chk16.setEnabled(false);
+		} else chk16.setEnabled(true);
+	});
+
+	
+	
+
+
+	
+	
+	chk10.setModel(0);
+	chk10.addListener("changeValue", function(e){
+		cbo10.setEnabled(chk10.isValue());
+	});
+	
+	chk11.setModel(1);
+	chk11.addListener("changeValue", function(e){
+		cbo11.setEnabled(chk11.isValue());
+	});
+	
+	chk12.setModel(2);
+	chk12.addListener("changeValue", function(e){
+		cbo12.setEnabled(chk12.isValue());
+	});
+	
+	chk13.setModel(3);
+	chk13.addListener("changeValue", function(e){
+		cbo13.setEnabled(chk13.isValue());
+	});
+	
+	
+	chk14.setModel(4);
+	chk14.addListener("changeValue", function(e){
+		cbo14.setEnabled(chk14.isValue());
+	});
+	
+	chk15.setModel(5);
+	chk15.addListener("changeValue", function(e){
+		cbo15.setEnabled(chk15.isValue());
+	});
+	
+	chk16.setModel(6);
+	chk16.addListener("changeValue", function(e){
+		cbo16.setEnabled(chk16.isValue());
+	});
 	
 
 	
 	
 	
+	cbo15.add(new qx.ui.form.ListItem("NORMAL", null, "1"));
+	cbo15.add(new qx.ui.form.ListItem("DUDOSO", null, "2"));
+	cbo15.add(new qx.ui.form.ListItem("PATOLÓGICO", null, "3"));
 	
 	
-	
-	
-	gpb.setLayout(new qx.ui.layout.Basic());
-	gpb.setWidth(220);
-	gpb.setHeight(245);
-	
-	
-
-	cgb.setLayout(new qx.ui.layout.Basic());
-	cgb.setWidth(545);
-	cgb.setHeight(245);
-	cgb.addListener("changeValue", function(e){
-		var data = e.getData();
-		
-		rbtFinanciador2.setEnabled(data && ! rbtFinanciador.isValue());
-		rbtProducto2.setEnabled(data && ! rbtProducto.isValue());
-		rbtMedico2.setEnabled(data && ! rbtMedico.isValue());
-		rbtEtareo2.setEnabled(data && ! rbtEtareo.isValue());
-		rbtSexo2.setEnabled(data && ! rbtSexo.isValue());
-		
-		cboFinanciador.setEnabled(data && rbtFinanciador2.isValue());
-		cboProducto.setEnabled(data && rbtProducto2.isValue());
-		cboMedico.setEnabled(data && rbtMedico2.isValue());
-		cboEtareo.setEnabled(data && rbtEtareo2.isValue());
-		cboSexo.setEnabled(data && rbtSexo2.isValue());
-		
-		functionSeleccion();
-	});
-	
-	
-	
-	
-	
-	
-	rbtFinanciador.setModel(1);
-	rbtFinanciador.addListener("changeValue", function(e){
-		if (rbtFinanciador.isValue()) {
-			if (rbtFinanciador2.isValue()) rbtProducto2.setValue(true);
-			if (cgb.getValue()) rbtFinanciador2.setEnabled(false);
-		} else {
-			if (cgb.getValue()) rbtFinanciador2.setEnabled(true);
-		}
-	});
-	
-	rbtProducto.setModel(2);
-	rbtProducto.addListener("changeValue", function(e){
-		if (rbtProducto.isValue()) {
-			if (rbtProducto2.isValue()) rbtFinanciador2.setValue(true);
-			if (cgb.getValue()) rbtProducto2.setEnabled(false);
-		} else {
-			if (cgb.getValue()) rbtProducto2.setEnabled(true);
-		}
-	});
-	
-	rbtMedico.setModel(3);
-	rbtMedico.addListener("changeValue", function(e){
-		if (rbtMedico.isValue()) {
-			if (rbtMedico2.isValue()) rbtProducto2.setValue(true);
-			if (cgb.getValue()) rbtMedico2.setEnabled(false);
-		} else {
-			if (cgb.getValue()) rbtMedico2.setEnabled(true);
-		}
-	});
-	rbtEtareo.setModel(4);
-	rbtEtareo.addListener("changeValue", function(e){
-		if (rbtEtareo.isValue()) {
-			if (rbtEtareo2.isValue()) rbtMedico2.setValue(true);
-			if (cgb.getValue()) rbtEtareo2.setEnabled(false);
-		} else {
-			if (cgb.getValue()) rbtEtareo2.setEnabled(true);
-		}
-	});
-	rbtSexo.setModel(5);
-	rbtSexo.addListener("changeValue", function(e){
-		if (rbtSexo.isValue()) {
-			if (rbtSexo2.isValue()) rbtEtareo2.setValue(true);
-			if (cgb.getValue()) rbtSexo2.setEnabled(false);
-		} else {
-			if (cgb.getValue()) rbtSexo2.setEnabled(true);
-		}
-	});
-
-	
-	
-	chkFecha.addListener("changeValue", function(e){
-		functionSeleccion();
-	});
-	var aux = new Date();
-	dtfDesde.setValue(aux);
-	dtfHasta.setValue(aux);
-
-
-	
-	
-	rbtFinanciador2.setModel(1);
-	rbtFinanciador2.addListener("changeValue", function(e){
-		if (cgb.getValue()) cboFinanciador.setEnabled(rbtFinanciador2.isValue());
-	});
-	
-	cboFinanciador.setWidth(400);
-	
-	rbtProducto2.setModel(2);
-	rbtProducto2.setValue(true);
-	rbtProducto2.addListener("changeValue", function(e){
-		if (cgb.getValue()) cboProducto.setEnabled(rbtProducto2.isValue());
-	});
-	
-	cboProducto.setWidth(400);
-	
-	rbtMedico2.setModel(3);
-	rbtMedico2.addListener("changeValue", function(e){
-		if (cgb.getValue()) cboMedico.setEnabled(rbtMedico2.isValue());
-	});
-	
-	cboMedico.setWidth(400);
-	
-	rbtEtareo2.setModel(4);
-	rbtEtareo2.addListener("changeValue", function(e){
-		if (cgb.getValue()) cboEtareo.setEnabled(rbtEtareo2.isValue());
-	});
-	
-	cboEtareo.add(new qx.ui.form.ListItem("0 - 15 años", null, "0 AND 15"));
-	cboEtareo.add(new qx.ui.form.ListItem("16 - 25 años", null, "16 AND 25"));
-	cboEtareo.add(new qx.ui.form.ListItem("26 - 30 años", null, "26 AND 30"));
-	cboEtareo.add(new qx.ui.form.ListItem("31 - 45 años", null, "31 AND 45"));
-	cboEtareo.add(new qx.ui.form.ListItem("46 - 60 años", null, "46 AND 60"));
-	cboEtareo.add(new qx.ui.form.ListItem("61 - 75 años", null, "61 AND 75"));
-	cboEtareo.add(new qx.ui.form.ListItem("76 - 90 años", null, "76 AND 90"));
-	cboEtareo.add(new qx.ui.form.ListItem("91 - 105 años", null, "91 AND 105"));
-	
-	rbtSexo2.setModel(5);
-	rbtSexo2.addListener("changeValue", function(e){
-		if (cgb.getValue()) cboSexo.setEnabled(rbtSexo2.isValue());
-	});
-	
-	cboSexo.add(new qx.ui.form.ListItem("Femenino", null, "F"));
-	cboSexo.add(new qx.ui.form.ListItem("Masculino", null, "M"));
-	
-	cboPrestacion.setWidth(400);
-	cboPaciente.setWidth(400);
-	
-	
-	cboResultado.add(new qx.ui.form.ListItem("NORMAL", null, "1"));
-	cboResultado.add(new qx.ui.form.ListItem("DUDOSO", null, "2"));
-	cboResultado.add(new qx.ui.form.ListItem("PATOLÓGICO", null, "3"));
-	
-	
-	cboCertAnses.add(new qx.ui.form.ListItem("NO", null, "N"));
-	cboCertAnses.add(new qx.ui.form.ListItem("SI", null, "S"));
+	cbo16.add(new qx.ui.form.ListItem("NO", null, "N"));
+	cbo16.add(new qx.ui.form.ListItem("SI", null, "S"));
 	
 	
 	var mgr = new qx.ui.form.RadioGroup();
-	mgr.add(rbtFinanciador, rbtProducto, rbtMedico, rbtEtareo, rbtSexo, rbtResultado, rbtCertAnses);
-	mgr.addListener("changeSelection", function(e){
-		functionSeleccion();
-	});
-	
-	var mgr2 = new qx.ui.form.RadioGroup();
-	mgr2.add(rbtFinanciador2, rbtProducto2, rbtMedico2, rbtEtareo2, rbtSexo2, rbtResultado2, rbtCertAnses2);
-	mgr2.addListener("changeSelection", function(e){
-		functionSeleccion();
-	});
+	mgr.add(rbt00, rbt01, rbt02, rbt03, rbt04, rbt05, rbt06);
+
 	
 
-	gpb.add(rbtFinanciador, {left: 0, top: 4});
-	//gpb.add(chkSinos, {left: 100, top: 4});
-	gpb.add(rbtProducto, {left: 0, top: 34});
-	gpb.add(rbtMedico, {left: 0, top: 64});
-	gpb.add(rbtEtareo, {left: 0, top: 94});
-	gpb.add(rbtSexo, {left: 0, top: 124});
-	gpb.add(rbtResultado, {left: 0, top: 154});
-	gpb.add(rbtCertAnses, {left: 0, top: 184});
+	gpb0.add(rbt00, {row: 0, column: 0});
+	gpb0.add(rbt01, {row: 1, column: 0});
+	gpb0.add(rbt02, {row: 2, column: 0});
+	gpb0.add(rbt03, {row: 3, column: 0});
+	gpb0.add(rbt04, {row: 4, column: 0});
+	gpb0.add(rbt05, {row: 5, column: 0});
+	gpb0.add(rbt06, {row: 6, column: 0});
 
-	this.add(chkFecha, {left: 12, top: 274});
-	this.add(lblDesde, {left: 85, top: 274});
-	this.add(lblHasta, {left: 265, top: 274});
-	this.add(dtfDesde, {left: 120, top: 270});
-	this.add(dtfHasta, {left: 300, top: 270});
+	
+	var aux = new qx.ui.layout.HBox(6).set({alignY: "middle"});
+	var compositeOtros = new qx.ui.container.Composite(aux);
+	this.add(compositeOtros, {left: 0, top: 274, right: "55%"});
+	
+	var dtfDesde = new qx.ui.form.DateField();
+	var dtfHasta = new qx.ui.form.DateField();
+	
+	compositeOtros.add(new qx.ui.basic.Label("Período desde", {flex: 1}));
+	compositeOtros.add(dtfDesde, {flex: 1});
+	compositeOtros.add(new qx.ui.basic.Label("hasta"), {flex: 1});
+	compositeOtros.add(dtfHasta, {flex: 1});
+	compositeOtros.add(new qx.ui.basic.Atom(), {flex: 2});
 
-	cgb.add(rbtFinanciador2, {left: 0, top: 4});
-	cgb.add(cboFinanciador, {left: 120, top: 0});
-	cgb.add(rbtProducto2, {left: 0, top: 34});
-	//rbtProducto2.setValue(true);
-	cgb.add(cboProducto, {left: 120, top: 30});
-	cgb.add(rbtMedico2, {left: 0, top: 64});
-	cgb.add(cboMedico, {left: 120, top: 60});
-	cgb.add(rbtEtareo2, {left: 0, top: 94});
-	cgb.add(cboPrestacion, {left: 120, top: 89});
-	cgb.add(rbtSexo2, {left: 0, top: 124});
-	cgb.add(cboPaciente, {left: 120, top: 119});
-	cgb.add(rbtResultado2, {left: 0, top: 154});
-	cgb.add(cboResultado, {left: 120, top: 149});
-	cgb.add(rbtCertAnses2, {left: 0, top: 184});
-	cgb.add(cboCertAnses, {left: 120, top: 179});
+	gpb1.add(chk10, {row: 0, column: 0});
+	gpb1.add(cbo10, {row: 0, column: 1});
+	gpb1.add(chk11, {row: 1, column: 0});
+	gpb1.add(cbo11, {row: 1, column: 1});
+	gpb1.add(chk12, {row: 2, column: 0});
+	gpb1.add(cbo12, {row: 2, column: 1});
+	gpb1.add(chk13, {row: 3, column: 0});
+	gpb1.add(cbo13, {row: 3, column: 1});
+	gpb1.add(chk14, {row: 4, column: 0});
+	gpb1.add(cbo14, {row: 4, column: 1});
+	gpb1.add(chk15, {row: 5, column: 0});
+	gpb1.add(cbo15, {row: 5, column: 1});
+	gpb1.add(chk16, {row: 6, column: 0});
+	gpb1.add(cbo16, {row: 6, column: 1});
 	
 	
-	this.add(gpb, {left: 0, top: 0});
-	this.add(cgb, {left: 250, top: 0});
+	this.add(gpb0, {left: 0, top: 0});
+	this.add(gpb1, {left: 250, top: 0});
 	
 	var rbtListado = new qx.ui.form.RadioButton("Listado");
+	rbtListado.setModel("listado");
+	rbtListado.setEnabled(false);
 	
 	var rbtTorta = new qx.ui.form.RadioButton("Torta");
+	rbtTorta.setEnabled(false);
 	rbtTorta.setModel("torta");
+	
 	var rbtBarras = new qx.ui.form.RadioButton("Barras");
+	rbtBarras.setEnabled(false);
 	rbtBarras.setModel("barras");
+	rbtBarras.setValue(true);
 	
 	var mgr3 = new qx.ui.form.RadioGroup();
 	mgr3.add(rbtListado, rbtTorta, rbtBarras);
 	
-	this.add(rbtListado, {left: 510, top: 274});
-	this.add(rbtTorta, {left: 580, top: 274});
-	this.add(rbtBarras, {left: 640, top: 274});
+	compositeOtros.add(rbtListado, {flex: 1});
+	compositeOtros.add(rbtTorta, {flex: 1});
+	compositeOtros.add(rbtBarras, {flex: 1});
+	compositeOtros.add(new qx.ui.basic.Atom(), {flex: 2});
 	
 	var btnGenerar = new qx.ui.form.Button("Generar")
 	btnGenerar.addListener("execute", function(e){
-		
-		return;
-		
 		var bandera = true;
-		cboProducto.setValid(true);
-		cboMedico.setValid(true);
-		dtfDesde.setValid(true);
-		dtfHasta.setValid(true);
+		
+		cbo10.setValid(true);
+		cbo11.setValid(true);
+		cbo12.setValid(true);
+		cbo13.setValid(true);
+		cbo14.setValid(true);
+		
+		if (chk14.getValue() && lst14.isSelectionEmpty()) {
+			bandera = false;
+			cbo14.setInvalidMessage("Debe seleccionar un paciente");
+			cbo14.setValid(false);
+			cbo14.focus();
+		}
+		
+		if (chk13.getValue() && lst13.isSelectionEmpty()) {
+			bandera = false;
+			cbo13.setInvalidMessage("Debe seleccionar un prestación");
+			cbo13.setValid(false);
+			cbo13.focus();
+		}
+		
+		if (chk12.getValue() && lst12.isSelectionEmpty()) {
+			bandera = false;
+			cbo12.setInvalidMessage("Debe seleccionar un prestador");
+			cbo12.setValid(false);
+			cbo12.focus();
+		}
+		
+		if (chk11.getValue() && lst11.isSelectionEmpty()) {
+			bandera = false;
+			cbo11.setInvalidMessage("Debe seleccionar un médico");
+			cbo11.setValid(false);
+			cbo11.focus();
+		}
 
-		if (chkFecha.getEnabled() && chkFecha.getValue() && dtfHasta.getValue() == null) {
+		if (chk10.getValue() && lst10.isSelectionEmpty()) {
 			bandera = false;
-			dtfHasta.setInvalidMessage("Debe ingresar una fecha correcta");
-			dtfHasta.setValid(false);
-			dtfHasta.focus();
+			cbo10.setInvalidMessage("Debe seleccionar un efector");
+			cbo10.setValid(false);
+			cbo10.focus();
 		}
-		if (chkFecha.getEnabled() && chkFecha.getValue() && dtfDesde.getValue() == null) {
-			bandera = false;
-			dtfDesde.setInvalidMessage("Debe ingresar una fecha correcta");
-			dtfDesde.setValid(false);
-			dtfDesde.focus();
-		}
-		if (cgb.getValue() && rbtMedico2.getValue() && lstMedico.isSelectionEmpty()) {
-			bandera = false;
-			cboMedico.setInvalidMessage("Debe seleccionar un médico");
-			cboMedico.setValid(false);
-			cboMedico.focus();
-		}
-		if (cgb.getValue() && rbtProducto2.getValue() && lstProducto.isSelectionEmpty()) {
-			bandera = false;
-			cboProducto.setInvalidMessage("Debe seleccionar un producto");
-			cboProducto.setValid(false);
-			cboProducto.focus();
-		}
+		
 
 		if (bandera) {
 			var root = application.getRoot();
@@ -336,77 +333,112 @@ qx.Class.define("sacdiag.comp.pageParametros",
 	
 			
 			var p = {};
-			p.basico = {opcion: mgr.getModelSelection().getItem(0), sinos: chkSinos.isValue()};
+			p.basico = {opcion: mgr.getModelSelection().getItem(0)};
 			p.grafico = mgr3.getModelSelection().getItem(0);
 			
-			p.pageLabel = mgr.getSelection()[0].getLabel();
 			
-			p.title = new Date();
-			p.title = p.title.toJSON().substr(0, 10);
-			p.title+= " - " + p.pageLabel;
+			
+			p.title = mgr.getSelection()[0].getLabel();
+			//p.title = p.title.toJSON().substr(0, 10);
+			//p.title+= " - " + p.pageLabel;
+			
+			p.pageLabel = new Date;
+			p.pageLabel = p.pageLabel.toJSON().substr(0, 10);
+			p.pageLabel = p.title + " - " + p.pageLabel;
+			
+			
 					
-			if (cgb.getValue()) {
-				var opcionVariable = mgr2.getModelSelection().getItem(0);
-				p.variable = {opcion: opcionVariable};
-				var selection;
-				if (opcionVariable == 1) {
-					if (lstFinanciador.isSelectionEmpty()) {
-						p.variable.model = null;
-						p.variable.descrip = "sin OS";
-					} else {
-						selection = lstFinanciador.getSelection()[0];
-						p.variable.model = selection.getModel();
-						p.variable.descrip = selection.getLabel();
-					}
-				} else if (opcionVariable == 2) {
-					selection = lstProducto.getSelection()[0];
-					p.variable.model = selection.getModel();
-					p.variable.descrip = selection.getLabel();
-				} else if (opcionVariable == 3) {
-					selection = lstMedico.getSelection()[0];
-					p.variable.model = selection.getModel();
-					p.variable.descrip = selection.getLabel();
-				} else if (opcionVariable == 4) {
-					selection = cboEtareo.getSelection()[0];
-					p.variable.model = selection.getModel();
-					p.variable.descrip = selection.getLabel();
-				} else if (opcionVariable == 5) {
-					selection = cboSexo.getSelection()[0];
-					p.variable.model = selection.getModel();
-					p.variable.descrip = selection.getLabel();
+			//var opcionVariable = mgr2.getModelSelection().getItem(0);
+			p.variable = {};
+			var selection;
+			if (chk10.isValue()) {
+				p.variable.efector = {};
+				selection = lst10.getSelection()[0];
+				p.variable.efector.model = selection.getModel();
+				p.variable.efector.descrip = selection.getLabel();
+			}
+			if (chk11.isValue()) {
+				p.variable.medico = {};
+				selection = lst11.getSelection()[0];
+				p.variable.medico.model = selection.getModel();
+				p.variable.medico.descrip = selection.getLabel();
+			}
+			if (chk12.isValue()) {
+				p.variable.prestador = {};
+				selection = lst12.getSelection()[0];
+				p.variable.prestador.model = selection.getModel();
+				p.variable.prestador.descrip = selection.getLabel();
+			}
+			if (chk13.isValue()) {
+				p.variable.prestacion = {};
+				selection = lst13.getSelection()[0];
+				p.variable.prestacion.model = selection.getModel();
+				p.variable.prestacion.descrip = selection.getLabel();
+			}
+			if (chk14.isValue()) {
+				p.variable.paciente = {};
+				selection = lst14.getSelection()[0];
+				p.variable.paciente.model = selection.getModel();
+				p.variable.paciente.descrip = selection.getLabel();
+			}
+			if (chk15.isValue()) {
+				p.variable.resultado = {};
+				selection = cbo15.getSelection()[0];
+				p.variable.resultado.model = selection.getModel();
+				p.variable.resultado.descrip = selection.getLabel();
+			}
+			if (chk16.isValue()) {
+				p.variable.anses_negativa = {};
+				selection = cbo16.getSelection()[0];
+				if (selection.getModel() == "S") {
+					p.variable.anses_negativa.model = "N";
+					p.variable.anses_negativa.descrip = "NO";
+				} else {
+					p.variable.anses_negativa.model = "S";
+					p.variable.anses_negativa.descrip = "SI";
 				}
-				
-				p.title+= " x " + mgr2.getSelection()[0].getLabel() + ": " + p.variable.descrip.trim();
-				p.pageLabel+= " x " + mgr2.getSelection()[0].getLabel();
 			}
 			
-			if (chkFecha.getEnabled() && chkFecha.isValue()) {
-				p.fecha = {desde: dtfDesde.getValue().toJSON().substr(0, 10), hasta: dtfHasta.getValue().toJSON().substr(0, 10)};
-				p.title+= " (período " + p.fecha.desde + " - " + p.fecha.hasta + ")";
-			}
+			//p.title+= " x " + mgr2.getSelection()[0].getLabel() + ": " + p.variable.descrip.trim();
+			//p.pageLabel+= " x " + mgr2.getSelection()[0].getLabel();
+
+			p.fecha = {desde: dtfDesde.getValue(), hasta: dtfHasta.getValue()};
+			//p.title+= " (período " + p.fecha.desde + " - " + p.fecha.hasta + ")";
+
 			
 			//alert(qx.lang.Json.stringify(p, null, 2));
 			
-			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
-			rpc.callAsync(function(resultado, error, id) {
-				//alert(qx.lang.Json.stringify(resultado, null, 2));
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Estadisticas");
+			rpc.addListener("completed", function(e){
+				var data = e.getData();
 				
-				p.resultado = resultado;
+				p.resultado = data.result;
+				
+				//alert(qx.lang.Json.stringify(p, null, 2));
 				
 				imageLoading.destroy();
-				root.unblock();		
-			
-				if ((p.grafico == "torta" && p.resultado.dataSeries[0].length > 0) || (p.grafico == "barras" && p.resultado.dataSeries.length > 0)) {
+				root.unblock();
+				
+				if ((p.grafico == "barras" && p.resultado.dataSeries_cantidad.length > 0)) {
 					var pagePlot = new sacdiag.comp.pagePlot(p);
 					application.tabviewMain.add(pagePlot);
 					application.tabviewMain.setSelection([pagePlot]);				
 				} else {
 					dialog.Dialog.alert("No se encuentran datos para el criterio seleccionado.");
 				}
-			}, "leer_datos", p);
+			});
+			rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				if (data.message != "sesion_terminada") {
+					alert(qx.lang.Json.stringify(data, null, 2));
+				}
+			});
+			
+			rpc.callAsyncListeners(true, "leer_datos", p);
 		}
 	});
-	this.add(btnGenerar, {left: 730, top: 270});
+	compositeOtros.add(btnGenerar);
 	
 	
 

@@ -94,12 +94,14 @@ qx.Class.define("sacdiag.comp.windowContrasena",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				if (data.message == "password") {
-					txtPassword.setInvalidMessage("Contraseña incorrecta")
-					txtPassword.setValid(false);
-					txtPassword.focus();
-				} else {
-					alert(qx.lang.Json.stringify(data, null, 2));
+				if (data.message != "sesion_terminada") {
+					if (data.message == "password") {
+						txtPassword.setInvalidMessage("Contraseña incorrecta")
+						txtPassword.setValid(false);
+						txtPassword.focus();
+					} else {
+						alert(qx.lang.Json.stringify(data, null, 2));
+					}
 				}
 			});
 			rpc.callAsyncListeners(true, "escribir_contrasena", p);

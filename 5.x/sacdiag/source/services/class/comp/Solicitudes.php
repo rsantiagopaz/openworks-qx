@@ -23,7 +23,6 @@ class class_Solicitudes extends class_Base
 	
 	$resultado = array();
 	
-	//$sql = "SELECT solicitudes.*, _personas.persona_nombre, _personas.persona_dni, efectores_publicos.denominacion AS efector_publico, prestadores.denominacion AS prestador FROM solicitudes INNER JOIN _personas USING(persona_id) INNER JOIN efectores_publicos USING(id_efector_publico) INNER JOIN prestadores USING(id_prestador) WHERE TRUE";
 	$sql = "SELECT solicitudes.*, _personas.persona_nombre, _personas.persona_dni FROM solicitudes INNER JOIN _personas USING(persona_id) WHERE TRUE";
 	
 	if (! is_null($p->desde) && ! is_null($p->hasta)) {
@@ -34,7 +33,7 @@ class class_Solicitudes extends class_Base
 		$sql.= " AND fecha_emite <= '" . substr($p->hasta, 0, 10) . "'";
 	}
 	
-	if (! is_null($p->id_prestador)) $sql.= " AND id_prestador='" . $p->id_prestador . "'";
+	if (! is_null($p->id_prestador_fantasia)) $sql.= " AND id_prestador_fantasia='" . $p->id_prestador_fantasia . "'";
 	if (! is_null($p->persona_id)) $sql.= " AND persona_id='" . $p->persona_id . "'";
 	if (! is_null($p->id_usuario_medico)) $sql.= " AND id_usuario_medico='" . $p->id_usuario_medico . "'";
 	if (empty($p->estado)) $sql.= " AND estado <> 'C'"; else $sql.= " AND estado='" . $p->estado . "'";
@@ -61,7 +60,7 @@ class class_Solicitudes extends class_Base
 		$rowAux = $rsAux->fetch_object();
 		$row->efector_publico = $rowAux->organismo_area;
 		
-		$sql = "SELECT organismo_area FROM _organismos_areas WHERE organismo_area_id='" . $row->id_prestador . "'";
+		$sql = "SELECT organismo_area FROM _organismos_areas WHERE organismo_area_id='" . $row->id_prestador_fantasia . "'";
 		$rsAux = $this->mysqli->query($sql);
 		$rowAux = $rsAux->fetch_object();
 		$row->prestador = $rowAux->organismo_area;
@@ -100,9 +99,15 @@ class class_Solicitudes extends class_Base
 	$p = $params[0];
 	
 	$set = $this->prepararCampos($p, "solicitudes");
+	
+	$this->mysqli->query("START TRANSACTION");
 	  		
 	$sql = "UPDATE solicitudes SET " . $set . " WHERE id_solicitud=" . $p->id_solicitud;
 	$this->mysqli->query($sql);
+	
+	$this->auditoria($sql, __FILE__ . ", " . __FUNCTION__);
+	
+	$this->mysqli->query("COMMIT");
   }
 }
 

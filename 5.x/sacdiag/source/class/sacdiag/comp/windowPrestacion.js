@@ -7,7 +7,7 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 	
 	this.set({
 		//width: 500,
-		height: 200,
+		height: 240,
 		showMinimize: false,
 		showMaximize: false,
 		allowMaximize: false,
@@ -53,6 +53,18 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 	//txtValor.setMinWidth(400);
 	form.add(txtValor, "Valor", null, "valor");
 	
+	var slbSubtipo = new qx.ui.form.SelectBox();
+	slbSubtipo.setRequired(true);
+	
+	var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+	try {
+		var resultado = rpc.callSync("autocompletarSubtipo", {texto: ""});
+	} catch (ex) {
+		//alert("Sync exception: " + ex);
+	}
+	for (var x in resultado) slbSubtipo.add(new qx.ui.form.ListItem(resultado[x].label, null, resultado[x].model));
+	
+	form.add(slbSubtipo, "Subtipo", null, "id_prestacion_subtipo");
 	
 	var slbTipo_cronograma = new qx.ui.form.SelectBox();
 	slbTipo_cronograma.add(new qx.ui.form.ListItem("Semanal", null, "SE"));
@@ -71,7 +83,7 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 	if (rowData == null) {
 		this.setCaption("Nueva prestación");
 		
-		aux = qx.data.marshal.Json.createModel({id_prestacion: "0", id_prestacion_tipo: id_prestacion_tipo, codigo: "", denominacion: "", valor: 0, cronograma_tipo: "SE"}, true);
+		aux = qx.data.marshal.Json.createModel({id_prestacion: "0", id_prestacion_tipo: id_prestacion_tipo, id_prestacion_subtipo: null, codigo: "", denominacion: "", valor: 0, cronograma_tipo: "SE"}, true);
 	} else {
 		this.setCaption("Modificar prestación");
 		

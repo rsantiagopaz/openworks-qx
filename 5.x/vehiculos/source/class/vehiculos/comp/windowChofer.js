@@ -8,7 +8,7 @@ qx.Class.define("vehiculos.comp.windowChofer",
 	this.set({
 		caption: "Nuevo chofer",
 		width: 440,
-		height: 500,
+		height: 570,
 		showMinimize: false,
 		showMaximize: false,
 		allowMaximize: false,
@@ -38,7 +38,7 @@ qx.Class.define("vehiculos.comp.windowChofer",
 		if (lstChofer.isSelectionEmpty()) {
 			this.setCaption("Nuevo chofer");
 			
-			datos = {id_chofer: "0", dni: "", apenom: "", email: "", telefono: "", cboDependencia: "", organismo_area_id: null, licencia_oficial: "S", id_tipo: "1", id_categoria: "1", f_emision: null, f_vencimiento: null};
+			datos = {id_chofer: "0", dni: "", apenom: "", email: "", observa: "", telefono: "", cboDependencia: "", organismo_area_id: null, licencia_oficial: "S", id_tipo: "1", id_categoria: "1", f_emision: null, f_vencimiento: null};
 			
 			cboDependencia.removeAll();
 			cboDependencia.setValue("");
@@ -110,36 +110,44 @@ qx.Class.define("vehiculos.comp.windowChofer",
 	form.add(aux, "E-mail", null, "email", null, {item: {row: 3, column: 1, colSpan: 6}});
 	
 	
+	aux = new qx.ui.form.TextArea();
+	aux.addListener("blur", function(e){
+		var value = this.getValue();
+		this.setValue((value == null) ? "" : value.trim());
+	});
+	form.add(aux, "Observaciones", null, "observa", null, {item: {row: 4, column: 1, colSpan: 13}});
+	
+	
 	aux = new qx.ui.form.TextField();
 	aux.addListener("blur", function(e){
 		var value = this.getValue();
 		this.setValue((value == null) ? "" : value.trim());
 	});
-	form.add(aux, "Teléfono", null, "telefono", null, {item: {row: 4, column: 1, colSpan: 6}});
+	form.add(aux, "Teléfono", null, "telefono", null, {item: {row: 5, column: 1, colSpan: 6}});
 	
 	
 	var cboDependencia = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Vehiculo", methodName: "autocompletarDependencia"});
 	//cboDependencia.setRequired(true);
 	form.add(cboDependencia, "Dependencia", function(value) {
 		//if (lstDependencia.isSelectionEmpty()) throw new qx.core.ValidationError("Validation Error", "Debe seleccionar dependencia");
-	}, "cboDependencia", null, {item: {row: 5, column: 1, colSpan: 13}});
+	}, "cboDependencia", null, {item: {row: 6, column: 1, colSpan: 13}});
 	var lstDependencia = cboDependencia.getChildControl("list");
 	form.add(lstDependencia, "", null, "organismo_area_id");
 	
-	form.addGroupHeader("Licencia de conducir", {item: {row: 6, column: 0, colSpan: 5}});
+	form.addGroupHeader("Licencia de conducir", {item: {row: 7, column: 0, colSpan: 5}});
 	
 	
 	var aux = new qx.ui.form.SelectBox();
 	aux.add(new qx.ui.form.ListItem("Si", null, "S"));
 	aux.add(new qx.ui.form.ListItem("No", null, "N"));
-	form.add(aux, "Lic.oficial", null, "licencia_oficial", null, {item: {row: 7, column: 1, colSpan: 2}});
+	form.add(aux, "Lic.oficial", null, "licencia_oficial", null, {item: {row: 8, column: 1, colSpan: 2}});
 
 	
 	var aux = new qx.ui.form.SelectBox();
 	aux.add(new qx.ui.form.ListItem("Nacional", null, "1"));
 	aux.add(new qx.ui.form.ListItem("Municipal", null, "2"));
 	aux.add(new qx.ui.form.ListItem("Otra", null, "4"));
-	form.add(aux, "Tipo", null, "id_tipo", null, {item: {row: 8, column: 1, colSpan: 4}});
+	form.add(aux, "Tipo", null, "id_tipo", null, {item: {row: 9, column: 1, colSpan: 4}});
 	
 	
 	var aux = new qx.ui.form.SelectBox();
@@ -150,15 +158,15 @@ qx.Class.define("vehiculos.comp.windowChofer",
 	aux.add(new qx.ui.form.ListItem("D3", null, "5"));
 	aux.add(new qx.ui.form.ListItem("E", null, "6"));
 	aux.add(new qx.ui.form.ListItem("D", null, "7"));
-	form.add(aux, "Categoria", null, "id_categoria", null, {item: {row: 9, column: 1, colSpan: 4}});
+	form.add(aux, "Categoria", null, "id_categoria", null, {item: {row: 10, column: 1, colSpan: 4}});
 	
 	
 	aux = new qx.ui.form.DateField();
-	form.add(aux, "F.emisión", null, "f_emision", null, {item: {row: 10, column: 1, colSpan: 4}});
+	form.add(aux, "F.emisión", null, "f_emision", null, {item: {row: 11, column: 1, colSpan: 4}});
 	
 	
 	aux = new qx.ui.form.DateField();
-	form.add(aux, "F.vencimiento", null, "f_vencimiento", null, {item: {row: 11, column: 1, colSpan: 4}});
+	form.add(aux, "F.vencimiento", null, "f_vencimiento", null, {item: {row: 12, column: 1, colSpan: 4}});
 	
 	
 

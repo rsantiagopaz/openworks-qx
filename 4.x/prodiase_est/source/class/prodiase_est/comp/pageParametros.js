@@ -358,14 +358,17 @@ qx.Class.define("prodiase_est.comp.pageParametros",
 			
 			var rpc = new qx.io.remote.Rpc("services/", "comp.Parametros");
 			rpc.callAsync(function(resultado, error, id) {
-				//alert(qx.lang.Json.stringify(resultado, null, 2));
-				
 				p.resultado = resultado;
+				
+				//alert(qx.lang.Json.stringify(p, null, 2));
 				
 				imageLoading.destroy();
 				root.unblock();		
 			
 				if ((p.grafico == "torta" && p.resultado.dataSeries[0].length > 0) || (p.grafico == "barras" && p.resultado.dataSeries.length > 0)) {
+					
+					//alert(qx.lang.Json.stringify(p, null, 2));
+					
 					var pagePlot = new prodiase_est.comp.pagePlot(p);
 					application.tabviewMain.add(pagePlot);
 					application.tabviewMain.setSelection([pagePlot]);				

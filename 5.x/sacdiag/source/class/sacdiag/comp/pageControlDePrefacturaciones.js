@@ -69,8 +69,9 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 		rpc.addListener("failed", function(e){
 			var data = e.getData();
 			
-			//alert(qx.lang.Json.stringify(data, null, 2));
-
+			if (data.message != "sesion_terminada") {
+				alert(qx.lang.Json.stringify(data, null, 2));
+			}
 		});
 		rpc.callAsyncListeners(true, "leer_prefacturacion", p);
 		
@@ -219,7 +220,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	
 	
 	var tableModelPrefac = new qx.ui.table.model.Simple();
-	tableModelPrefac.setColumns(["Fecha", "Prestador", "Asunto", "Cantidad", "Total", "Estado"], ["fecha_creacion", "prestador", "documentacion_id", "cantidad", "valor", "estado"]);
+	tableModelPrefac.setColumns(["Fecha", "Prestador", "Asunto", "Cantidad", "Total", "Estado"], ["fecha_creacion", "nombre", "documentacion_id", "cantidad", "valor", "estado"]);
 	tableModelPrefac.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrefac.getRowCount();
 		
@@ -333,7 +334,9 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
+				if (data.message != "sesion_terminada") {
+					alert(qx.lang.Json.stringify(data, null, 2));
+				}
 			});
 			rpc.callAsyncListeners(true, "leer_solicitudes", p);
 		}
@@ -547,7 +550,9 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
+				if (data.message != "sesion_terminada") {
+					alert(qx.lang.Json.stringify(data, null, 2));
+				}
 			});
 			rpc.callAsyncListeners(true, "leer_solicitudes_prestaciones", p);
 		}

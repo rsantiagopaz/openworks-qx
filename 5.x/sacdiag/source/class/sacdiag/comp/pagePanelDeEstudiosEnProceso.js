@@ -47,7 +47,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		var p = {};
 		p.desde = dtfDesde.getValue();
 		p.hasta = dtfHasta.getValue();
-		if (! lstPrestador.isSelectionEmpty()) p.id_prestador = lstPrestador.getSelection()[0].getModel();
+		if (! lstPrestador.isSelectionEmpty()) p.id_prestador_fantasia = lstPrestador.getSelection()[0].getModel();
 		if (! lstPaciente.isSelectionEmpty()) p.persona_id = lstPaciente.getSelection()[0].getModel();
 		if (! lstPersonal.isSelectionEmpty()) p.id_usuario_medico = lstPersonal.getSelection()[0].getModel();
 		p.estado = slbEstado.getSelection()[0].getModel();
@@ -177,9 +177,11 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		win.addListener("aceptado", function(e){
 			var data = e.getData();
 
-			rowDataSolicitud.id_prestador = data;
+			rowDataSolicitud.id_prestador_fantasia = data;
 			
 			var p = rowDataSolicitud;
+			
+			//alert(qx.lang.Json.stringify(p, null, 2));
 			
 			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
 			rpc.addListener("completed", function(e){
@@ -227,7 +229,9 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 									rpc.addListener("failed", function(e){
 										var data = e.getData();
 										
-										//alert(qx.lang.Json.stringify(data, null, 2));
+										if (data.message != "sesion_terminada") {
+											alert(qx.lang.Json.stringify(data, null, 2));
+										}
 									});
 									rpc.callAsyncListeners(true, "escribir_solicitud", p);
 	        					}
@@ -258,7 +262,9 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
+				if (data.message != "sesion_terminada") {
+					alert(qx.lang.Json.stringify(data, null, 2));
+				}
 			});
 			rpc.callAsyncListeners(true, "escribir_solicitud", p);			
 		}
@@ -455,19 +461,19 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Orient.diagnóstica", null, "orientacion_diagnostica");
+	//formInfoEntsal.add(aux, "Orient.diagnóstica", null, "orientacion_diagnostica");
 	
 	var aux = new qx.ui.form.TextArea("");
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Servicio", null, "servicio");
+	//formInfoEntsal.add(aux, "Servicio", null, "servicio");
 	
 	var aux = new qx.ui.form.TextArea("");
 	aux.setReadOnly(true);
 	aux.setDecorator("main");
 	aux.setBackgroundColor("#ffffc0");
-	formInfoEntsal.add(aux, "Habitación cama", null, "habitacion_cama");
+	//formInfoEntsal.add(aux, "Habitación cama", null, "habitacion_cama");
 	
 	var controllerFormInfoEntsal = new qx.data.controller.Form(null, formInfoEntsal);
 	//modelForm = controllerFormInfoVehiculo.createModel(true);

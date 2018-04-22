@@ -66,6 +66,7 @@ qx.Class.define("prodiase_est.comp.pagePlot",
 		var plugins = ['barRenderer', 'categoryAxisRenderer', 'pointLabels'];
 		
 		plot = new qxjqplot.Plot(paramet.resultado.dataSeries, options, plugins);
+		
 	}
 
 	

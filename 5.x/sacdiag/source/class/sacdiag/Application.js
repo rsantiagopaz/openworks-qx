@@ -95,7 +95,6 @@ qx.Class.define("sacdiag.Application",
 	var doc = this.getRoot();
 	doc.set({blockerColor: '#bfbfbf', blockerOpacity: 0.4});
 	
-	//alert("entrooo");
 	
 	
 	
