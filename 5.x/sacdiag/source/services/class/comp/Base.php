@@ -19,6 +19,7 @@ class class_Base
 		} else {
 			$request_time = (int) $_SERVER["REQUEST_TIME"];
 			
+
 			if ($_SESSION["cookie_lifetime"] == 0) {
 				$timeout_duration = $_SESSION["gc_maxlifetime"] - 60;
 			} else if ($_SESSION["cookie_lifetime"] <= $_SESSION["gc_maxlifetime"]) {
@@ -26,8 +27,9 @@ class class_Base
 			} else if ($_SESSION["gc_maxlifetime"] <= $_SESSION["cookie_lifetime"]) {
 				$timeout_duration = $_SESSION["gc_maxlifetime"] - 60;
 			}
+
 			
-			//$timeout_duration = 60 * 5;
+			//$timeout_duration = 60 * 3;
 			
 			if (($request_time - $_SESSION["sacdiag_LAST_ACTIVITY"]) > $timeout_duration) {
 				throw new JsonRpcError("sesion_terminada", 0);

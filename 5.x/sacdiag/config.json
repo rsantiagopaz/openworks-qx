@@ -64,6 +64,9 @@
       "library" :
       [
         {
+          "manifest" : "../QxJqPlot/Manifest.json"
+        },
+        {
           "manifest" : "../Dialog/Manifest.json"
         },
         {

@@ -11056,12 +11056,12 @@
         });
     };
 
-    $.jqplot.sprintf.thousandsSeparator = ',';
+    $.jqplot.sprintf.thousandsSeparator = '.';
     // Specifies the decimal mark for floating point values. By default a period '.'
     // is used. If you change this value to for example a comma be sure to also
     // change the thousands separator or else this won't work since a simple String
     // replace is used (replacing all periods with the mark specified here).
-    $.jqplot.sprintf.decimalMark = '.';
+    $.jqplot.sprintf.decimalMark = ',';
     
     $.jqplot.sprintf.regex = /%%|%(\d+\$)?([-+#0&\' ]*)(\*\d+\$|\*|\d+)?(\.(\*\d+\$|\*|\d+))?([nAscboxXuidfegpEGP])/g;
 

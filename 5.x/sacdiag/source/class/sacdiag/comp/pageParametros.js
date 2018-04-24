@@ -326,7 +326,7 @@ qx.Class.define("sacdiag.comp.pageParametros",
 			var bounds = root.getBounds();
 			var imageLoading = new qx.ui.basic.Image("sacdiag/loading66.gif");
 	
-			root.block();
+			//root.block();
 			imageLoading.setBackgroundColor("#FFFFFF");
 			imageLoading.setDecorator("main");
 			root.add(imageLoading, {left: parseInt(bounds.width / 2 - 33), top: parseInt(bounds.height / 2 - 33)});
@@ -417,7 +417,7 @@ qx.Class.define("sacdiag.comp.pageParametros",
 				//alert(qx.lang.Json.stringify(p, null, 2));
 				
 				imageLoading.destroy();
-				root.unblock();
+				//root.unblock();
 				
 				if ((p.grafico == "barras" && p.resultado.dataSeries_cantidad.length > 0)) {
 					var pagePlot = new sacdiag.comp.pagePlot(p);

@@ -53,95 +53,37 @@ qx.Class.define("prueba.Application",
       -------------------------------------------------------------------------
       */
 
+      // Create a button
+      var button1 = new qx.ui.form.Button("First Button", "prueba/test.png");
 
       // Document is the application root
       var doc = this.getRoot();
 
-      
-      
-      
+      // Add button to document at fixed coordinates
+      doc.add(button1, {left: 100, top: 50});
 
-	var commandEscape = new qx.ui.command.Command("Escape");
-	commandEscape.addListener("execute", function(e){
-		if (! table.isEditing()) {
-			this.debug("escape");
-		}
-	});
-
-
-
-
-function createRandomRows(rowCount) {
-  var rowData = [];
-  var now = new Date().getTime();
-  var dateRange = 400 * 24 * 60 * 60 * 1000; // 400 days
-  var nextId = 0;
-  for (var row = 0; row < rowCount; row++) {
-    var date = new Date(now + Math.random() * dateRange - dateRange / 2);
-    rowData.push([ nextId++, Math.random() * 10000, date, (Math.random() > 0.5) ]);
-  }
-  return rowData;
-}
-
-var grid = new qx.ui.layout.Grid(6, 6);
-grid.setColumnFlex(0, 1);
-grid.setColumnFlex(1, 1);
-grid.setColumnFlex(2, 1);
-grid.setColumnFlex(3, 1);
-grid.setColumnFlex(4, 1);
-grid.setColumnFlex(5, 1);
-grid.setColumnFlex(6, 1);
-
-grid.setRowFlex(1, 1);
-
-// window
-var win = new qx.ui.window.Window("Table").set({
-  layout : grid,
-  allowClose: false,
-  allowMinimize: false,
-  width: 600,
-  height: 600,
-  contentPadding: 0
-});
-this.getRoot().add(win);
-win.moveTo(30, 40);
-win.open();
-
-// table model
-var tableModel = new qx.ui.table.model.Simple();
-tableModel.setColumns([ "ID", "A number", "A date", "Boolean" ]);
-tableModel.setData(createRandomRows(1000));
-
-// make second column editable
-tableModel.setColumnEditable(1, true);
-
-// table
-var table = new componente.comp.ui.ramon.table.Table(tableModel).set({
-  decorator: null
-});
-table.addListener("keypress", function(e){
-	this.debug("kp2");
-});
-
-
-win.add(table, {row: 1, column: 0, colSpan: 7});
-
-win.add(new qx.ui.form.Button("Button 1"), {row: 0, column: 0});
-win.add(new qx.ui.form.Button("Button 2 Button 2"), {row: 0, column: 1});
-win.add(new qx.ui.form.Button("Button 3"), {row: 0, column: 4});
-win.add(new qx.ui.form.Button("Button 4 Button 4"), {row: 0, column: 6});
-
-var tcm = table.getTableColumnModel();
-
-// Display a checkbox in column 3
-tcm.setDataCellRenderer(3, new qx.ui.table.cellrenderer.Boolean());
-
-// use a different header renderer
-tcm.setHeaderCellRenderer(2, new qx.ui.table.headerrenderer.Icon("icon/16/apps/office-calendar.png", "A date"));
-      
-      
-      
-      
+      // Add an event listener
+      button1.addListener("execute", function(e) {
+      	
+        var rpc = new qx.io.remote.Rpc("services/", "comp.Prueba");
+		rpc.addListener("completed", function(e){
+			var data = e.getData();
+			
+			alert("completed");
+		});
+		rpc.addListener("failed", function(e){
+			var data = e.getData();
+			
+			alert(qx.lang.Json.stringify(data, null, 2));
+		});
+		rpc.addListener("aborted", function(e){
+			var data = e.getData();
+			
+			alert(qx.lang.Json.stringify(data, null, 2));
+		});
+		
+		rpc.callAsyncListeners(false, "leer_datos");
+      });
     }
   }
 });

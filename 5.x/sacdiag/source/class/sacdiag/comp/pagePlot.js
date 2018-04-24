@@ -20,8 +20,8 @@ qx.Class.define("sacdiag.comp.pagePlot",
 	
 	if (paramet.grafico == "torta") {
 		var options = function($jqplot){
-			$.jqplot.sprintf.thousandsSeparator = '.';
-			$.jqplot.sprintf.decimalMark = ',';
+			$jqplot.sprintf.thousandsSeparator = '.';
+			$jqplot.sprintf.decimalMark = ',';
 			
 			return {
 			    title: paramet.title,
@@ -35,8 +35,8 @@ qx.Class.define("sacdiag.comp.pagePlot",
 
 	} else {
 		var options = function($jqplot){
-			$.jqplot.sprintf.thousandsSeparator = '.';
-			$.jqplot.sprintf.decimalMark = ',';
+			$jqplot.sprintf.thousandsSeparator = '.';
+			$jqplot.sprintf.decimalMark = ',';
 			
 			return {
 			    //title: paramet.title,
@@ -46,7 +46,7 @@ qx.Class.define("sacdiag.comp.pagePlot",
 			    legend: {show: true},
 				axes:{
 					xaxis:{
-						renderer: $.jqplot.CategoryAxisRenderer,
+						renderer: $jqplot.CategoryAxisRenderer,
 						ticks: [""]
 					},
 					yaxis: {
@@ -64,8 +64,8 @@ qx.Class.define("sacdiag.comp.pagePlot",
 		
 
 		var options = function($jqplot){
-			$.jqplot.sprintf.thousandsSeparator = '.';
-			$.jqplot.sprintf.decimalMark = ',';
+			$jqplot.sprintf.thousandsSeparator = '.';
+			$jqplot.sprintf.decimalMark = ',';
 			
 			return {
 			    //title: paramet.title,
@@ -75,7 +75,7 @@ qx.Class.define("sacdiag.comp.pagePlot",
 			    legend: {show: false},
 				axes:{
 					xaxis:{
-						renderer: $.jqplot.CategoryAxisRenderer,
+						renderer: $jqplot.CategoryAxisRenderer,
 						ticks: [""]
 					},
 					yaxis: {
