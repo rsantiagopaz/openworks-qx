@@ -54,6 +54,11 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	
 	
 	var functionActualizarPrestacion = function(id_prestacion) {
+		
+		application.loading.show();
+		
+		tableModelPrestacion.setDataAsMapArray([], true);
+		
 		tblPrestacion.blur();
 		tblPrestacion.setFocusedCell();
 		
@@ -62,28 +67,55 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 		commandAgregarPrestacion.setEnabled(true);
 		menuPrestacion.memorizar([commandAgregarPrestacion]);
 		
-		var p = {};
-		p.texto = "";
-		p.phpParametros = {id_prestacion_tipo: rowDataPrestaciones_tipo.id_prestacion_tipo};
 		
-		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
-		rpc.addListener("completed", function(e){
-			var data = e.getData();
+		var timer = qx.util.TimerManager.getInstance();
+		if (this.timerId != null) {
+			timer.stop(this.timerId);
+			this.timerId = null;
 			
-			//alert(qx.lang.Json.stringify(data, null, 2));
-			
-			tableModelPrestacion.setDataAsMapArray(data.result, true);
-			
-			if (id_prestacion != null) {
-				tblPrestacion.blur();
-				tblPrestacion.buscar("id_prestacion", id_prestacion);
-				tblPrestacion.focus();
+			if (this.rpc != null) {
+				this.rpc.abort(this.opaqueCallRef);
+				this.rpc = null;
+			} else {
+				application.loading.hide();
 			}
-		});
-		rpc.callAsyncListeners(true, "autocompletarPrestacion", p);
+		}
 
-		return rpc;
-	}
+
+		this.timerId = timer.start(function() {
+
+			var p = {};
+			p.texto = "";
+			p.phpParametros = {id_prestacion_tipo: rowDataPrestaciones_tipo.id_prestacion_tipo};
+			
+			this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+			this.rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				//alert(qx.lang.Json.stringify(data, null, 2));
+				
+				tableModelPrestacion.setDataAsMapArray(data.result, true);
+				
+				if (id_prestacion != null) {
+					tblPrestacion.blur();
+					tblPrestacion.buscar("id_prestacion", id_prestacion);
+					tblPrestacion.focus();
+				}
+				
+				//this.timerId = null;
+				//this.rpc = null
+				
+				application.loading.hide();
+			});
+			
+			this.rpc.addListener("aborted", function(e){
+				application.loading.hide();
+			});
+			
+			this.opaqueCallRef = this.rpc.callAsyncListeners(false, "autocompletarPrestacion", p);
+
+		}, null, this, null, 200);
+	};
 	
 	
 	var functionBuscar = function(keySequence){

@@ -23,13 +23,14 @@ qx.Class.define("vehiculos.comp.pageGeneral",
 		//alert(qx.lang.Json.stringify(p, null, 2));
 
 		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
-		rpc.callAsync(function(resultado, error, id) {
-			//alert(qx.lang.Json.stringify(resultado, null, 2));
-			//alert(qx.lang.Json.stringify(error, null, 2));
-
-			tableModelGral.setDataAsMapArray(resultado.gral, true);
-			tblGral.setAdditionalStatusBarText(resultado.statusBarText);
-		}, "leer_gral", p);
+		rpc.addListener("completed", function(e){
+			var data = e.getData();
+			
+			tableModelGral.setDataAsMapArray(data.result.gral, true);
+			tblGral.setAdditionalStatusBarText(data.result.statusBarText);
+		});
+		
+		rpc.callAsyncListeners(true, "leer_gral", p);
 	};
 	
 	var functionBuscar = function(keySequence){
@@ -209,20 +210,24 @@ qx.Class.define("vehiculos.comp.pageGeneral",
 		var p = {};
 		p.texto = rowDataGral.nro_patente;
 		
-		var rpc = new qx.io.remote.Rpc("services/", "comp.Vehiculo");
-		rpc.callAsync(function(resultado, error, id) {
+		var rpc = new vehiculos.comp.rpc.Rpc("services/", "comp.Vehiculo");
+		rpc.addListener("completed", function(e){
+			var data = e.getData();
+
 			var pageParticular = new vehiculos.comp.pageParticular();
 			application.tabviewMain.addAt(pageParticular, application.tabviewMain.getChildren().length - 1);
 			application.tabviewMain.setSelection([pageParticular]);
 			
-			var listItem = new qx.ui.form.ListItem(resultado[0].label, null, resultado[0].model);
-			listItem.setUserData("datos", resultado[0]);
+			var listItem = new qx.ui.form.ListItem(data.result[0].label, null, data.result[0].model);
+			listItem.setUserData("datos", data.result[0]);
 			pageParticular.lstVehiculo.add(listItem);
 			
 			pageParticular.lstVehiculo.setSelection([listItem]);
 			pageParticular.cboVehiculo.selectAllText();
 			tblGral.setEnabled(true);
-		}, "autocompletarVehiculo", p);
+		});
+		
+		rpc.callAsyncListeners(true, "autocompletarVehiculo", p);
 	});
 	
 	var menu = new componente.comp.ui.ramon.menu.Menu();

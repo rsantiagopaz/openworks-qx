@@ -122,6 +122,9 @@ qx.Class.define("sacdiag.Application",
 	numberformatEntero.setGroupingUsed(false);
 	numberformatEntero.setMaximumFractionDigits(0);
 	numberformatEntero.setMinimumFractionDigits(0);
+	
+	
+	var loading = this.loading = new componente.comp.ui.ramon.image.Loading("sacdiag/loading66.gif");
       
 
 	var contenedorMain = new qx.ui.container.Composite(new qx.ui.layout.Grow());

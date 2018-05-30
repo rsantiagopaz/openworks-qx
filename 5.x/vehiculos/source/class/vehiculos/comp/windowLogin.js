@@ -1,4 +1,4 @@
-qx.Class.define("sacdiag.comp.windowLogin",
+qx.Class.define("vehiculos.comp.windowLogin",
 {
 	extend : componente.comp.ui.ramon.window.Window,
 	construct : function ()

@@ -34,6 +34,8 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 	var functionActualizarSolicitud = function(id_solicitud) {
 		
+		application.loading.show();
+		
 		tblSolicitud.setFocusedCell();
 		tableModelPrestacion.setDataAsMapArray([], true);
 		
@@ -44,33 +46,56 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		
 		controllerFormInfoEntsal.resetModel();
 		
-		var p = {};
-		p.desde = dtfDesde.getValue();
-		p.hasta = dtfHasta.getValue();
-		if (! lstPrestador.isSelectionEmpty()) p.id_prestador_fantasia = lstPrestador.getSelection()[0].getModel();
-		if (! lstPaciente.isSelectionEmpty()) p.persona_id = lstPaciente.getSelection()[0].getModel();
-		if (! lstPersonal.isSelectionEmpty()) p.id_usuario_medico = lstPersonal.getSelection()[0].getModel();
-		p.estado = slbEstado.getSelection()[0].getModel();
 		
-		//alert(qx.lang.Json.stringify(p, null, 2));
 		
-		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
-		rpc.addListener("completed", function(e){
-			var data = e.getData();
+		var timer = qx.util.TimerManager.getInstance();
+		if (this.timerId != null) {
+			timer.stop(this.timerId);
+			this.timerId = null;
 			
-			//alert(qx.lang.Json.stringify(data, null, 2));
-
-			tableModelSolicitud.setDataAsMapArray(data.result, true);
-			
-			if (id_solicitud != null) {
-				tblSolicitud.blur();
-				tblSolicitud.buscar("id_solicitud", id_solicitud);
-				tblSolicitud.focus();
+			if (this.rpc != null) {
+				this.rpc.abort(this.opaqueCallRef);
+				this.rpc = null;
+			} else {
+				application.loading.hide();
 			}
-		});
-		rpc.callAsyncListeners(true, "leer_solicitud", p);
+		}
 		
-		return rpc;
+		this.timerId = timer.start(function() {
+			
+			var p = {};
+			p.desde = dtfDesde.getValue();
+			p.hasta = dtfHasta.getValue();
+			if (! lstPrestador.isSelectionEmpty()) p.id_prestador_fantasia = lstPrestador.getSelection()[0].getModel();
+			if (! lstPaciente.isSelectionEmpty()) p.persona_id = lstPaciente.getSelection()[0].getModel();
+			if (! lstPersonal.isSelectionEmpty()) p.id_usuario_medico = lstPersonal.getSelection()[0].getModel();
+			p.estado = slbEstado.getSelection()[0].getModel();
+			
+			//alert(qx.lang.Json.stringify(p, null, 2));
+			
+			this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
+			this.rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				//alert(qx.lang.Json.stringify(data, null, 2));
+	
+				tableModelSolicitud.setDataAsMapArray(data.result, true);
+				
+				if (id_solicitud != null) {
+					tblSolicitud.blur();
+					tblSolicitud.buscar("id_solicitud", id_solicitud);
+					tblSolicitud.focus();
+				}
+				
+				application.loading.hide();
+			});
+			this.rpc.addListener("aborted", function(e){
+				application.loading.hide();
+			});
+			
+			this.opaqueCallRef = this.rpc.callAsyncListeners(false, "leer_solicitud", p);
+			
+		}, null, this, null, 200);
 	}
 	
 	
@@ -385,6 +410,8 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 		if (selectionModelSolicitud.isSelectionEmpty()) {
 
 		} else {
+			application.loading.show();
+			
 			rowDataSolicitud = tableModelSolicitud.getRowDataAsMap(tblSolicitud.getFocusedRow());
 			
 			controllerFormInfoEntsal.setModel(qx.data.marshal.Json.createModel(rowDataSolicitud));
@@ -397,18 +424,41 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 			menuSolicitud.memorizar([btnCambiarPrestador, btnAutorizar, btnBloquear]);
 			
 			
-			var p = {};
-			p.id_solicitud = rowDataSolicitud.id_solicitud;
-			
-			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
-			rpc.addListener("completed", function(e){
-				var data = e.getData();
+			var timer = qx.util.TimerManager.getInstance();
+			if (this.timerId != null) {
+				timer.stop(this.timerId);
+				this.timerId = null;
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
-		
-				tableModelPrestacion.setDataAsMapArray(data.result, true);
-			});
-			rpc.callAsyncListeners(true, "leer_solicitudes_prestaciones", p);
+				if (this.rpc != null) {
+					this.rpc.abort(this.opaqueCallRef);
+					this.rpc = null;
+				} else {
+					application.loading.hide();
+				}
+			}
+			
+			this.timerId = timer.start(function() {
+				
+				var p = {};
+				p.id_solicitud = rowDataSolicitud.id_solicitud;
+				
+				this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
+				this.rpc.addListener("completed", function(e){
+					var data = e.getData();
+					
+					//alert(qx.lang.Json.stringify(data, null, 2));
+			
+					tableModelPrestacion.setDataAsMapArray(data.result, true);
+					
+					application.loading.hide();
+				});
+				this.rpc.addListener("aborted", function(e){
+					application.loading.hide();
+				});
+				
+				this.opaqueCallRef = this.rpc.callAsyncListeners(false, "leer_solicitudes_prestaciones", p);
+				
+			}, null, this, null, 200);
 		}
 	});
 

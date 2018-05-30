@@ -11,22 +11,22 @@ class class_Chofer extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT dni FROM _personal WHERE dni='" . $p->model->dni . "'";
-  	$rs = mysql_query($sql);
-  	if (mysql_num_rows($rs) == 0) {
+  	$rs = $this->mysqli->query($sql);
+  	if ($rs->num_rows == 0) {
   		$error->SetError(0, "personal");
   		return $error;
   	}
   	
   	$sql = "SELECT id_chofer FROM chofer WHERE dni='" . $p->model->dni . "' AND id_chofer <> " . $p->model->id_chofer;
-  	$rs = mysql_query($sql);
-  	if (mysql_num_rows($rs) > 0) {
+  	$rs = $this->mysqli->query($sql);
+  	if ($rs->num_rows > 0) {
   		$error->SetError(0, "dni");
   		return $error;
   	}
 
   	$sql = "SELECT id_chofer FROM chofer WHERE apenom='" . $p->model->apenom . "' AND id_chofer <> " . $p->model->id_chofer;
-  	$rs = mysql_query($sql);
-  	if (mysql_num_rows($rs) > 0) {
+  	$rs = $this->mysqli->query($sql);
+  	if ($rs->num_rows > 0) {
   		$error->SetError(0, "apenom");
   		return $error;
   	}
@@ -36,10 +36,10 @@ class class_Chofer extends class_Base
 		
 	if ($p->model->id_chofer == "0") {
 		$sql = "INSERT chofer SET " . $set . ", id_parque=" . $_SESSION['parque']->id_parque . ", f_inscripcion=NOW()";
-		mysql_query($sql);		
+		$this->mysqli->query($sql);		
 	} else {
 		$sql = "UPDATE chofer SET " . $set . " WHERE id_chofer=" . $p->model->id_chofer;
-		mysql_query($sql);
+		$this->mysqli->query($sql);
 	}
   }
   
@@ -47,16 +47,16 @@ class class_Chofer extends class_Base
   public function method_alta_modifica_incidente($params, $error) {
   	$p = $params[0];
   	
-  	$p->model->id_usuario = $_SESSION['usuario'];
+  	$p->model->id_usuario = $_SESSION['login']->usuario;
   	
 	$set = $this->prepararCampos($p->model, "incidente");
 		
 	if ($p->model->id_incidente == "0") {
 		$sql = "INSERT incidente SET " . $set;
-		mysql_query($sql);		
+		$this->mysqli->query($sql);		
 	} else {
 		$sql = "UPDATE incidente SET " . $set . " WHERE id_incidente=" . $p->model->id_incidente;
-		mysql_query($sql);
+		$this->mysqli->query($sql);
 	}
   }
   
@@ -91,22 +91,25 @@ class class_Chofer extends class_Base
   public function method_autocompletarChoferCompleto($params, $error) {
   	$p = $params[0];
   	
+  	$resultado = array();
+  	
   	if (is_numeric($p->texto)) {
   		$sql = "SELECT id_chofer AS model, CONCAT(dni, ' - ', apenom) AS label, chofer.* FROM chofer WHERE id_parque=" . $_SESSION['parque']->id_parque . " AND dni LIKE '%" . $p->texto . "%' ORDER BY label";
   	} else {
   		$sql = "SELECT id_chofer AS model, CONCAT(apenom, ' - ', dni) AS label, chofer.* FROM chofer WHERE id_parque=" . $_SESSION['parque']->id_parque . " AND apenom LIKE '%" . $p->texto . "%' ORDER BY label";
   	}
   	
-	function functionAux(&$row, $key) {
-		$resultado = new stdClass;
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
+		$rowAux = new stdClass;
 		
-		$resultado->model = $row->model;
-		$resultado->label = $row->label;
+		$rowAux->model = $row->model;
+		$rowAux->label = $row->label;
 		
 		unset($row->model);
 		unset($row->label);
 		
-		$resultado->chofer = $row;
+		$rowAux->chofer = $row;
 
 		
 		$sql = "SELECT";
@@ -115,16 +118,15 @@ class class_Chofer extends class_Base
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
-		$rsDependencia = mysql_query($sql);
-		if (mysql_num_rows($rsDependencia) > 0) $resultado->cboDependencia = mysql_fetch_object($rsDependencia);
+		$rsDependencia = $this->mysqli->query($sql);
+		if ($rsDependencia->num_rows > 0) $rowAux->cboDependencia = $rsDependencia->fetch_object();
 
-		return $resultado;
-	};
+		$row = $rowAux;
+		
+		$resultado[] = $row;
+	}
   	
-  	$opciones = new stdClass;
-  	$opciones->functionAux = functionAux;
-	
-	return $this->toJson($sql, $opciones);
+	return $resultado;
   }
 }
 

@@ -490,9 +490,9 @@ class class_Parametros extends class_Base
   	$opciones->valor = "float";
   	
   	if (is_numeric($p->texto)) {
-  		$sql = "SELECT prestaciones.*, prestaciones_subtipo.denominacion AS subtipo_descrip, id_prestacion AS model, CONCAT(prestaciones.codigo, ', ', prestaciones.denominacion, ' (', prestaciones_tipo.denominacion, ')') AS label FROM prestaciones INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) INNER JOIN prestaciones_subtipo USING(id_prestacion_subtipo) WHERE prestaciones.codigo LIKE'%". $p->texto . "%'";
+  		$sql = "SELECT prestaciones.*, prestaciones_subtipo.denominacion AS subtipo_descrip, id_prestacion AS model, CONCAT(prestaciones.codigo, ', ', prestaciones.denominacion, ' (', prestaciones_tipo.denominacion, ')') AS label FROM prestaciones INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) LEFT JOIN prestaciones_subtipo USING(id_prestacion_subtipo) WHERE prestaciones.codigo LIKE'%". $p->texto . "%'";
   	} else {
-  		$sql = "SELECT prestaciones.*, prestaciones_subtipo.denominacion AS subtipo_descrip, id_prestacion AS model, CONCAT(prestaciones.denominacion, ', ', prestaciones.codigo, ' (', prestaciones_tipo.denominacion, ')') AS label FROM prestaciones INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) INNER JOIN prestaciones_subtipo USING(id_prestacion_subtipo) WHERE prestaciones.denominacion LIKE'%". $p->texto . "%'";
+  		$sql = "SELECT prestaciones.*, prestaciones_subtipo.denominacion AS subtipo_descrip, id_prestacion AS model, CONCAT(prestaciones.denominacion, ', ', prestaciones.codigo, ' (', prestaciones_tipo.denominacion, ')') AS label FROM prestaciones INNER JOIN prestaciones_tipo USING(id_prestacion_tipo) LEFT JOIN prestaciones_subtipo USING(id_prestacion_subtipo) WHERE prestaciones.denominacion LIKE'%". $p->texto . "%'";
   		if (! is_null($p->phpParametros)) $sql.= " AND id_prestacion_tipo=" . $p->phpParametros->id_prestacion_tipo;  		
   	}
   	

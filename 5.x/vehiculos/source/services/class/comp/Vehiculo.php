@@ -1,51 +1,47 @@
 <?php
-session_start();
 
 require("Base.php");
 
 class class_Vehiculo extends class_Base
 {
-  function __construct() {
-    parent::__construct();
-  }
   
   
   public function calcular_estados($id_movimiento = null, $id_entsal = null) {
   	if (is_null($id_entsal)) {
 	  	$sql = "SELECT id_entsal FROM movimiento WHERE id_movimiento=" . $id_movimiento . " LIMIT 1";
-	  	$rs = mysql_query($sql);
-	  	$row = mysql_fetch_object($rs);
+	  	$rs = $this->mysqli->query($sql);
+	  	$row = $rs->fetch_object();
 	  	
 	  	$id_entsal = $row->id_entsal;
 	}
   	
   	$sql = "SELECT id_vehiculo, estado FROM entsal WHERE id_entsal=" . $id_entsal;
-  	$rs = mysql_query($sql);
-  	$row = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$row = $rs->fetch_object();
   	$id_vehiculo = $row->id_vehiculo;
   	$estado = $row->estado;
   	
 	if ($estado != "S" && $estado != "A") {
   		$sql = "SELECT id_movimiento FROM movimiento WHERE id_entsal=" . $id_entsal . " AND estado='E'";
-  		$rs = mysql_query($sql);
-		$estado = ((mysql_num_rows($rs) > 0) ? "T" : "E");
+  		$rs = $this->mysqli->query($sql);
+		$estado = (($rs->num_rows > 0) ? "T" : "E");
   	}
   	
   	$sql = "SELECT id_movimiento FROM movimiento WHERE id_entsal=" . $id_entsal . " AND estado<>'A' AND ISNULL(documentacion_id)";
-  	$rs = mysql_query($sql);
-  	$asunto = ((mysql_num_rows($rs) > 0) ? "TRUE" : "FALSE");
+  	$rs = $this->mysqli->query($sql);
+  	$asunto = (($rs->num_rows > 0) ? "TRUE" : "FALSE");
   	
   	$sql = "SELECT id_movimiento FROM movimiento WHERE id_entsal=" . $id_entsal . " AND estado='D'";
-  	$rs = mysql_query($sql);
-  	$diferido = ((mysql_num_rows($rs) > 0) ? "TRUE" : "FALSE");
+  	$rs = $this->mysqli->query($sql);
+  	$diferido = (($rs->num_rows > 0) ? "TRUE" : "FALSE");
   	
   	$sql = "UPDATE entsal SET estado='" . $estado . "', asunto=" . $asunto . ", diferido=" . $diferido . " WHERE id_entsal=" . $id_entsal;
-  	mysql_query($sql);
+  	$this->mysqli->query($sql);
   	
 
   	if ($estado == "A") $estado = "S";
   	$sql = "UPDATE vehiculo SET estado='" . $estado . "' WHERE id_vehiculo=" . $id_vehiculo;
-  	mysql_query($sql);
+  	$this->mysqli->query($sql);
   }
   
   
@@ -53,45 +49,45 @@ class class_Vehiculo extends class_Base
   	
   	if (is_null($id_entsal)) {
 	  	$sql = "SELECT id_entsal FROM movimiento WHERE id_movimiento=" . $id_movimiento . " LIMIT 1";
-	  	$rs = mysql_query($sql);
-	  	$row = mysql_fetch_object($rs);
+	  	$rs = $this->mysqli->query($sql);
+	  	$row = $rs->fetch_object();
 	  	
 	  	$id_entsal = $row->id_entsal;
 	}
   	
   	if (! is_null($id_movimiento)) {
 	  	$sql = "SELECT id_movimiento, SUM(total) AS total FROM reparacion WHERE id_movimiento=" . $id_movimiento . " GROUP BY id_movimiento";
-	  	$rs = mysql_query($sql);
-	  	$row = mysql_fetch_object($rs);
+	  	$rs = $this->mysqli->query($sql);
+	  	$row = $rs->fetch_object();
 	  	
 	  	$sql = "UPDATE movimiento SET total=" . $row->total . " WHERE id_movimiento=" . $id_movimiento;
-	  	mysql_query($sql);
+	  	$this->mysqli->query($sql);
   	}
 
   	
   	$sql = "SELECT id_entsal, SUM(total) AS total FROM movimiento WHERE id_entsal=" . $id_entsal . " GROUP BY id_entsal";
-  	$rs = mysql_query($sql);
-  	$row = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$row = $rs->fetch_object();
   	
   	$sql = "UPDATE entsal SET total=" . $row->total . " WHERE id_entsal=" . $id_entsal;
-  	mysql_query($sql);
+  	$this->mysqli->query($sql);
   	
   	
 
   	
   	
   	$sql = "SELECT id_vehiculo FROM entsal WHERE id_entsal=" . $id_entsal . " LIMIT 1";
-  	$rs = mysql_query($sql);
-  	$row = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$row = $rs->fetch_object();
   	
   	$id_vehiculo = $row->id_vehiculo;
   	
   	$sql = "SELECT id_vehiculo, SUM(total) AS total FROM entsal WHERE id_vehiculo=" . $id_vehiculo . " GROUP BY id_vehiculo";
-  	$rs = mysql_query($sql);
-  	$row = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$row = $rs->fetch_object();
   	
   	$sql = "UPDATE vehiculo SET total=" . $row->total . " WHERE id_vehiculo=" . $id_vehiculo;
-  	mysql_query($sql);
+  	$this->mysqli->query($sql);
   }
   
   
@@ -113,29 +109,29 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT estado FROM movimiento WHERE id_movimiento=" . $p->id_movimiento;
-  	$rs = mysql_query($sql);
-  	$rowMovimiento = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$rowMovimiento = $rs->fetch_object();
   	
   	if ($rowMovimiento->estado == $p->movimiento_estado) {
-  		mysql_query("START TRANSACTION");
+  		$this->mysqli->query("START TRANSACTION");
   		
-	  	$sql = "UPDATE movimiento SET f_sal=NOW(), id_usuario_sal='" . $_SESSION['usuario'] . "', kilo=" . $p->kilo . ", estado='S' WHERE id_movimiento=" . $p->id_movimiento;
-	  	mysql_query($sql);
+	  	$sql = "UPDATE movimiento SET f_sal=NOW(), id_usuario_sal='" . $_SESSION['login']->usuario . "', kilo=" . $p->kilo . ", estado='S' WHERE id_movimiento=" . $p->id_movimiento;
+	  	$this->mysqli->query($sql);
 	  	
   		$sql = "DELETE FROM reparacion WHERE id_movimiento=" . $p->id_movimiento;
-  		mysql_query($sql);
+  		$this->mysqli->query($sql);
 	  	
 	  	foreach ($p->model as $item) {
 	  		$set = $this->prepararCampos($item, "reparacion");
 	  		
 	  		$sql = "INSERT reparacion SET " . $set;
-	  		mysql_query($sql);  		
+	  		$this->mysqli->query($sql);  		
 	  	}
 	  	
 	  	$this->calcular_totales($p->id_movimiento);
 	  	$this->calcular_estados($p->id_movimiento);
 	  	
-	  	mysql_query("COMMIT");
+	  	$this->mysqli->query("COMMIT");
   	} else {
 		$error->SetError(0, "estado");
 		return $error;
@@ -147,18 +143,18 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT estado FROM movimiento WHERE id_movimiento=" . $p->id_movimiento;
-  	$rs = mysql_query($sql);
-  	$rowMovimiento = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$rowMovimiento = $rs->fetch_object();
   	
   	if ($rowMovimiento->estado == $p->movimiento_estado) {
-	  	mysql_query("START TRANSACTION");
+	  	$this->mysqli->query("START TRANSACTION");
 	  	
-	  	$sql = "UPDATE movimiento SET f_sal=NOW(), id_usuario_sal='" . $_SESSION['usuario'] . "', estado='D' WHERE id_movimiento=" . $p->id_movimiento;
-	  	mysql_query($sql);
+	  	$sql = "UPDATE movimiento SET f_sal=NOW(), id_usuario_sal='" . $_SESSION['login']->usuario . "', estado='D' WHERE id_movimiento=" . $p->id_movimiento;
+	  	$this->mysqli->query($sql);
 	  	
 	  	$this->calcular_estados($p->id_movimiento);
 	  	
-	  	mysql_query("COMMIT");
+	  	$this->mysqli->query("COMMIT");
   	} else {
 		$error->SetError(0, "estado");
 		return $error;
@@ -170,19 +166,19 @@ class class_Vehiculo extends class_Base
 	$p = $params[0];
 	
   	$sql = "SELECT estado FROM entsal WHERE id_entsal=" . $p->id_entsal;
-  	$rs = mysql_query($sql);
-  	$rowEntsal = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$rowEntsal = $rs->fetch_object();
   	
   	if ($rowEntsal->estado == $p->entsal_estado) {
-		mysql_query("START TRANSACTION");
+		$this->mysqli->query("START TRANSACTION");
 	
-		$sql = "INSERT movimiento SET id_entsal=" . $p->id_entsal . ", cod_razon_social=" . $p->cod_razon_social . ", observa='" . $p->observa . "', f_ent=NOW(), id_usuario_ent='" . $_SESSION['usuario'] . "', estado='E'";
-		mysql_query($sql);
-		$insert_id = mysql_insert_id();
+		$sql = "INSERT movimiento SET id_entsal=" . $p->id_entsal . ", cod_razon_social=" . $p->cod_razon_social . ", observa='" . $p->observa . "', f_ent=NOW(), id_usuario_ent='" . $_SESSION['login']->usuario . "', estado='E'";
+		$this->mysqli->query($sql);
+		$insert_id = $this->mysqli->insert_id;
 	
 		$this->calcular_estados($insert_id);
 	
-		mysql_query("COMMIT");
+		$this->mysqli->query("COMMIT");
 	
 		return $insert_id;
   	} else {
@@ -196,19 +192,19 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT estado FROM movimiento WHERE id_movimiento=" . $p->id_movimiento;
-  	$rs = mysql_query($sql);
-  	$rowMovimiento = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$rowMovimiento = $rs->fetch_object();
   	
   	if ($rowMovimiento->estado == $p->movimiento_estado) {
-	  	mysql_query("START TRANSACTION");
+	  	$this->mysqli->query("START TRANSACTION");
 	  	
-	  	$sql = "UPDATE movimiento SET f_sal=NOW(), id_usuario_sal='" . $_SESSION['usuario'] . "', total=0, estado='A' WHERE id_movimiento=" . $p->id_movimiento;
-	  	mysql_query($sql);
+	  	$sql = "UPDATE movimiento SET f_sal=NOW(), id_usuario_sal='" . $_SESSION['login']->usuario . "', total=0, estado='A' WHERE id_movimiento=" . $p->id_movimiento;
+	  	$this->mysqli->query($sql);
 	  	
 	  	$this->calcular_totales($p->id_movimiento);
 	  	$this->calcular_estados($p->id_movimiento);
 	  	
-	  	mysql_query("COMMIT");
+	  	$this->mysqli->query("COMMIT");
   	} else {
 		$error->SetError(0, "estado");
 		return $error;
@@ -234,7 +230,7 @@ class class_Vehiculo extends class_Base
 	
 	
 	$sql = "SELECT * FROM (";
-	$sql.= "(SELECT movimiento.*, razones_sociales.razon_social AS taller FROM movimiento INNER JOIN `019`.razones_sociales USING(cod_razon_social))";
+	$sql.= "(SELECT movimiento.*, razones_sociales.razon_social AS taller FROM movimiento LEFT JOIN `019`.razones_sociales USING(cod_razon_social))";
 	$sql.= " UNION ALL";
 	$sql.= "(SELECT movimiento.*, temporal_1.razon_social AS taller FROM movimiento INNER JOIN ";
 		$sql.= "(";
@@ -255,20 +251,20 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT estado FROM vehiculo WHERE id_vehiculo=" . $p->id_vehiculo;
-  	$rs = mysql_query($sql);
-  	$rowVehiculo = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$rowVehiculo = $rs->fetch_object();
   	
   	if ($rowVehiculo->estado == $p->vehiculo_estado) {
-	  	mysql_query("START TRANSACTION");
+	  	$this->mysqli->query("START TRANSACTION");
 	  	
 	  	$sql = "UPDATE vehiculo SET estado='E' WHERE id_vehiculo=" . $p->id_vehiculo;
-	  	mysql_query($sql);
+	  	$this->mysqli->query($sql);
 	  	
-	  	$sql = "INSERT entsal SET id_vehiculo=" . $p->id_vehiculo . ", observa='" . $p->observa . "', f_ent=NOW(), id_usuario_ent='" . $_SESSION['usuario'] . "', resp_ent='" . $p->resp_ent . "', kilo=" . $p->kilo . ", cod_up=" . $p->cod_up . ", asunto=FALSE, diferido=FALSE, estado='E'";
-	  	mysql_query($sql);
-	  	$insert_id = mysql_insert_id();
+	  	$sql = "INSERT entsal SET id_vehiculo=" . $p->id_vehiculo . ", observa='" . $p->observa . "', f_ent=NOW(), id_usuario_ent='" . $_SESSION['login']->usuario . "', resp_ent='" . $p->resp_ent . "', kilo=" . $p->kilo . ", cod_up=" . $p->cod_up . ", asunto=FALSE, diferido=FALSE, estado='E'";
+	  	$this->mysqli->query($sql);
+	  	$insert_id = $this->mysqli->insert_id;
 	  	
-	  	mysql_query("COMMIT");
+	  	$this->mysqli->query("COMMIT");
 	  	
 	  	return $insert_id;
   	} else {
@@ -282,24 +278,24 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT estado FROM entsal WHERE id_entsal=" . $p->id_entsal;
-  	$rs = mysql_query($sql);
-  	$rowEntsal = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$rowEntsal = $rs->fetch_object();
   	
 	if ($rowEntsal->estado == $p->entsal_estado) {
 		$fecha = date("Y-m-d H:i:s");
 
-		mysql_query("START TRANSACTION");
+		$this->mysqli->query("START TRANSACTION");
 
-		$sql = "UPDATE entsal SET f_sal='" . $fecha . "', id_usuario_sal='" . $_SESSION['usuario'] . "', total=0, estado='A' WHERE id_entsal=" . $p->id_entsal;
-		mysql_query($sql);
+		$sql = "UPDATE entsal SET f_sal='" . $fecha . "', id_usuario_sal='" . $_SESSION['login']->usuario . "', total=0, estado='A' WHERE id_entsal=" . $p->id_entsal;
+		$this->mysqli->query($sql);
 
-		$sql = "UPDATE movimiento SET f_sal='" . $fecha . "', id_usuario_sal='" . $_SESSION['usuario'] . "', total=0, estado='A' WHERE id_entsal=" . $p->id_entsal . " AND estado<>'A'";
-		mysql_query($sql);
+		$sql = "UPDATE movimiento SET f_sal='" . $fecha . "', id_usuario_sal='" . $_SESSION['login']->usuario . "', total=0, estado='A' WHERE id_entsal=" . $p->id_entsal . " AND estado<>'A'";
+		$this->mysqli->query($sql);
 
 		$this->calcular_totales(null, $p->id_entsal);
 		$this->calcular_estados(null, $p->id_entsal);
 
-		mysql_query("COMMIT");
+		$this->mysqli->query("COMMIT");
 	} else {
 		$error->SetError(0, "estado");
 		return $error;
@@ -311,19 +307,19 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT estado FROM entsal WHERE id_entsal=" . $p->id_entsal;
-  	$rs = mysql_query($sql);
-  	$rowEntsal = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$rowEntsal = $rs->fetch_object();
   	
   	if ($rowEntsal->estado == $p->entsal_estado) {
-	  	mysql_query("START TRANSACTION");
+	  	$this->mysqli->query("START TRANSACTION");
 	  	
 	  	$sql = "UPDATE vehiculo SET estado='S' WHERE id_vehiculo=" . $p->id_vehiculo;
-	  	mysql_query($sql);
+	  	$this->mysqli->query($sql);
 	
-	  	$sql = "UPDATE entsal SET cod_up='" . $p->cod_up . "', f_sal=NOW(), id_usuario_sal='" . $_SESSION['usuario'] . "', resp_sal='" . $p->resp_sal . "', estado='S' WHERE id_entsal=" . $p->id_entsal;
-	  	mysql_query($sql);
+	  	$sql = "UPDATE entsal SET cod_up='" . $p->cod_up . "', f_sal=NOW(), id_usuario_sal='" . $_SESSION['login']->usuario . "', resp_sal='" . $p->resp_sal . "', estado='S' WHERE id_entsal=" . $p->id_entsal;
+	  	$this->mysqli->query($sql);
 	  	
-	  	mysql_query("COMMIT");
+	  	$this->mysqli->query("COMMIT");
   	} else {
 		$error->SetError(0, "estado");
 		return $error;
@@ -332,11 +328,14 @@ class class_Vehiculo extends class_Base
   
   
   public function method_leer_vehiculo($params, $error) {
-  	$p = $params[0];
+	$p = $params[0];
+
+	$resultado = array();
+
+	$sql = "SELECT vehiculo.*, tipo_vehiculo.descrip AS tipo FROM vehiculo INNER JOIN tipo_vehiculo USING(id_tipo_vehiculo) WHERE id_vehiculo=" . $p->id_vehiculo;
   	
-  	$resultado = new stdClass;
-  	
-	function functionAux1(&$row, $key) {
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		$row->total = (float) $row->total;
 		
 		$sql = "SELECT";
@@ -344,21 +343,18 @@ class class_Vehiculo extends class_Base
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
-		$rsDependencia = mysql_query($sql);
-		if (mysql_num_rows($rsDependencia) > 0) {
-			$rowDependencia = mysql_fetch_object($rsDependencia);
+		$rsDependencia = $this->mysqli->query($sql);
+		if ($rsDependencia->num_rows > 0) {
+			$rowDependencia = $rsDependencia->fetch_object();
 			$row->dependencia = $rowDependencia->label;
 		} else {
 			$row->dependencia = "";
 		}
-	};
-  	
-  	$opciones = new stdClass;
-  	$opciones->functionAux = functionAux1;
-  	
-  	$sql = "SELECT vehiculo.*, tipo_vehiculo.descrip AS tipo FROM vehiculo INNER JOIN tipo_vehiculo USING(id_tipo_vehiculo) WHERE id_vehiculo=" . $p->id_vehiculo;
-  	$resultado = $this->toJson($sql, $opciones);
-  	$resultado = $resultado[0];
+		
+		$resultado[] = $row;
+	}
+
+	$resultado = $resultado[0];
 
 	return $resultado;
   }
@@ -389,8 +385,8 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
   	$sql = "SELECT id_vehiculo FROM vehiculo WHERE nro_patente='" . $p->model->nro_patente . "' AND id_vehiculo <> " . $p->model->id_vehiculo;
-  	$rs = mysql_query($sql);
-  	if (mysql_num_rows($rs) > 0) {
+  	$rs = $this->mysqli->query($sql);
+  	if ($rs->num_rows > 0) {
   		$error->SetError(0, "duplicado");
   		return $error;
   	} else {
@@ -398,10 +394,10 @@ class class_Vehiculo extends class_Base
 	  		
 		if ($p->model->id_vehiculo == "0") {
 	  		$sql = "INSERT vehiculo SET " . $set . ", id_parque=" . $_SESSION['parque']->id_parque . ", total=0, estado='S'";
-	  		mysql_query($sql);		
+	  		$this->mysqli->query($sql);		
 		} else {
 	  		$sql = "UPDATE vehiculo SET " . $set . " WHERE id_vehiculo=" . $p->model->id_vehiculo;
-	  		mysql_query($sql);
+	  		$this->mysqli->query($sql);
 		}
   	}
   }
@@ -419,8 +415,8 @@ class class_Vehiculo extends class_Base
   	$dif = 0;
  	
 	$sql = "SELECT id_entsal, organismo_area_id, nro_patente, CONCAT(nro_patente, '  ', marca) AS vehiculo, f_ent, f_sal, asunto, entsal.estado, entsal.diferido FROM entsal INNER JOIN vehiculo USING(id_vehiculo) WHERE vehiculo.id_parque=" . $_SESSION['parque']->id_parque . " AND entsal.estado<>'A' AND (entsal.estado='E' OR entsal.estado='T' OR entsal.asunto OR entsal.diferido) ORDER BY f_ent DESC";
-	$rs = mysql_query($sql);
-	while ($row = mysql_fetch_object($rs)) {
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		$row->asunto = (bool) $row->asunto;
 		$row->diferido = (bool) $row->diferido;
 		
@@ -429,9 +425,9 @@ class class_Vehiculo extends class_Base
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
-		$rsDependencia = mysql_query($sql);
-		if (mysql_num_rows($rsDependencia) > 0) {
-			$rowDependencia = mysql_fetch_object($rsDependencia);
+		$rsDependencia = $this->mysqli->query($sql);
+		if ($rsDependencia->num_rows > 0) {
+			$rowDependencia = $rsDependencia->fetch_object();
 			$row->dependencia = $rowDependencia->label;
 		} else {
 			$row->dependencia = "";
@@ -455,8 +451,8 @@ class class_Vehiculo extends class_Base
 			$resultado->gral[] = $row;
 		} else if (is_numeric($p->ver)) {
 			$sql = "SELECT id_movimiento FROM movimiento WHERE id_entsal=" . $row->id_entsal . " AND estado <> 'A' AND cod_razon_social=" . $p->ver;
-			$rsMovimiento = mysql_query($sql);
-			if (mysql_num_rows($rsMovimiento) > 0) $resultado->gral[] = $row;
+			$rsMovimiento = $this->mysqli->query($sql);
+			if ($rsMovimiento->num_rows > 0) $resultado->gral[] = $row;
 		}
 	}
 	
@@ -470,12 +466,12 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
 
 	$sql = "SELECT 001_documentaciones.*, 001_documentaciones_tipos.documentacion_tipo FROM salud1.001_documentaciones INNER JOIN salud1.001_documentaciones_tipos USING(documentacion_tipo_id) WHERE documentacion_id='" . $p->documentacion_id . "'";
-	$rs = mysql_query($sql);
-	if (mysql_num_rows($rs) == 0) {
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows == 0) {
   		$error->SetError(0, "documentacion_id");
   		return $error;
 	} else {
-		$row = mysql_fetch_object($rs);
+		$row = $rs->fetch_object();
 		$documento = (($row->documentacion_tipo_id=="1") ? $row->expediente_numero . "-" . $row->expediente_codigo . "-" . $row->expediente_ano : $row->documentacion_numero . "/" . $row->documentacion_numero_ano);
 		$documento = $row->documentacion_tipo . " Nro. " . $documento;
 		$row->documento = $documento;
@@ -489,24 +485,24 @@ class class_Vehiculo extends class_Base
   	$p = $params[0];
   	
 	$sql = "SELECT documentacion_id FROM movimiento WHERE id_movimiento=" . $p->id_movimiento;
-  	$rs = mysql_query($sql);
-  	$row = mysql_fetch_object($rs);
+  	$rs = $this->mysqli->query($sql);
+  	$row = $rs->fetch_object();
   	
   	if (is_null($row->documentacion_id)) {
 		$sql = "SELECT documentacion_id FROM salud1.001_documentaciones WHERE documentacion_id='" . $p->documentacion_id . "'";
-		$rs = mysql_query($sql);
-		if (mysql_num_rows($rs) == 0) {
+		$rs = $this->mysqli->query($sql);
+		if ($rs->num_rows == 0) {
 	  		$error->SetError(0, "documentacion_id");
 	  		return $error;
 		} else {
-			mysql_query("START TRANSACTION");
+			$this->mysqli->query("START TRANSACTION");
 			
 			$sql = "UPDATE movimiento SET documentacion_id='" . $p->documentacion_id . "' WHERE id_movimiento=" . $p->id_movimiento;
-			mysql_query($sql);
+			$this->mysqli->query($sql);
 			
 			$this->calcular_estados($p->id_movimiento);
 			
-			mysql_query("COMMIT");
+			$this->mysqli->query("COMMIT");
 		}
   	} else {
 		$error->SetError(0, "estado");
@@ -518,26 +514,28 @@ class class_Vehiculo extends class_Base
   public function method_leer_parque($params, $error) {
   	$p = $params[0];
   	
-	function functionAux1(&$row, $key) {
+  	$resultado = array();
+  	
+	$sql = "SELECT * FROM parque WHERE organismo_area_id='" . $p->organismo_area_id . "'";
+	
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		$sql = "SELECT";
 		$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
-		$rsDependencia = mysql_query($sql);
-		if (mysql_num_rows($rsDependencia) > 0) {
-			$rowDependencia = mysql_fetch_object($rsDependencia);
+		$rsDependencia = $this->mysqli->query($sql);
+		if ($rsDependencia->num_rows > 0) {
+			$rowDependencia = $rsDependencia->fetch_object();
 			$row->dependencia = $rowDependencia->label;
 		} else {
 			$row->dependencia = "";
 		}
-	};
-  	
-  	$opciones = new stdClass;
-  	$opciones->functionAux = functionAux1;
-  	
-	$sql = "SELECT * FROM parque WHERE organismo_area_id='" . $p->organismo_area_id . "'";
-	$resultado = $this->toJson($sql, $opciones);
+		
+		$resultado[] = $row;
+	}
+	
 	$resultado = $resultado[0];
 	
 	$_SESSION['parque'] = $resultado;
@@ -557,16 +555,21 @@ class class_Vehiculo extends class_Base
   public function method_autocompletarVehiculoCompleto($params, $error) {
   	$p = $params[0];
   	
-	function functionAux(&$row, $key) {
+  	$resultado = array();
+  	
+	$sql = "SELECT * FROM vehiculo WHERE id_parque=" . $_SESSION['parque']->id_parque . " AND nro_patente LIKE '%" . $p->texto . "%' ORDER BY nro_patente, marca";
+	
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		unset($row->total);
 		unset($row->estado);
 		
-		$resultado = new stdClass;
+		$rowAux = new stdClass;
 		
-		$resultado->model = $row->id_vehiculo;
-		$resultado->label = $row->nro_patente . "  " . $row->marca;
+		$rowAux->model = $row->id_vehiculo;
+		$rowAux->label = $row->nro_patente . "  " . $row->marca;
 		
-		$resultado->vehiculo = $row;
+		$rowAux->vehiculo = $row;
 
 		
 		$sql = "SELECT";
@@ -575,17 +578,15 @@ class class_Vehiculo extends class_Base
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
-		$rsDependencia = mysql_query($sql);
-		if (mysql_num_rows($rsDependencia) > 0) $resultado->cboDependencia = mysql_fetch_object($rsDependencia);
+		$rsDependencia = $this->mysqli->query($sql);
+		if ($rsDependencia->num_rows > 0) $rowAux->cboDependencia = $rsDependencia->fetch_object();
 
-		return $resultado;
-	};
-  	
-  	$opciones = new stdClass;
-  	$opciones->functionAux = functionAux;
-  	
-	$sql = "SELECT * FROM vehiculo WHERE id_parque=" . $_SESSION['parque']->id_parque . " AND nro_patente LIKE '%" . $p->texto . "%' ORDER BY nro_patente, marca";
-	return $this->toJson($sql, $opciones);
+		$row = $rowAux;
+		
+		$resultado[] = $row;
+	}
+	
+	return $resultado;
   }
   
   
@@ -604,7 +605,7 @@ class class_Vehiculo extends class_Base
 	$sql.= " UNION DISTINCT";
 	$sql.= " (SELECT _organismos_areas.organismo_area_id AS model, CONCAT(_organismos_areas.organismo_area, ' (', _organismos.organismo, ')') AS label FROM salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id) WHERE _organismos_areas.organismo_area_tipo_id<>'E' AND (_organismos_areas.organismo_id='33' OR _organismos_areas.organismo_id='54') AND _organismos_areas.organismo_area LIKE '%" . $p->texto . "%')";
 	$sql.= " ORDER BY label";
-	return $this->toJson(mysql_query($sql));
+	return $this->toJson($this->mysqli->query($sql));
   }
   
   

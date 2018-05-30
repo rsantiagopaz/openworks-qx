@@ -1,51 +1,68 @@
 <?php
+
 class class_Base
 {
-	protected $link1;
-	protected $rowParamet;
-	protected $arraySucursal;
+	protected $mysqli;
 	
 	function __construct() {
 		require('Conexion.php');
 		
-		$this->link1 = mysql_connect("$servidor", "$usuario", "$password");
-		mysql_select_db("$base", $this->link1);
-		mysql_query("SET NAMES 'utf8'", $this->link1);
+		set_time_limit(0);
+		
+		if ( $this->is_session_started() === false ) session_start();
+		
+		
+		if (! isset($_SESSION["vehiculos_LAST_ACTIVITY"])) {
+			throw new JsonRpcError("sesion_terminada", 0);
+			
+		} else {
+			$request_time = (int) $_SERVER["REQUEST_TIME"];
+			
+
+			if ($_SESSION["cookie_lifetime"] == 0) {
+				$timeout_duration = $_SESSION["gc_maxlifetime"] - 60;
+			} else if ($_SESSION["cookie_lifetime"] <= $_SESSION["gc_maxlifetime"]) {
+				$timeout_duration = $_SESSION["cookie_lifetime"] - 60;
+			} else if ($_SESSION["gc_maxlifetime"] <= $_SESSION["cookie_lifetime"]) {
+				$timeout_duration = $_SESSION["gc_maxlifetime"] - 60;
+			}
+
+			
+			$timeout_duration = 60 * 3;
+			
+			if (($request_time - $_SESSION["vehiculos_LAST_ACTIVITY"]) > $timeout_duration) {
+				throw new JsonRpcError("sesion_terminada", 0);
+			} else {
+				$_SESSION["vehiculos_LAST_ACTIVITY"] = $request_time;
+				
+				
+				
+				$aux = new mysqli_driver;
+				$aux->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+				
+				$this->mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+				$this->mysqli->query("SET NAMES 'utf8'");
+			}
+		}
 	}
 	
 	
-  public function sql_query($query, &$lnk = null) {
-  	$resultado = null;
-  	$errno = 0;
-  	if (is_null($lnk)) {
-  		$resultado = mysql_query($query);
-  		$errno = mysql_errno();
-  		if ($errno) throw new Exception(mysql_error(), $errno);
-  	} else {
-  		$resultado = mysql_query($query, $lnk);
-  		$errno = mysql_errno($lnk);
-  		if ($errno) throw new Exception(mysql_error($lnk), $errno);
-  	}
-  	return $resultado;
-  }
-  
-  
   public function toJson($paramet, &$opciones = null) {
 	if (is_string($paramet)) {
-		$paramet = @mysql_query($paramet);
-		if (mysql_errno() > 0) {
-			return mysql_errno() . " " . mysql_error() . "\n";
+		$paramet = $this->mysqli->query($paramet);
+		if ($this->mysqli->errno > 0) {
+			return $this->mysqli->errno . " " . $this->mysqli->error . "\n";
 		} else {
 			return $this->toJson($paramet, $opciones);
 		}
-	} else if (is_resource($paramet)) {
+	} else if (is_a($paramet, "MySQLi_Result")) {
 		$rows = array();
 		if (is_null($opciones)) {
-			while ($row = mysql_fetch_object($paramet)) {
+			while ($row = $paramet->fetch_object()) {
 				$rows[] = $row;
 			}
 		} else {
-			while ($row = mysql_fetch_object($paramet)) {
+			while ($row = $paramet->fetch_object()) {
 				foreach($opciones as $key => $value) {
 					if ($value=="int") {
 						$row->$key = (int) $row->$key;
@@ -65,23 +82,19 @@ class class_Base
 		return $rows;
 	}
   }
-  
 
+  
   public function prepararCampos(&$model, $tabla = null) {
-  	static $campos;
-  	
-  	if (is_null($campos)) $campos = array();
-  	
+  	static $campos = array();
 	$set = array();
 	$chequear = false;
-	
 	if (!is_null($tabla)) {
 		$chequear = true;
 		if (is_null($campos[$tabla])) {
 			$campos[$tabla] = array();
-			$rs = mysql_query("SHOW COLUMNS FROM " . $tabla);
-			while ($row = mysql_fetch_assoc($rs)) {
-				$campos[$tabla][$row['Field']] = $row;
+			$rs = $this->mysqli->query("SHOW COLUMNS FROM " . $tabla);
+			while ($row = $rs->fetch_assoc()) {
+				$campos[$tabla][$row['Field']] = true;
 			}
 		}
 	}
@@ -97,6 +110,19 @@ class class_Base
 		}
 	}
 	return implode(", ", $set);
+  }
+  
+  
+  public function is_session_started() {
+	if ( php_sapi_name() !== 'cli' ) {
+		if ( version_compare(phpversion(), '5.4.0', '>=') ) {
+			return session_status() === PHP_SESSION_ACTIVE ? true : false;
+		} else {
+			return session_id() === '' ? false : true;
+		}
+	}
+
+	return false;
   }
 }
 

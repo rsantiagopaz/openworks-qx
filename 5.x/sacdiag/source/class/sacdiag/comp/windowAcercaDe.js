@@ -36,7 +36,19 @@ qx.Class.define("sacdiag.comp.windowAcercaDe",
 	composite.add(new qx.ui.basic.Label("Ramón S. Paz - rsantiagopaz@gmail.com"), {flex: 1});
 
 	
+	
+	
+	
 	var application = qx.core.Init.getApplication();
+		
+	alert(application.toString());
+	
+	var bounds = application.getRoot().getBounds();
+	var imageLoading = new qx.ui.basic.Image("sical3/loading66.gif");
+	imageLoading.setVisibility("hidden");
+	imageLoading.setBackgroundColor("#FFFFFF");
+	imageLoading.setDecorator("main");
+	//application.getRoot().add(imageLoading, {left: parseInt(bounds.width / 2 - 33), top: parseInt(bounds.height / 2 - 33)});
 
 	
 	}

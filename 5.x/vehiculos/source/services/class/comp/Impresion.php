@@ -5,9 +5,9 @@ require("Conexion.php");
 
 set_time_limit(0);
 
-$link1 = mysql_connect($servidor, $usuario, $password);
-mysql_select_db($base, $link1);
-mysql_query("SET NAMES 'utf8'", $link1);
+
+$mysqli = new mysqli("$servidor", "$usuario", "$password", "$base");
+$mysqli->query("SET NAMES 'utf8'");
 
 switch ($_REQUEST['rutina'])
 {
@@ -52,8 +52,8 @@ case "general" : {
 			$sql.= " WHERE model=" . $_REQUEST['ver'];
 			$sql.= " ORDER BY label";
 			
-			$rs = mysql_query($sql);
-			$row = mysql_fetch_object($rs);
+			$rs = $mysqli->query($sql);
+			$row = $rs->fetch_object();
 			echo $row->label;
 			
 		} else {
@@ -116,14 +116,14 @@ case "general" : {
 			$sql.= " ORDER BY f_ent DESC";
 			
 			
-			$rs = mysql_query($sql);
+			$rs = $mysqli->query($sql);
 			
 			?>
 			<tr>
 			<td colspan="20">
 			<table border="0" rules="rows" cellpadding="5" cellspacing="0" width="100%" align="center">
 			<?php
-			while ($row = mysql_fetch_object($rs)) {
+			while ($row = $rs->fetch_object()) {
 				?>
 				<tr>
 				<td>&nbsp;</td>
@@ -161,8 +161,8 @@ case "gastos" : {
 	
 	if (! is_null($_REQUEST['cod_up'])) {
 		$sql = "SELECT CONCAT(REPLACE(codigo, '-', ''), ' - ', nombre) AS descrip FROM unipresu WHERE cod_up=" . $_REQUEST['cod_up'];
-		$rsUnipresu = mysql_query($sql);
-		$rowUnipresu = mysql_fetch_object($rsUnipresu);
+		$rsUnipresu = $mysqli->query($sql);
+		$rowUnipresu = $rsUnipresu->fetch_object();
 	}
 	
 	?>
@@ -238,8 +238,8 @@ case "gastos" : {
 	
 	$sql.= " ORDER BY f_ent DESC";
 	
-	$rs = mysql_query($sql);
-	while ($row = mysql_fetch_object($rs)) {
+	$rs = $mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		$row->total = (float) $row->total;
 		$total+= $row->total;
 		?>
@@ -309,8 +309,8 @@ case "incidentes" : {
 
 	} else if (! is_null($_REQUEST['id_tipo_incidente'])) {
 		$sql = "SELECT descrip FROM tipo_incidente WHERE id_tipo_incidente=" . $_REQUEST['id_tipo_incidente'];
-		$rsAux = mysql_query($sql);
-		$rowAux = mysql_fetch_object($rsAux);
+		$rsAux = $mysqli->query($sql);
+		$rowAux = $rsAux->fetch_object();
 		
 		?>
 		<tr><td align="center" colspan="10"><big>Tipo incidente: <?php echo $rowAux->descrip; ?></big></td></tr>
@@ -323,9 +323,9 @@ case "incidentes" : {
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $_REQUEST['organismo_area_id'] . "'";
 		
-		$rsAux = mysql_query($sql);
-		if (mysql_num_rows($rsAux) > 0) {
-			$rowAux = mysql_fetch_object($rsAux);
+		$rsAux = $mysqli->query($sql);
+		if ($rsAux->num_rows > 0) {
+			$rowAux = $rsAux->fetch_object();
 			$rowAux = $rowAux->label;
 		}
 		
@@ -367,8 +367,8 @@ case "incidentes" : {
 	$sql.= " ORDER BY fecha DESC, apenom";
 	
 	
-	$rs = mysql_query($sql);
-	while ($row = mysql_fetch_object($rs)) {
+	$rs = $mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		?>
 		<tr><td rowSpan="3"><?php echo $row->apenom . " - " . $row->dni; ?></td><td><?php echo $row->fecha; ?></td><td rowSpan="3"><?php echo nl2br($row->descrip); ?></td></tr>
 		<tr><td><?php echo $row->tipo_incidente_descrip; ?></td></tr>
@@ -421,9 +421,9 @@ case "choferes" : {
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $_REQUEST['organismo_area_id'] . "'";
 		
-		$rsAux = mysql_query($sql);
-		if (mysql_num_rows($rsAux) > 0) {
-			$rowAux = mysql_fetch_object($rsAux);
+		$rsAux = $mysqli->query($sql);
+		if ($rsAux->num_rows > 0) {
+			$rowAux = $rsAux->fetch_object();
 			$rowAux = $rowAux->label;
 		}
 		
@@ -452,8 +452,8 @@ case "choferes" : {
 	$sql.= " ORDER BY apenom";
 	
 	
-	$rs = mysql_query($sql);
-	while ($row = mysql_fetch_object($rs)) {
+	$rs = $mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		/*
  
 		?>
@@ -470,9 +470,9 @@ case "choferes" : {
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
-		$rsAux = mysql_query($sql);
-		if (mysql_num_rows($rsAux) > 0) {
-			$rowAux = mysql_fetch_object($rsAux);
+		$rsAux = $mysqli->query($sql);
+		if ($rsAux->num_rows > 0) {
+			$rowAux = $rsAux->fetch_object();
 			$rowAux = $rowAux->label;
 		} else {
 			$rowAux = "";
@@ -505,17 +505,17 @@ break;
 case "historial" : {
 	
 	$sql = "SELECT * FROM vehiculo WHERE id_vehiculo=" . $_REQUEST['id_vehiculo'];
-	$rsVehiculo = mysql_query($sql);
-	$rowVehiculo = mysql_fetch_object($rsVehiculo);
+	$rsVehiculo = $mysqli->query($sql);
+	$rowVehiculo = $rsVehiculo->fetch_object();
 	
 	$sql = "SELECT";
 	$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
 	$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 	$sql.= " WHERE _organismos_areas.organismo_area_id='" . $rowVehiculo->organismo_area_id . "'";
 	
-	$rsDependencia = mysql_query($sql);
-	if (mysql_num_rows($rsDependencia) > 0) {
-		$rowDependencia = mysql_fetch_object($rsDependencia);
+	$rsDependencia = $mysqli->query($sql);
+	if ($rsDependencia->num_rows > 0) {
+		$rowDependencia = $rsDependencia->fetch_object();
 		$rowVehiculo->dependencia = $rowDependencia->label;
 	} else {
 		$rowVehiculo->dependencia = "";
@@ -540,15 +540,15 @@ case "historial" : {
 	<tr><td><b>Historial Vehiculo: <?php echo $rowVehiculo->nro_patente . "  " . $rowVehiculo->marca; ?></b></td></tr>
 	<tr><td colspan="20">Dependencia: <?php echo $rowVehiculo->dependencia; ?></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td>Usuario: <?php echo $_SESSION['usuario']; ?></td></tr>
+	<tr><td>Usuario: <?php echo $_SESSION['login']->usuario; ?></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	
 	<?php
 	
 	$sql = "SELECT * FROM entsal WHERE estado<>'A' AND id_vehiculo=" . $rowVehiculo->id_vehiculo . " ORDER BY f_ent DESC";
-	$rsEntsal = mysql_query($sql);
+	$rsEntsal = $mysqli->query($sql);
 	
-	while ($rowEntsal = mysql_fetch_object($rsEntsal)) {
+	while ($rowEntsal = $rsEntsal->fetch_object()) {
 		?>
 		<tr><td colspan="20"><hr/></td></tr>
 		<tr><td>&nbsp;</td></tr>
@@ -579,9 +579,9 @@ case "historial" : {
 		$sql.= " ORDER BY f_ent DESC";
 		
 		
-		$rsMovimiento = mysql_query($sql);
+		$rsMovimiento = $mysqli->query($sql);
 		
-		while ($rowMovimiento = mysql_fetch_object($rsMovimiento)) {
+		while ($rowMovimiento = $rsMovimiento->fetch_object()) {
 			?>
 			<tr><td>&nbsp;</td></tr>
 			<tr><td>&nbsp;</td></tr>
@@ -599,9 +599,9 @@ case "historial" : {
 			<?php
 			//$sql = "SELECT * FROM reparacion WHERE id_movimiento=" . $rowMovimiento->id_movimiento;
 			$sql = "SELECT reparacion.*, tipo_reparacion.descrip AS tipo_reparacion FROM reparacion INNER JOIN tipo_reparacion USING(id_tipo_reparacion) WHERE id_movimiento=" . $rowMovimiento->id_movimiento;
-			$rsReparacion = mysql_query($sql);
+			$rsReparacion = $mysqli->query($sql);
 			
-			while ($rowReparacion = mysql_fetch_object($rsReparacion)) {
+			while ($rowReparacion = $rsReparacion->fetch_object()) {
 				?>
 				<tr>
 				<td><?php echo $rowReparacion->tipo_reparacion; ?></td>
@@ -641,17 +641,17 @@ break;
 case "salida_vehiculo" : {
 
 	$sql = "SELECT * FROM entsal INNER JOIN vehiculo USING(id_vehiculo) WHERE id_entsal=" . $_REQUEST['id_entsal'];
-	$rsEntsal = mysql_query($sql);
-	$rowEntsal = mysql_fetch_object($rsEntsal);
+	$rsEntsal = $mysqli->query($sql);
+	$rowEntsal = $rsEntsal->fetch_object();
 	
 	$sql = "SELECT";
 	$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
 	$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 	$sql.= " WHERE _organismos_areas.organismo_area_id='" . $rowEntsal->organismo_area_id . "'";
 	
-	$rsDependencia = mysql_query($sql);
-	if (mysql_num_rows($rsDependencia) > 0) {
-		$rowDependencia = mysql_fetch_object($rsDependencia);
+	$rsDependencia = $mysqli->query($sql);
+	if ($rsDependencia->num_rows > 0) {
+		$rowDependencia = $rsDependencia->fetch_object();
 		$rowEntsal->dependencia = $rowDependencia->label;
 	} else {
 		$rowEntsal->dependencia = "";
@@ -678,7 +678,7 @@ case "salida_vehiculo" : {
 	<tr><td><b>Vehículo: <?php echo $rowEntsal->nro_patente . "  " . $rowEntsal->marca; ?></b></td><td>Salida: <?php echo $rowEntsal->f_sal; ?></td><td>Km: <?php echo $rowEntsal->kilo; ?></td></tr>
 	<tr><td colspan="20">Dependencia: <?php echo $rowEntsal->dependencia; ?></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td>Usuario: <?php echo $_SESSION['usuario']; ?></td><td>Responsable: <?php echo $rowEntsal->resp_sal; ?></td></tr>
+	<tr><td>Usuario: <?php echo $_SESSION['login']->usuario; ?></td><td>Responsable: <?php echo $rowEntsal->resp_sal; ?></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	
 	<?php
@@ -699,7 +699,7 @@ case "salida_vehiculo" : {
 	$sql.= " USING(cod_razon_social))";
 	$sql.= ") AS temporal_2";
 
-	if (is_null($_REQUEST['id_movimiento'])) {
+	if (! isset($_REQUEST['id_movimiento'])) {
 		$sql.= " WHERE id_entsal=" . $rowEntsal->id_entsal . " AND estado='S'";
 	} else {
 		$sql.= " WHERE id_movimiento=" . $_REQUEST['id_movimiento'];
@@ -708,9 +708,9 @@ case "salida_vehiculo" : {
 	$sql.= " ORDER BY f_ent DESC";
 	
 	
-	$rsMovimiento = mysql_query($sql);
+	$rsMovimiento = $mysqli->query($sql);
 	
-	while ($rowMovimiento = mysql_fetch_object($rsMovimiento)) {
+	while ($rowMovimiento = $rsMovimiento->fetch_object()) {
 		?>
 		<tr><td colspan="2"><?php echo "# " .  $rowMovimiento->id_movimiento . " - " . $rowMovimiento->taller; ?></td><td>Km: <?php echo $rowMovimiento->kilo; ?></td></tr>
 		<tr><td colspan="20">
@@ -719,9 +719,9 @@ case "salida_vehiculo" : {
 		<?php
 		//$sql = "SELECT * FROM reparacion WHERE id_movimiento=" . $rowMovimiento->id_movimiento;
 		$sql = "SELECT reparacion.*, tipo_reparacion.descrip AS tipo_reparacion FROM reparacion INNER JOIN tipo_reparacion USING(id_tipo_reparacion) WHERE id_movimiento=" . $rowMovimiento->id_movimiento;
-		$rsReparacion = mysql_query($sql);
+		$rsReparacion = $mysqli->query($sql);
 		
-		while ($rowReparacion = mysql_fetch_object($rsReparacion)) {
+		while ($rowReparacion = $rsReparacion->fetch_object()) {
 			?>
 			<tr>
 			<td><?php echo $rowReparacion->tipo_reparacion; ?></td>
@@ -766,17 +766,17 @@ break;
 case "entrada_taller" : {
 
 	$sql = "SELECT * FROM entsal INNER JOIN vehiculo USING(id_vehiculo) WHERE id_entsal=" . $_REQUEST['id_entsal'];
-	$rsEntsal = mysql_query($sql);
-	$rowEntsal = mysql_fetch_object($rsEntsal);
+	$rsEntsal = $mysqli->query($sql);
+	$rowEntsal = $rsEntsal->fetch_object();
 	
 	$sql = "SELECT";
 	$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
 	$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 	$sql.= " WHERE _organismos_areas.organismo_area_id='" . $rowEntsal->organismo_area_id . "'";
 	
-	$rsDependencia = mysql_query($sql);
-	if (mysql_num_rows($rsDependencia) > 0) {
-		$rowDependencia = mysql_fetch_object($rsDependencia);
+	$rsDependencia = $mysqli->query($sql);
+	if ($rsDependencia->num_rows > 0) {
+		$rowDependencia = $rsDependencia->fetch_object();
 		$rowEntsal->dependencia = $rowDependencia->label;
 	} else {
 		$rowEntsal->dependencia = "";
@@ -800,8 +800,8 @@ case "entrada_taller" : {
 	$sql.= " ORDER BY f_ent DESC";
 	
 	
-	$rsMovimiento = mysql_query($sql);
-	$rowMovimiento = mysql_fetch_object($rsMovimiento);
+	$rsMovimiento = $mysqli->query($sql);
+	$rowMovimiento = $rsMovimiento->fetch_object();
 	
 	
 	?>
@@ -824,7 +824,7 @@ case "entrada_taller" : {
 	<tr><td><b>Vehiculo: <?php echo $rowEntsal->nro_patente . "  " . $rowEntsal->marca; ?></b></td><td>Entrada: <?php $aux = new DateTime($rowMovimiento->f_ent); echo $aux->format("d/m/Y H:i:s"); ?></td></tr>
 	<tr><td colspan="20">Dependencia: <?php echo $rowEntsal->dependencia; ?></td></tr>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td>Usuario: <?php echo $_SESSION['usuario']; ?></td></tr>
+	<tr><td>Usuario: <?php echo $_SESSION['login']->usuario; ?></td></tr>
 	<tr><td>&nbsp;</td></tr>
 	
 	<?php
@@ -862,89 +862,17 @@ break;
 }
 
 
-case "recibo" : {
-	
-	$sql = "SELECT cliente.*, usuario.descrip AS usuario, pago.importe, pago.tipo_pago FROM ((pago INNER JOIN usuario USING(id_usuario)) INNER JOIN operacion_cliente USING(id_operacion)) INNER JOIN cliente USING(id_cliente) WHERE pago.id_pago=" . $_REQUEST['id_pago'];
-	$rs = mysql_query($sql);
-	$row = mysql_fetch_object($rs);
-	$apenom = $row->apellido . ", " . $row->nombre . " - " . $row->dni . " - " . $row->cuit;
 
-	$tipo_pago = array();
-	$tipo_pago["E"] = "Efectivo";
-	$tipo_pago["C"] = "Tarjeta crédito";
-	$tipo_pago["D"] = "Tarjeta débito";
-	$tipo_pago["Q"] = "Cheque";
-	$tipo_pago["T"] = "Transferencia";
-	
-?>
-
-<table cellpadding="5" cellspacing="0" width="700px" border="1" >
-<tr align="center">
-	<td>
-	<table width="100%" border="0">
-	<tr>
-		<td width="33%">
-			<table width="100%" border="0" style="font-size:14; font-weight: bold;" align="center">
-				<tr>
-				<td rowspan="3"><img src="logo.png" border="0"></td>
-				<td><b>Almundo</b></td>
-				</tr>
-				<!-- 
-				<tr style="font-size:8; font-weight:normal;"><td>DirecciÃ³n: Rivadavia NÂº 1018</td></tr>
-				<tr style="font-size:8; font-weight:normal;"><td>Tel: 0385 421-8866/ 0385 424-1917</td></tr>
-				 -->
-				<tr style="font-size:8; font-weight:normal;"><td>Mitre 372</td><td>C.P. 4200</td></tr>
-				<tr style="font-size:8; font-weight:normal;"><td>(0385) 4221527</td><td>mario.avila@almundo.com</td></tr>
-			</table>
-			</td>
-		<td width="33%" align="center"><table align="center" cellpadding="5" border="1"><tr><td align="center"><big>RECIBO DE PAGO</big><br /><font style="font-size:8;">Sin firma y sello no posee validez.</font></td></tr></table></td>
-		<td width="33%" align="right">Fecha: <?php echo date('Y-m-d'); ?> <br /><br /> <?php echo $config->sucursal; ?> - 00000000<?php echo $_REQUEST["id_ctacte_pago"]; ?> <br /> Usuario: <?php echo $row->usuario; ?></td>
-	</tr>
-	<tr><td colspan="3"><hr></td></tr>
-	<tr><td colspan="3" align="center"><b><u>Cliente</u>:</b> <?php echo $apenom; ?><br /><br />
-		Recibimos del mismo la suma de: <b>$<?php echo number_format((float) $row->importe, 2, ',', '.'); ?></b> 
-		</td>
-	</tr>
-	<tr><td colspan="3"><hr></td></tr>
-	<tr><td colspan="3">
-	<b><u>FORMA DE PAGO</u>:</b> 
-		<?php echo $tipo_pago[$row->tipo_pago] . ": $" . number_format((float) $row->importe, 2, ',', '.'); ?>
-	</td></tr>
-	<tr><td colspan="3"><hr></td></tr>
-	<!--
-	<tr><td align="right">SALDO ANTERIOR: </td><td align="right">$<?php echo number_format($SALDO_ANTERIOR, 2, ',', '.'); ?></td><td></td></tr>
-	<tr><td align="right">PAGO A CUENTA: </td><td align="right">$<?php echo number_format($rPAGO->monto, 2, ',', '.'); ?></td><td></td></tr>
-	<tr><td></td><td><hr /></td><td></td></tr>
-	<tr><td align="right">SALDO ACTUAL: </td><td align="right">$<?php echo number_format($SALDO, 2, ',', '.'); ?></td><td></td></tr>
-	-->
-	<tr><td>&nbsp;</td></tr>
-	<tr><td>&nbsp;</td></tr>
-	<tr><td>&nbsp;</td></tr>
-	<tr><td>&nbsp;</td></tr>
-	<tr><td colspan="3" align="right"><br />____________________________<br /> Firma y Sello &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
-	</table>
-	</td>
-	</tr>
-</table>
-<script>
-//window.print();
-</script>		
-
-<?php
-
-	
-break;
-}
 	
 	
 case "comprobante_entrega" : {
 	
 	$sql = "SELECT entrega_lugar.descrip AS lugar, entrega.descrip, entrega.fecha FROM entrega INNER JOIN entrega_lugar USING(id_entrega_lugar) WHERE id_entrega=" . $_REQUEST['id_entrega'];
-	$rsEntrega = mysql_query($sql);
-	$rowEntrega = mysql_fetch_object($rsEntrega);
+	$rsEntrega = $mysqli->query($sql);
+	$rowEntrega = $rsEntrega->fetch_object();
 
 	$sql = "SELECT producto.descrip, stock.lote, stock.f_vencimiento, entrega_item.cantidad FROM ((entrega INNER JOIN entrega_item USING(id_entrega)) INNER JOIN stock USING(id_stock)) INNER JOIN producto ON stock.id_producto = producto.id_producto WHERE entrega.id_entrega=" . $_REQUEST['id_entrega'] . " ORDER BY descrip, f_vencimiento";
-	$rsEntrega_item = mysql_query($sql);
+	$rsEntrega_item = $mysqli->query($sql);
 	
 	?>
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -965,7 +893,7 @@ case "comprobante_entrega" : {
 	<table border="1" rules="all" width="100%" align="center">
 	<tr><th>Producto</th><th>Lote</th><th>F.vencimiento</th><th align="right">Cantidad</th></tr>
 	<?php
-	while ($rowEntrega_item = mysql_fetch_object($rsEntrega_item)) {
+	while ($rowEntrega_item = $rsEntrega_item->fetch_object()) {
 		?>
 		<tr><td><?php echo $rowEntrega_item->descrip; ?></td><td><?php echo $rowEntrega_item->lote; ?></td><td><?php echo $rowEntrega_item->f_vencimiento; ?></td><td align="right"><?php echo $rowEntrega_item->cantidad; ?></td></tr>
 		<?php
@@ -985,7 +913,7 @@ break;
 case "consumo_producto" : {
 
 	$sql = "SELECT producto.id_producto, producto.descrip, SUM(entrega_item.cantidad) AS cantidad FROM (entrega INNER JOIN entrega_item USING(id_entrega)) INNER JOIN producto USING(id_producto) WHERE entrega.fecha BETWEEN '" . $_REQUEST['desde'] . "' AND '" . $_REQUEST['hasta'] . "' GROUP BY id_producto ORDER BY descrip";
-	$rs = mysql_query($sql);
+	$rs = $mysqli->query($sql);
 	
 	?>
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -1003,7 +931,7 @@ case "consumo_producto" : {
 	<table border="1" rules="all" width="100%" align="center">
 	<tr><th>Producto</th><th align="right">Cantidad</th></tr>
 	<?php
-	while ($row = mysql_fetch_array($rs)) {
+	while ($row = $rs->fetch_array()) {
 		?>
 		<tr><td><?php echo $row['descrip']; ?></td><td align="right"><?php echo $row['cantidad']; ?></td></tr>
 		<?php
@@ -1023,7 +951,7 @@ break;
 case "stock" : {
 
 	$sql = "SELECT producto.*, SUM(stock.stock) AS cantidad FROM producto LEFT JOIN stock USING(id_producto) GROUP BY id_producto ORDER BY descrip";
-	$rs = mysql_query($sql);
+	$rs = $mysqli->query($sql);
 	
 	?>
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -1040,7 +968,7 @@ case "stock" : {
 	<table border="1" rules="all" width="100%" align="center">
 	<tr><th>Producto</th><th align="right">Pto.reposición</th><th align="right">Stock</th></tr>
 	<?php
-	while ($row = mysql_fetch_array($rs)) {
+	while ($row = $rs->fetch_array()) {
 		?>
 		<tr><td><?php echo $row['descrip']; ?></td><td align="right"><?php echo $row['pto_reposicion']; ?></td><td align="right"><?php echo (($row['cantidad'] == null) ? 0: $row['cantidad']); ?></td></tr>
 		<?php
@@ -1060,7 +988,7 @@ break;
 case "producto_falta" : {
 
 	$sql = "SELECT producto.*, SUM(stock.stock) AS cantidad FROM producto LEFT JOIN stock USING(id_producto) GROUP BY id_producto HAVING cantidad <= pto_reposicion OR ISNULL(cantidad) ORDER BY descrip";
-	$rs = mysql_query($sql);
+	$rs = $mysqli->query($sql);
 	
 	?>
 	<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -1077,7 +1005,7 @@ case "producto_falta" : {
 	<table border="1" rules="all" width="100%" align="center">
 	<tr><th>Producto</th><th align="right">Pto.reposición</th><th align="right">Stock</th></tr>
 	<?php
-	while ($row = mysql_fetch_array($rs)) {
+	while ($row = $rs->fetch_array()) {
 		?>
 		<tr><td><?php echo $row['descrip']; ?></td><td align="right"><?php echo $row['pto_reposicion']; ?></td><td align="right"><?php echo (($row['cantidad'] == null) ? 0: $row['cantidad']); ?></td></tr>
 		<?php

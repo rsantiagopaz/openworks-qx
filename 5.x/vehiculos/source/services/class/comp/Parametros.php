@@ -1,21 +1,17 @@
 <?php
-session_start();
 
 require("Base.php");
 
 class class_Parametros extends class_Base
 {
-  function __construct() {
-    parent::__construct();
-  }
   
   
   public function method_editar_parametro($params, $error) {
   	$p = $params[0];
   	
   	$sql = "SELECT id_" . $p->tabla . " FROM " . $p->tabla . " WHERE UPPER(descrip)='" . strtoupper($p->model->descrip) . "' AND id_" . $p->tabla . " <> " . $p->model->{"id_" . $p->tabla};
-  	$rs = mysql_query($sql);
-  	if (mysql_num_rows($rs) > 0) {
+  	$rs = $this->mysqli->query($sql);
+  	if ($rs->num_rows > 0) {
   		$error->SetError(0, "duplicado");
   		return $error;
   	} else {
@@ -23,11 +19,11 @@ class class_Parametros extends class_Base
   		
   		if ($insert_id == "0") {
   			$sql = "INSERT " . $p->tabla . " SET descrip='" . $p->model->descrip . "'";
-  			mysql_query($sql);
-  			$insert_id = mysql_insert_id();
+  			$this->mysqli->query($sql);
+  			$insert_id = $this->mysqli->insert_id;
   		} else {
 			$sql = "UPDATE " . $p->tabla . " SET descrip='" . $p->model->descrip . "' WHERE id_" . $p->tabla . "=" . $p->model->{"id_" . $p->tabla};
-			mysql_query($sql);
+			$this->mysqli->query($sql);
   		}
   		
   		return $insert_id;
@@ -38,16 +34,16 @@ class class_Parametros extends class_Base
   public function method_agregar_parametro($params, $error) {
   	$p = $params[0];
   	
-  	mysql_query("START TRANSACTION");
+  	$this->mysqli->query("START TRANSACTION");
   	
 	$sql = "INSERT " . $p->tabla . " SET descrip=''";
-	mysql_query($sql);
-	$insert_id = mysql_insert_id();
+	$this->mysqli->query($sql);
+	$insert_id = $this->mysqli->insert_id;
 	
 	$sql = "UPDATE " . $p->tabla . " SET descrip='Nuevo (" . $insert_id . ")' WHERE id_" . $p->tabla . "=" . $insert_id;
-	mysql_query($sql);
+	$this->mysqli->query($sql);
 	
-	mysql_query("COMMIT");
+	$this->mysqli->query("COMMIT");
 	
 	return $insert_id;
   }
@@ -57,7 +53,7 @@ class class_Parametros extends class_Base
   	$p = $params[0];
 
 	$sql = "SELECT * FROM " . $p->tabla . " ORDER BY descrip";
-	return $this->toJson(mysql_query($sql));
+	return $this->toJson($this->mysqli->query($sql));
   }
   
   
@@ -65,7 +61,7 @@ class class_Parametros extends class_Base
   	$p = $params[0];
   	
 	$sql = "SELECT descrip AS label, id_tipo_reparacion AS model FROM tipo_reparacion WHERE descrip LIKE '%" . $p->texto . "%' ORDER BY label";
-	return $this->toJson(mysql_query($sql));
+	return $this->toJson($this->mysqli->query($sql));
   }
   
   
@@ -102,7 +98,7 @@ class class_Parametros extends class_Base
 		$sql.= " ORDER BY label";
 	}
 	
-	return $this->toJson(mysql_query($sql));
+	return $this->toJson($this->mysqli->query($sql));
   }
   
   
@@ -148,7 +144,7 @@ class class_Parametros extends class_Base
   	$p = $params[0];
   	
 	$sql = "INSERT taller SET cod_razon_social=" . $p->cod_razon_social;
-	mysql_query($sql);
+	$this->mysqli->query($sql);
   }
   
   
@@ -156,8 +152,8 @@ class class_Parametros extends class_Base
   	$p = $params[0];
   	
 	$sql = "INSERT parque SET descrip='" . $p->descrip . "', organismo_area_id='" . $p->organismo_area_id . "'";
-	mysql_query($sql);
-	$insert_id = mysql_insert_id();
+	$this->mysqli->query($sql);
+	$insert_id = $this->mysqli->insert_id;
 	
 	return $insert_id;
   }
@@ -166,27 +162,29 @@ class class_Parametros extends class_Base
   public function method_leer_parque($params, $error) {
   	$p = $params[0];
   	
-	function functionAux1(&$row, $key) {
+  	$resultado = array();
+  	
+	$sql = "SELECT * FROM parque ORDER BY descrip";
+	
+	$rs = $this->mysqli->query($sql);
+	while ($row = $rs->fetch_object()) {
 		$sql = "SELECT";
 		$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
 		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
-		$rsDependencia = mysql_query($sql);
-		if (mysql_num_rows($rsDependencia) > 0) {
-			$rowDependencia = mysql_fetch_object($rsDependencia);
+		$rsDependencia = $this->mysqli->query($sql);
+		if ($rsDependencia->num_rows > 0) {
+			$rowDependencia = $rsDependencia->fetch_object();
 			$row->dependencia = $rowDependencia->label;
 		} else {
 			$row->dependencia = "";
 		}
-	};
-  	
-  	$opciones = new stdClass;
-  	$opciones->functionAux = functionAux1;
-  	
-	$sql = "SELECT * FROM parque ORDER BY descrip";
+		
+		$resultado[] = $row;
+	}
 	
-	return $this->toJson($sql, $opciones);
+	return $resultado;
   }
 }
 

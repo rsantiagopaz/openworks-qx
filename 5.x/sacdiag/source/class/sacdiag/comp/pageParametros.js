@@ -322,15 +322,17 @@ qx.Class.define("sacdiag.comp.pageParametros",
 		
 
 		if (bandera) {
-			var root = application.getRoot();
-			var bounds = root.getBounds();
-			var imageLoading = new qx.ui.basic.Image("sacdiag/loading66.gif");
+			//var root = application.getRoot();
+			//var bounds = root.getBounds();
+			//var imageLoading = new qx.ui.basic.Image("sacdiag/loading66.gif");
 	
 			//root.block();
-			imageLoading.setBackgroundColor("#FFFFFF");
-			imageLoading.setDecorator("main");
-			root.add(imageLoading, {left: parseInt(bounds.width / 2 - 33), top: parseInt(bounds.height / 2 - 33)});
+			//imageLoading.setBackgroundColor("#FFFFFF");
+			//imageLoading.setDecorator("main");
+			//root.add(imageLoading, {left: parseInt(bounds.width / 2 - 33), top: parseInt(bounds.height / 2 - 33)});
 	
+			
+			application.loading.show();
 			
 			var p = {};
 			p.basico = {opcion: mgr.getModelSelection().getItem(0)};
@@ -416,8 +418,10 @@ qx.Class.define("sacdiag.comp.pageParametros",
 				
 				//alert(qx.lang.Json.stringify(p, null, 2));
 				
-				imageLoading.destroy();
+				//imageLoading.destroy();
 				//root.unblock();
+				
+				
 				
 				if ((p.grafico == "barras" && p.resultado.dataSeries_cantidad.length > 0)) {
 					var pagePlot = new sacdiag.comp.pagePlot(p);
@@ -426,9 +430,14 @@ qx.Class.define("sacdiag.comp.pageParametros",
 				} else {
 					dialog.Dialog.alert("No se encuentran datos para el criterio seleccionado.");
 				}
+				
+				application.loading.hide();
+				
 			});
 			rpc.addListener("failed", function(e){
 				var data = e.getData();
+				
+				application.loading.hide();
 				
 				if (data.message != "sesion_terminada") {
 					alert(qx.lang.Json.stringify(data, null, 2));

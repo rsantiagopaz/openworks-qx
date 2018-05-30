@@ -274,6 +274,9 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	selectionModelPrefac.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModelPrefac.addListener("changeSelection", function(e){
 		if (! selectionModelPrefac.isSelectionEmpty()) {
+			
+			application.loading.show();
+			
 			rowDataPrefac = tableModelPrefac.getRowDataAsMap(tblPrefac.getFocusedRow());
 			
 			btnObservarGral.setLabel((rowDataPrefac.estado == "O") ? "Quitar observación..." : "Observar...");
@@ -311,34 +314,58 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			tableModelSolicitud.setDataAsMapArray([], true);
 			tableModelPrestacion.setDataAsMapArray([], true);
 			
-			var p = {};
-			p.id_prefacturacion = rowDataPrefac.id_prefacturacion;
 			
-			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
-			rpc.addListener("completed", function(e){
-				var data = e.getData();
+			var timer = qx.util.TimerManager.getInstance();
+			if (this.timerId != null) {
+				timer.stop(this.timerId);
+				this.timerId = null;
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
-		
-				tableModelSolicitud.setDataAsMapArray(data.result, true);
-				
-				var bandera = true;
-				for (var x in data.result) {
-					if (data.result[x].prefacturaciones_items_estado == "O") bandera = false;
+				if (this.rpc != null) {
+					this.rpc.abort(this.opaqueCallRef);
+					this.rpc = null;
+				} else {
+					application.loading.hide();
 				}
+			}
+			
+			this.timerId = timer.start(function() {
+			
+				var p = {};
+				p.id_prefacturacion = rowDataPrefac.id_prefacturacion;
 				
-				btnAutorizar.setEnabled(rowDataPrefac.estado == "E" && bandera);
+				this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Prefacturacion");
+				this.rpc.addListener("completed", function(e){
+					var data = e.getData();
+					
+					//alert(qx.lang.Json.stringify(data, null, 2));
+			
+					tableModelSolicitud.setDataAsMapArray(data.result, true);
+					
+					var bandera = true;
+					for (var x in data.result) {
+						if (data.result[x].prefacturaciones_items_estado == "O") bandera = false;
+					}
+					
+					btnAutorizar.setEnabled(rowDataPrefac.estado == "E" && bandera);
+					
+					menuPrefac.memorizar([btnAutorizar]);
+					
+					application.loading.hide();
+				});
+				this.rpc.addListener("failed", function(e){
+					var data = e.getData();
+					
+					if (data.message != "sesion_terminada") alert(qx.lang.Json.stringify(data, null, 2));
+					
+					application.loading.hide();
+				});
+				this.rpc.addListener("aborted", function(e){
+					application.loading.hide();
+				});
 				
-				menuPrefac.memorizar([btnAutorizar]);
-			});
-			rpc.addListener("failed", function(e){
-				var data = e.getData();
-				
-				if (data.message != "sesion_terminada") {
-					alert(qx.lang.Json.stringify(data, null, 2));
-				}
-			});
-			rpc.callAsyncListeners(true, "leer_solicitudes", p);
+				this.opaqueCallRef = this.rpc.callAsyncListeners(false, "leer_solicitudes", p);
+			
+			}, null, this, null, 200);
 		}
 	});
 
@@ -522,6 +549,9 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 	selectionModelSolicitud.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
 	selectionModelSolicitud.addListener("changeSelection", function(e){
 		if (! selectionModelSolicitud.isSelectionEmpty()) {
+			
+			application.loading.show();
+			
 			rowDataSolicitud = tableModelSolicitud.getRowDataAsMap(tblSolicitud.getFocusedRow());
 			
 			tblPrestacion.resetSelection();
@@ -536,25 +566,49 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			
 			tableModelPrestacion.setDataAsMapArray([], true);
 			
-			var p = {};
-			p.id_solicitud = rowDataSolicitud.id_solicitud;
 			
-			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
-			rpc.addListener("completed", function(e){
-				var data = e.getData();
+			var timer = qx.util.TimerManager.getInstance();
+			if (this.timerId != null) {
+				timer.stop(this.timerId);
+				this.timerId = null;
 				
-				//alert(qx.lang.Json.stringify(data, null, 2));
-		
-				tableModelPrestacion.setDataAsMapArray(data.result, true);
-			});
-			rpc.addListener("failed", function(e){
-				var data = e.getData();
-				
-				if (data.message != "sesion_terminada") {
-					alert(qx.lang.Json.stringify(data, null, 2));
+				if (this.rpc != null) {
+					this.rpc.abort(this.opaqueCallRef);
+					this.rpc = null;
+				} else {
+					application.loading.hide();
 				}
-			});
-			rpc.callAsyncListeners(true, "leer_solicitudes_prestaciones", p);
+			}
+			
+			this.timerId = timer.start(function() {
+			
+				var p = {};
+				p.id_solicitud = rowDataSolicitud.id_solicitud;
+				
+				this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Solicitudes");
+				this.rpc.addListener("completed", function(e){
+					var data = e.getData();
+					
+					//alert(qx.lang.Json.stringify(data, null, 2));
+			
+					tableModelPrestacion.setDataAsMapArray(data.result, true);
+					
+					application.loading.hide();
+				});
+				this.rpc.addListener("failed", function(e){
+					var data = e.getData();
+					
+					if (data.message != "sesion_terminada") alert(qx.lang.Json.stringify(data, null, 2));
+
+					application.loading.hide();
+				});
+				this.rpc.addListener("aborted", function(e){
+					application.loading.hide();
+				});
+				
+				this.opaqueCallRef = this.rpc.callAsyncListeners(false, "leer_solicitudes_prestaciones", p);
+			
+			}, null, this, null, 200);
 		}
 	});
 

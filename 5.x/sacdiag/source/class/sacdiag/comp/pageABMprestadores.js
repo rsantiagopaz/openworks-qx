@@ -23,6 +23,9 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	
 	
 	var functionActualizarPrestador = function(organismo_area_id) {
+		
+		application.loading.show();
+		
 		tblPrestador.blur();
 		tblPrestador.setFocusedCell();
 		tblPrestacion.setFocusedCell();
@@ -37,39 +40,63 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		
 		txtSemanal_descrip.setValue("");
 		txtMensual_descrip.setValue("");
-
-
-		var p = {};
 		
-		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
-		rpc.addListener("completed", function(e){
-			var data = e.getData();
-			
-			//alert(qx.lang.Json.stringify(data, null, 2));
-
-			tableModelPrestador.setDataAsMapArray(data.result, true);
-			
-			if (organismo_area_id != null) {
-				tblPrestador.blur();
-				tblPrestador.buscar("organismo_area_id", organismo_area_id);
-				tblPrestador.focus();
-			}
-		});
-		rpc.addListener("failed", function(e){
-			var data = e.getData();
-			
-			if (data.message != "sesion_terminada") {
-				alert(qx.lang.Json.stringify(data, null, 2));
-			}
-		});
-		rpc.callAsyncListeners(true, "autocompletarPrestador", p);
 		
-		return rpc;
+		var timer = qx.util.TimerManager.getInstance();
+		if (this.timerId != null) {
+			timer.stop(this.timerId);
+			this.timerId = null;
+			
+			if (this.rpc != null) {
+				this.rpc.abort(this.opaqueCallRef);
+				this.rpc = null;
+			} else {
+				application.loading.hide();
+			}
+		}
+
+		this.timerId = timer.start(function() {
+
+			var p = {};
+		
+			this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+			this.rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				//alert(qx.lang.Json.stringify(data, null, 2));
+	
+				tableModelPrestador.setDataAsMapArray(data.result, true);
+				
+				if (organismo_area_id != null) {
+					tblPrestador.blur();
+					tblPrestador.buscar("organismo_area_id", organismo_area_id);
+					tblPrestador.focus();
+				}
+				
+				application.loading.hide();
+			});
+			this.rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				if (data.message != "sesion_terminada") alert(qx.lang.Json.stringify(data, null, 2));
+				
+				application.loading.hide();
+			});
+			this.rpc.addListener("aborted", function(e){
+				application.loading.hide();
+			});
+			
+			this.opaqueCallRef = this.rpc.callAsyncListeners(false, "autocompletarPrestador", p);
+		
+		}, null, this, null, 200);
 	}
 	
 	
 	
 	var functionActualizarRS = function(id_prestador) {
+		
+		application.loading.show();
+		
 		tblRS.blur();
 		tblRS.setFocusedCell();
 		tblPrestacion.setFocusedCell();
@@ -78,66 +105,113 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		tableModelPrestacion.setDataAsMapArray([], true);
 		
 
-		var p = {};
-		p.organismo_area_id = rowDataPrestador.organismo_area_id;
-		
-		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
-		rpc.addListener("completed", function(e){
-			var data = e.getData();
+		var timer = qx.util.TimerManager.getInstance();
+		if (this.timerId != null) {
+			timer.stop(this.timerId);
+			this.timerId = null;
 			
-			//alert(qx.lang.Json.stringify(data, null, 2));
-
-			tableModelRS.setDataAsMapArray(data.result, true);
-			
-			if (id_prestador != null) {
-				tblRS.blur();
-				tblRS.buscar("id_prestador", id_prestador);
-				tblRS.focus();
+			if (this.rpc != null) {
+				this.rpc.abort(this.opaqueCallRef);
+				this.rpc = null;
+			} else {
+				application.loading.hide();
 			}
-		});
-		rpc.addListener("failed", function(e){
-			var data = e.getData();
-			
-			if (data.message != "sesion_terminada") {
-				alert(qx.lang.Json.stringify(data, null, 2));
-			}
-		});
-		rpc.callAsyncListeners(true, "autocompletarRS", p);
+		}
 		
-		return rpc;
+		this.timerId = timer.start(function() {
+		
+			var p = {};
+			p.organismo_area_id = rowDataPrestador.organismo_area_id;
+			
+			this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+			this.rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				//alert(qx.lang.Json.stringify(data, null, 2));
+	
+				tableModelRS.setDataAsMapArray(data.result, true);
+				
+				if (id_prestador != null) {
+					tblRS.blur();
+					tblRS.buscar("id_prestador", id_prestador);
+					tblRS.focus();
+				}
+				
+				application.loading.hide();
+			});
+			this.rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				if (data.message != "sesion_terminada") alert(qx.lang.Json.stringify(data, null, 2));
+	
+				application.loading.hide();
+			});
+			this.rpc.addListener("aborted", function(e){
+				application.loading.hide();
+			});
+			
+			this.opaqueCallRef = this.rpc.callAsyncListeners(false, "autocompletarRS", p);
+		
+		}, null, this, null, 200);
 	}
 	
 	
 	var functionActualizarPrestacion = function(id_prestador_prestacion) {
+		
+		application.loading.show();
+		
 		tblPrestacion.blur();
 		tblPrestacion.setFocusedCell();
 		
-		var p = {};
-		p.id_prestador = rowDataRS.id_prestador;
 		
-		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
-		rpc.addListener("completed", function(e){
-			var data = e.getData();
+		var timer = qx.util.TimerManager.getInstance();
+		if (this.timerId != null) {
+			timer.stop(this.timerId);
+			this.timerId = null;
 			
-			//alert(qx.lang.Json.stringify(data, null, 2));
-			
-			tableModelPrestacion.setDataAsMapArray(data.result, true);
-			
-			if (id_prestador_prestacion != null) {
-				tblPrestacion.blur();
-				tblPrestacion.buscar("id_prestador_prestacion", id_prestador_prestacion);
-				tblPrestacion.focus();
+			if (this.rpc != null) {
+				this.rpc.abort(this.opaqueCallRef);
+				this.rpc = null;
+			} else {
+				application.loading.hide();
 			}
-		});
-		rpc.addListener("failed", function(e){
-			var data = e.getData();
-			
-			if (data.message != "sesion_terminada") {
-				alert(qx.lang.Json.stringify(data, null, 2));
-			}
-		});
+		}
 		
-		rpc.callAsyncListeners(true, "leer_prestador_prestacion", p);
+		this.timerId = timer.start(function() {
+		
+			var p = {};
+			p.id_prestador = rowDataRS.id_prestador;
+			
+			this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+			this.rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				//alert(qx.lang.Json.stringify(data, null, 2));
+				
+				tableModelPrestacion.setDataAsMapArray(data.result, true);
+				
+				if (id_prestador_prestacion != null) {
+					tblPrestacion.blur();
+					tblPrestacion.buscar("id_prestador_prestacion", id_prestador_prestacion);
+					tblPrestacion.focus();
+				}
+				
+				application.loading.hide();
+			});
+			this.rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				if (data.message != "sesion_terminada") alert(qx.lang.Json.stringify(data, null, 2));
+
+				application.loading.hide();
+			});
+			this.rpc.addListener("aborted", function(e){
+				application.loading.hide();
+			});
+			
+			this.opaqueCallRef = this.rpc.callAsyncListeners(false, "leer_prestador_prestacion", p);
+		
+		}, null, this, null, 200);
 
 		return rpc;
 	}
