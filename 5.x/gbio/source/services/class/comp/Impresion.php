@@ -93,7 +93,7 @@ case "permisos" : {
 		$sql.= " FROM empleado INNER JOIN empleado_turno USING(id_empleado)";
 		$sql.= " WHERE id_turno=" . $rowTurno->id_turno;
 		
-		if (! is_null($_REQUEST['id_empleado'])) {
+		if (isset($_REQUEST['id_empleado'])) {
 			$sql.= " AND id_empleado=" . $_REQUEST['id_empleado'];
 		}
 		

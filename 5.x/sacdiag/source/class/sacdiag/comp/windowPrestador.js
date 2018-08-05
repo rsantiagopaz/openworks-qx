@@ -96,6 +96,7 @@ qx.Class.define("sacdiag.comp.windowPrestador",
 		if (form.validate()) {
 			var p = {};
 			p.model = qx.util.Serializer.toNativeObject(controllerForm.getModel());
+			delete p.model.fecha_alta;
 			
 			//alert(qx.lang.Json.stringify(p, null, 2));
 			

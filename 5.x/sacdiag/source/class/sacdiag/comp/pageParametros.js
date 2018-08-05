@@ -256,14 +256,14 @@ qx.Class.define("sacdiag.comp.pageParametros",
 	
 	var rbtListado = new qx.ui.form.RadioButton("Listado");
 	rbtListado.setModel("listado");
-	rbtListado.setEnabled(false);
+	//rbtListado.setEnabled(false);
 	
 	var rbtTorta = new qx.ui.form.RadioButton("Torta");
 	rbtTorta.setEnabled(false);
 	rbtTorta.setModel("torta");
 	
 	var rbtBarras = new qx.ui.form.RadioButton("Barras");
-	rbtBarras.setEnabled(false);
+	//rbtBarras.setEnabled(false);
 	rbtBarras.setModel("barras");
 	rbtBarras.setValue(true);
 	
@@ -427,6 +427,9 @@ qx.Class.define("sacdiag.comp.pageParametros",
 					var pagePlot = new sacdiag.comp.pagePlot(p);
 					application.tabviewMain.add(pagePlot);
 					application.tabviewMain.setSelection([pagePlot]);				
+				} else if ((p.grafico == "listado" && p.resultado.dataSeries_cantidad.length > 0)) {
+					//alert(qx.lang.Json.stringify(p, null, 2));
+					window.open("services/class/comp/Impresion.php?rutina=estadisticas_listado");
 				} else {
 					dialog.Dialog.alert("No se encuentran datos para el criterio seleccionado.");
 				}

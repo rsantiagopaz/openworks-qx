@@ -532,6 +532,9 @@ qx.Class.define("gbio.comp.empleados.pageAsignaciones",
 			var row = slbPermiso.getSelection()[0].getUserData("row");
 			//alert(qx.lang.Json.stringify(row, null, 2));
 			
+			//alert(qx.lang.Json.stringify(resultado.hora, null, 2));
+			//alert(qx.lang.Json.stringify(row.hora_asignacion_limite, null, 2));
+			
 			if (application.usuario.tipo == "A" || resultado.hora < row.hora_asignacion_limite){
 				var p = qx.util.Serializer.toNativeObject(controllerFormPermisos.getModel());
 				

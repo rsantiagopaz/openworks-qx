@@ -33,7 +33,7 @@ class class_Solicitudes extends class_Base
 		$sql.= " AND fecha_emite <= '" . substr($p->hasta, 0, 10) . "'";
 	}
 	
-	if (! is_null($p->id_prestador_fantasia)) $sql.= " AND id_prestador_fantasia='" . $p->id_prestador_fantasia . "'";
+	if (! empty($p->id_prestador_fantasia)) $sql.= " AND id_prestador_fantasia='" . $p->id_prestador_fantasia . "'";
 	if (! is_null($p->persona_id)) $sql.= " AND persona_id='" . $p->persona_id . "'";
 	if (! is_null($p->id_usuario_medico)) $sql.= " AND id_usuario_medico='" . $p->id_usuario_medico . "'";
 	if (empty($p->estado)) $sql.= " AND estado <> 'C'"; else $sql.= " AND estado='" . $p->estado . "'";

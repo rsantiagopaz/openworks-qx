@@ -1,6 +1,6 @@
-qx.Class.define("elpintao.comp.varios.windowAcercaDe",
+qx.Class.define("gbio.comp.windowAcercaDe",
 {
-	extend : componente.general.ramon.ui.window.Window,
+	extend : componente.comp.ui.ramon.window.Window,
 	construct : function ()
 	{
 	this.base(arguments);

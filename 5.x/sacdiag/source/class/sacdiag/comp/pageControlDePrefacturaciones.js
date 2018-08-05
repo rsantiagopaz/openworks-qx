@@ -304,7 +304,7 @@ qx.Class.define("sacdiag.comp.pageControlDePrefacturaciones",
 			txtObservaGral.setValue(rowDataPrefac.observaciones);
 			txtObserva.setValue("");
 			
-			btnVincular.setEnabled(true);
+			btnVincular.setEnabled(rowDataPrefac.documentacion_id == null);
 			btnObservarGral.setEnabled(rowDataPrefac.estado == "E" || rowDataPrefac.estado == "O");
 			menuPrefac.memorizar([btnObservarGral, btnVincular]);
 			

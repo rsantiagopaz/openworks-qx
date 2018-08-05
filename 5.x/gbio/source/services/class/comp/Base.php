@@ -10,6 +10,8 @@ class class_Base
 	function __construct() {
 		require('Conexion.php');
 		
+		date_default_timezone_set("America/Argentina/Buenos_Aires");
+		
 		$aux = new mysqli_driver;
 		$aux->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
 		//$aux->report_mode = MYSQLI_REPORT_ERROR;

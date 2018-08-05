@@ -167,7 +167,11 @@ qx.Class.define("gbio.Application",
 	var mnuArchivo = new qx.ui.menu.Menu();
 	var btnAcercaDe = new qx.ui.menu.Button("Acerca de...");
 	btnAcercaDe.addListener("execute", function(){
-
+		var win = new gbio.comp.windowAcercaDe();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
 	});
 	mnuArchivo.add(btnAcercaDe);
 	
@@ -319,7 +323,7 @@ qx.Class.define("gbio.Application",
 		win.center();
 		win.open();
 	}, this);
-	mnuParametros.add(btnOtros);
+	//mnuParametros.add(btnOtros);
 	
 	mnuVer.addSeparator();
 	

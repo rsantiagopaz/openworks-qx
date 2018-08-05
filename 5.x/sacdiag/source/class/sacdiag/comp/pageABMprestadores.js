@@ -213,7 +213,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		
 		}, null, this, null, 200);
 
-		return rpc;
+		return this.rpc;
 	}
 	
 	
@@ -331,6 +331,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 			functionActualizarRS();
 			
 			btnEditarPrestador.setEnabled(true);
+			menuRS.memorizarEnabled([btnAgregarRS], true);
 		} else {
 			btnEditarPrestador.setEnabled(false);
 		}
@@ -351,6 +352,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	// Menu
 
 	var btnAgregarRS = new qx.ui.menu.Button("Agregar...");
+	btnAgregarRS.setEnabled(false);
 	btnAgregarRS.addListener("execute", function(e){
 		var win = new sacdiag.comp.windowRazonSocial(null, rowDataPrestador.organismo_area_id);
 		win.setModal(true);
@@ -478,9 +480,9 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	
 	var btnAgregarPrestacion = new qx.ui.form.Button("Agregar");
 	btnAgregarPrestacion.addListener("execute", function(e){
-		var model = lstPrestacion.getSelection()[0].getModel();
-		
-		if (tblPrestacion.buscar("id_prestacion", model) == null) {
+		if (! lstPrestacion.isSelectionEmpty()) {
+			var model = lstPrestacion.getSelection()[0].getModel();
+			
 			var p = {};
 			p.id_prestador = rowDataRS.id_prestador;
 			p.id_prestacion = model;
@@ -500,6 +502,8 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 				})
 			});
 			rpc.callAsyncListeners(true, "agregar_prestador_prestacion", p);
+		} else {
+			cboPrestacion.focus();
 		}
 	});
 	composite.add(btnAgregarPrestacion);
@@ -516,11 +520,11 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	// Menu
 
 
-	var radioGroup = new qx.ui.form.RadioGroup();
+	var rgItem = new qx.ui.form.RadioGroup();
 	
-	var btnEstadoHabilitado = new qx.ui.menu.RadioButton("Habilitado");
-	btnEstadoHabilitado.setValue(true);
-	btnEstadoHabilitado.addListener("execute", function(e){
+	var btnEstadoHabilitadoItem = new qx.ui.menu.RadioButton("Habilitado");
+	btnEstadoHabilitadoItem.setValue(true);
+	btnEstadoHabilitadoItem.addListener("execute", function(e){
 		rowDataPrestacion.estado = "H";
 		
 		tableModelPrestacion.setRowsAsMapArray([rowDataPrestacion], tblPrestacion.getFocusedRow(), true);
@@ -531,8 +535,8 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 		rpc.callAsyncListeners(true, "escribir_estado", p);
 	});
-	var btnEstadoSuspendido = new qx.ui.menu.RadioButton("Suspendido");
-	btnEstadoSuspendido.addListener("execute", function(e){
+	var btnEstadoSuspendidoItem = new qx.ui.menu.RadioButton("Suspendido");
+	btnEstadoSuspendidoItem.addListener("execute", function(e){
 		rowDataPrestacion.estado = "S";
 		
 		tableModelPrestacion.setRowsAsMapArray([rowDataPrestacion], tblPrestacion.getFocusedRow(), true);
@@ -544,12 +548,75 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		rpc.callAsyncListeners(true, "escribir_estado", p);
 	});
 	
-	var menuEstado = new componente.comp.ui.ramon.menu.Menu();
-	menuEstado.add(btnEstadoHabilitado);
-	menuEstado.add(btnEstadoSuspendido);
+	var menuEstadoItem = new componente.comp.ui.ramon.menu.Menu();
+	menuEstadoItem.add(btnEstadoHabilitadoItem);
+	menuEstadoItem.add(btnEstadoSuspendidoItem);
 	
-	radioGroup.add(btnEstadoHabilitado);
-	radioGroup.add(btnEstadoSuspendido);
+	rgItem.add(btnEstadoHabilitadoItem);
+	rgItem.add(btnEstadoSuspendidoItem);
+	
+	
+	
+	
+	
+	
+	
+
+	
+	var btnEstadoHabilitadoSubtipo = new qx.ui.menu.Button("Habilitado");
+	btnEstadoHabilitadoSubtipo.addListener("execute", function(e){
+		if (rowDataPrestacion.id_prestacion_subtipo) {
+			var p = {};
+			p.estado = "H";
+			p.id_prestador = rowDataRS.id_prestador;
+			p.id_prestacion_subtipo = rowDataPrestacion.id_prestacion_subtipo;
+			
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+			rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				functionActualizarPrestacion(rowDataPrestacion.id_prestador_prestacion);
+			});
+			rpc.callAsyncListeners(true, "escribir_estado", p);
+		}
+	});
+	var btnEstadoSuspendidoSubtipo = new qx.ui.menu.Button("Suspendido");
+	btnEstadoSuspendidoSubtipo.addListener("execute", function(e){
+		if (rowDataPrestacion.id_prestacion_subtipo) {
+			var p = {};
+			p.estado = "S";
+			p.id_prestador = rowDataRS.id_prestador;
+			p.id_prestacion_subtipo = rowDataPrestacion.id_prestacion_subtipo;
+			
+			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+			rpc.addListener("completed", function(e){
+				var data = e.getData();
+				
+				functionActualizarPrestacion(rowDataPrestacion.id_prestador_prestacion);
+			});
+			rpc.callAsyncListeners(true, "escribir_estado", p);
+		}
+	});
+	
+	var menuEstadoSubtipo = new componente.comp.ui.ramon.menu.Menu();
+	menuEstadoSubtipo.add(btnEstadoHabilitadoSubtipo);
+	menuEstadoSubtipo.add(btnEstadoSuspendidoSubtipo);
+	
+	
+	
+	
+	
+	var btnEstadoPrestacionItem = new qx.ui.menu.Button("Item", null, null, menuEstadoItem);
+	var btnEstadoPrestacionSubtipo = new qx.ui.menu.Button("x Subtipo", null, null, menuEstadoSubtipo);
+	
+	
+	var menuEstado = new componente.comp.ui.ramon.menu.Menu();
+	menuEstado.add(btnEstadoPrestacionItem);
+	menuEstado.add(btnEstadoPrestacionSubtipo);
+	
+	
+	
+	
 	
 	
 	var btnEstadoPrestacion = new qx.ui.menu.Button("Estado", null, null, menuEstado);
@@ -575,7 +642,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	
 	
 	var tableModelPrestacion = new qx.ui.table.model.Simple();
-	tableModelPrestacion.setColumns(["Código", "Descripción", "Valor", "Estado"], ["codigo", "denominacion", "valor", "estado"]);
+	tableModelPrestacion.setColumns(["Código", "Descripción", "Valor", "Subtipo", "Estado"], ["codigo", "denominacion", "valor", "subtipo_descrip", "estado"]);
 	tableModelPrestacion.addListener("dataChanged", function(e){
 		var rowCount = tableModelPrestacion.getRowCount();
 		
@@ -594,10 +661,11 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 	var tableColumnModelPrestacion = tblPrestacion.getTableColumnModel();
 	
 	var resizeBehaviorPrestacion = tableColumnModelPrestacion.getBehavior();
-	resizeBehaviorPrestacion.set(0, {width:"15%", minWidth:100});
-	resizeBehaviorPrestacion.set(1, {width:"61%", minWidth:100});
-	resizeBehaviorPrestacion.set(2, {width:"12%", minWidth:100});
+	resizeBehaviorPrestacion.set(0, {width:"12%", minWidth:100});
+	resizeBehaviorPrestacion.set(1, {width:"56%", minWidth:100});
+	resizeBehaviorPrestacion.set(2, {width:"10%", minWidth:100});
 	resizeBehaviorPrestacion.set(3, {width:"12%", minWidth:100});
+	resizeBehaviorPrestacion.set(4, {width:"10%", minWidth:100});
 	
 	
 	var cellrendererNumber = new qx.ui.table.cellrenderer.Number();
@@ -610,7 +678,7 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		"H" : "Habilitado",
 		"S" : "Suspendido"
 	});
-	tableColumnModelPrestacion.setDataCellRenderer(3, cellrendererReplace);
+	tableColumnModelPrestacion.setDataCellRenderer(4, cellrendererReplace);
 	
 
 	
@@ -620,8 +688,8 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		if (! selectionModelPrestacion.isSelectionEmpty()) {
 			rowDataPrestacion = tableModelPrestacion.getRowDataAsMap(tblPrestacion.getFocusedRow());
 			
-			btnEstadoHabilitado.setValue(rowDataPrestacion.estado == "H");
-			btnEstadoSuspendido.setValue(rowDataPrestacion.estado == "S");
+			btnEstadoHabilitadoItem.setValue(rowDataPrestacion.estado == "H");
+			btnEstadoSuspendidoItem.setValue(rowDataPrestacion.estado == "S");
 			
 			btnEstadoPrestacion.setEnabled(true);
 			btnEliminarPrestacion.setEnabled(true);

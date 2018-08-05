@@ -66,7 +66,7 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 			var p = {};
 			p.desde = dtfDesde.getValue();
 			p.hasta = dtfHasta.getValue();
-			if (! lstPrestador.isSelectionEmpty()) p.id_prestador_fantasia = lstPrestador.getSelection()[0].getModel();
+			p.id_prestador_fantasia = lstPrestador.getSelection()[0].getModel();
 			if (! lstPaciente.isSelectionEmpty()) p.persona_id = lstPaciente.getSelection()[0].getModel();
 			if (! lstPersonal.isSelectionEmpty()) p.id_usuario_medico = lstPersonal.getSelection()[0].getModel();
 			p.estado = slbEstado.getSelection()[0].getModel();
@@ -127,14 +127,26 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	
 	gbxFiltrar.add(new qx.ui.basic.Label("Prestador:"), {row: 2, column: 0});
 	
-	var cboPrestador = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPrestador"});
+	var cboPrestador = new qx.ui.form.SelectBox();
+	cboPrestador.add(new qx.ui.form.ListItem("-", null, ""));
+	
+	var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+	rpc.addListener("completed", function(e){
+		var data = e.getData();
+		
+		for (var x in data.result) {
+			//listItem = new qx.ui.form.ListItem(data.result[x].nombre, null, data.result[x].organismo_area_id)
+			cboPrestador.add(new qx.ui.form.ListItem(data.result[x].nombre, null, data.result[x].organismo_area_id));
+		}
+	});
+	rpc.callAsyncListeners(true, "autocompletarPrestador", {texto: ""});
+	
+	
+	//var cboPrestador = new componente.comp.ui.ramon.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.Parametros", methodName: "autocompletarPrestador"});
 	//cboPrestador.setWidth(400);
 	
 	var lstPrestador = cboPrestador.getChildControl("list");
-	lstPrestador.addListener("changeSelection", function(e){
-		var data = e.getData();
-		
-	});
+
 	gbxFiltrar.add(cboPrestador, {row: 2, column: 1, colSpan: 3});
 	
 	
@@ -179,6 +191,29 @@ qx.Class.define("sacdiag.comp.pagePanelDeEstudiosEnProceso",
 	slbEstado.add(new qx.ui.form.ListItem("para Pago", null, "P"));
 	
 	gbxFiltrar.add(slbEstado, {row: 5, column: 1});
+	
+	
+	
+	var btnInicializar = new qx.ui.form.Button("Inicializar");
+	btnInicializar.addListener("execute", function(e){
+		var aux = new Date;
+		dtfHasta.setValue(aux);
+		aux.setMonth(aux.getMonth() - 1);
+		dtfDesde.setValue(aux);
+		
+		cboPrestador.setSelection([cboPrestador.getChildren()[0]]);
+		
+		lstPaciente.removeAll();
+		cboPaciente.setValue("");
+		
+		lstPersonal.removeAll();
+		cboPersonal.setValue("");
+		
+		slbEstado.setSelection([slbEstado.getChildren()[0]]);
+		
+		dtfDesde.focus();
+	})
+	gbxFiltrar.add(btnInicializar, {row: 6, column: 2});
 	
 
 	

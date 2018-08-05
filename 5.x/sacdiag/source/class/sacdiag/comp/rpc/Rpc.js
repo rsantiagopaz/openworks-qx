@@ -12,6 +12,8 @@ qx.Class.define("sacdiag.comp.rpc.Rpc",
 			var data = e.getData();
 			
 			if (data.message == "sesion_terminada") {
+				qx.core.Init.getApplication().loading.hide(true);
+				
 				dialog.Dialog.warning("Sesión terminada.<br/>Debe ingresar datos de autenticación.", function(e){location.reload(true);});
 			}
 		});

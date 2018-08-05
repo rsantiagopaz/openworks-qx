@@ -100,7 +100,7 @@ class class_Parametros extends class_Base
 		
 		$set = $this->prepararCampos($p->model, "prestadores_fantasia");
 		
-		$sql = "INSERT prestadores_fantasia SET " . $set . ", sig_semanal=" . $sig_semanal . ", sig_mensual=" . $sig_mensual;
+		$sql = "INSERT prestadores_fantasia SET " . $set . ", fecha_alta=NOW(), sig_semanal=" . $sig_semanal . ", sig_mensual=" . $sig_mensual;
 		$this->mysqli->query($sql);
 		
 		$this->auditoria($sql, __FILE__ . ", " . __FUNCTION__);
@@ -113,7 +113,7 @@ class class_Parametros extends class_Base
 		
 		$set = $this->prepararCampos($p->model, "prestadores_fantasia");
 		
-		$sql = "INSERT prestadores_fantasia SET " . $set . " ON DUPLICATE KEY UPDATE " . $set;
+		$sql = "INSERT prestadores_fantasia SET " . $set . ", fecha_alta=NOW() ON DUPLICATE KEY UPDATE " . $set;
 		$this->mysqli->query($sql);
 		
 		$this->auditoria($sql, __FILE__ . ", " . __FUNCTION__);
@@ -158,9 +158,27 @@ class class_Parametros extends class_Base
 			$datetime = $datetime->add(new DateInterval("P1W"));
 			$fecha_hasta = $datetime->format("Y-m-d");
 			
-			$sql = "SELECT * FROM prestadores_fantasia WHERE organismo_area_id='" . $row->id_prestador_fantasia . "'";
-			$rsPD = $this->mysqli->query($sql);
-			$rowPD = $rsPD->fetch_object();
+			
+			$id_prestador_fantasia = $row->id_prestador_fantasia;
+			
+			do {
+				$sql = "SELECT * FROM prestadores_fantasia WHERE organismo_area_id='" . $id_prestador_fantasia . "'";
+				$rsPD = $this->mysqli->query($sql);
+				$rowPD = $rsPD->fetch_object();
+				
+				$sql = "SELECT * FROM prestadores_fantasia WHERE organismo_area_id='" . $rowPD->sig_semanal . "'";
+				$rsSig = $this->mysqli->query($sql);
+				$rowSig = $rsSig->fetch_object();
+				
+				if ($rowSig->fecha_alta >= $fecha_desde) {
+					$id_prestador_fantasia = $rowPD->sig_semanal;
+					$bandera = true;
+				} else {
+					$bandera = false;
+				}
+			
+			} while ($bandera);
+			
 			
 			$sql = "INSERT cronograma_semanal SET id_prestador_fantasia='" . $rowPD->sig_semanal . "', fecha_desde='" . $fecha_desde . "', fecha_hasta='" . $fecha_hasta . "'";
 			$this->mysqli->query($sql);
@@ -217,9 +235,27 @@ class class_Parametros extends class_Base
 			$datetime->add(new DateInterval("P1M"));
 			$fecha_desde = $datetime->format("Y") . "-" . $datetime->format("m") . "-" . "01";
 			
-			$sql = "SELECT * FROM prestadores_fantasia WHERE organismo_area_id='" . $row->id_prestador_fantasia . "'";
-			$rsPD = $this->mysqli->query($sql);
-			$rowPD = $rsPD->fetch_object();
+			
+			$id_prestador_fantasia = $row->id_prestador_fantasia;
+			
+			do {
+				$sql = "SELECT * FROM prestadores_fantasia WHERE organismo_area_id='" . $id_prestador_fantasia . "'";
+				$rsPD = $this->mysqli->query($sql);
+				$rowPD = $rsPD->fetch_object();
+				
+				$sql = "SELECT * FROM prestadores_fantasia WHERE organismo_area_id='" . $rowPD->sig_mensual . "'";
+				$rsSig = $this->mysqli->query($sql);
+				$rowSig = $rsSig->fetch_object();
+				
+				if ($rowSig->fecha_alta >= $fecha_desde) {
+					$id_prestador_fantasia = $rowPD->sig_mensual;
+					$bandera = true;
+				} else {
+					$bandera = false;
+				}
+			
+			} while ($bandera);
+			
 			
 			$sql = "INSERT cronograma_mensual SET id_prestador_fantasia='" . $rowPD->sig_mensual . "', fecha='" . $fecha_desde . "'";
 			$this->mysqli->query($sql);
@@ -367,8 +403,9 @@ class class_Parametros extends class_Base
   	$sql = "SELECT";
   	$sql.= "  prestaciones.*";
   	$sql.= ", prestadores_prestaciones.id_prestador_prestacion";
+  	$sql.= ", prestaciones_subtipo.denominacion AS subtipo_descrip";
   	$sql.= ", prestadores_prestaciones.estado";
-  	$sql.= " FROM prestadores_prestaciones INNER JOIN prestaciones USING(id_prestacion)";
+  	$sql.= " FROM prestadores_prestaciones INNER JOIN prestaciones USING(id_prestacion) LEFT JOIN prestaciones_subtipo USING(id_prestacion_subtipo)";
   	$sql.= " WHERE id_prestador='" . $p->id_prestador . "'";
   	$sql.= " ORDER BY denominacion";
   	
@@ -379,16 +416,25 @@ class class_Parametros extends class_Base
   public function method_agregar_prestador_prestacion($params, $error) {
   	$p = $params[0];
   	
-  	$sql = "INSERT prestadores_prestaciones SET";
-  	$sql.= "  id_prestador='" . $p->id_prestador . "'";
-  	$sql.= ", id_prestacion='" . $p->id_prestacion . "'";
-  	$sql.= ", estado='H'";
-  	
-  	$this->mysqli->query($sql);
-  	
-  	$insert_id = $this->mysqli->insert_id;
-  	
-  	$this->auditoria($sql, __FILE__ . ", " . __FUNCTION__);
+  	$sql = "SELECT * FROM prestadores_prestaciones WHERE id_prestador='" . $p->id_prestador . "' AND id_prestacion='" . $p->id_prestacion . "'";
+	$rs = $this->mysqli->query($sql);
+	if ($rs->num_rows == 0) {
+	  	$sql = "INSERT prestadores_prestaciones SET";
+	  	$sql.= "  id_prestador='" . $p->id_prestador . "'";
+	  	$sql.= ", id_prestacion='" . $p->id_prestacion . "'";
+	  	$sql.= ", estado='H'";
+	  	
+	  	$this->mysqli->query($sql);
+	  	
+	  	$insert_id = $this->mysqli->insert_id;
+	  	
+	  	$this->auditoria($sql, __FILE__ . ", " . __FUNCTION__);
+	  	
+	} else {
+		$row = $rs->fetch_object();
+		
+		$insert_id = $row->id_prestador_prestacion;
+	}
   	
   	return $insert_id;
   }
@@ -404,12 +450,16 @@ class class_Parametros extends class_Base
   
   
   public function method_escribir_estado($params, $error) {
-  	$p = $params[0];
-  	
-  	$sql = "UPDATE prestadores_prestaciones SET estado='" . $p->estado . "' WHERE id_prestador_prestacion=" . $p->id_prestador_prestacion;
-	
+	$p = $params[0];
+
+	if (is_null($p->id_prestador_prestacion)) {
+		$sql = "UPDATE prestadores_prestaciones INNER JOIN prestaciones USING(id_prestacion) SET prestadores_prestaciones.estado='" . $p->estado . "' WHERE prestadores_prestaciones.id_prestador=" . $p->id_prestador . " AND prestaciones.id_prestacion_subtipo=" . $p->id_prestacion_subtipo;
+	} else {
+		$sql = "UPDATE prestadores_prestaciones SET estado='" . $p->estado . "' WHERE id_prestador_prestacion=" . $p->id_prestador_prestacion;
+	}
+
 	$this->mysqli->query($sql);
-	
+
 	$this->auditoria($sql, __FILE__ . ", " . __FUNCTION__);
   }
   

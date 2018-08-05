@@ -4,9 +4,6 @@ require("Base.php");
 
 class class_Parametros extends class_Base
 {
-  function __construct() {
-    parent::__construct();
-  }
   
   
   public function method_escribir_contrasena($params, $error) {
@@ -352,6 +349,7 @@ class class_Parametros extends class_Base
   
   public function method_leer_hora_servidor($params, $error) {
   	
+  	date_default_timezone_set("America/Argentina/Buenos_Aires");
   	$resultado = new stdClass;
   	$resultado->hora = date("H:i");
 	

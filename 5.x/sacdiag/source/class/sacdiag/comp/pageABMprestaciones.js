@@ -433,7 +433,8 @@ qx.Class.define("sacdiag.comp.pageABMprestaciones",
 	cellrendererReplace.setReplaceMap({
 		"SE" : "Semanal",
 		"ME" : "Mensual",
-		"RK" : "Ranking"
+		"RK" : "Ranking",
+		"SC" : "Sin cronograma"
 	});
 	tableColumnModelPrestacion.setDataCellRenderer(4, cellrendererReplace);
 

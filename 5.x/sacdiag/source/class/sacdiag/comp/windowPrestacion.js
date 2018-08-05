@@ -70,6 +70,7 @@ qx.Class.define("sacdiag.comp.windowPrestacion",
 	slbTipo_cronograma.add(new qx.ui.form.ListItem("Semanal", null, "SE"));
 	slbTipo_cronograma.add(new qx.ui.form.ListItem("Mensual", null, "ME"));
 	slbTipo_cronograma.add(new qx.ui.form.ListItem("Ranking", null, "RK"));
+	slbTipo_cronograma.add(new qx.ui.form.ListItem("Sin cronograma", null, "SC"));
 	form.add(slbTipo_cronograma, "Cronograma", null, "cronograma_tipo");
 	
 	

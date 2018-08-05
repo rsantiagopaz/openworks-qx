@@ -30,8 +30,9 @@ qx.Class.define("componente.comp.ui.ramon.image.Loading",
 			this._contador+= 1;
 		},
 		
-		hide: function() {
-			if (this._contador > 0) this._contador-= 1;
+		hide: function(bandera) {
+			if (bandera) this._contador = 0;
+			else if (this._contador > 0) this._contador-= 1;
 			
 			if (this._contador == 0) this.setVisibility("hidden");
 		}

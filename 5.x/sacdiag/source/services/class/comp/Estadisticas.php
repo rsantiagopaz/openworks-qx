@@ -53,13 +53,13 @@ class class_Estadisticas extends class_Base
 		$sql.= " AND DATE(solicitudes.fecha_emite) <= '" . substr($p->fecha->hasta, 0, 10) . "'";
 	}
 	
-	if (! is_null($p->variable->efector)) $sql.= " AND solicitudes.id_efector_publico='" . $p->variable->efector->model . "'";
-	if (! is_null($p->variable->medico)) $sql.= " AND solicitudes.id_usuario_medico='" . $p->variable->medico->model . "'";
-	if (! is_null($p->variable->prestador)) $sql.= " AND solicitudes.id_prestador_fantasia='" . $p->variable->prestador->model . "'";
-	if (! is_null($p->variable->prestacion)) $sql.= " AND solicitudes_prestaciones.id_prestacion='" . $p->variable->prestacion->model . "'";
-	if (! is_null($p->variable->paciente)) $sql.= " AND solicitudes.persona_id='" . $p->variable->paciente->model . "'";
-	if (! is_null($p->variable->resultado)) $sql.= " AND solicitudes_prestaciones.id_prestacion_resultado='" . $p->variable->resultado->model . "'";
-	if (! is_null($p->variable->anses_negativa)) $sql.= " AND solicitudes.anses_negativa='" . $p->variable->anses_negativa->model . "'";
+	if (isset($p->variable->efector)) $sql.= " AND solicitudes.id_efector_publico='" . $p->variable->efector->model . "'";
+	if (isset($p->variable->medico)) $sql.= " AND solicitudes.id_usuario_medico='" . $p->variable->medico->model . "'";
+	if (isset($p->variable->prestador)) $sql.= " AND solicitudes.id_prestador_fantasia='" . $p->variable->prestador->model . "'";
+	if (isset($p->variable->prestacion)) $sql.= " AND solicitudes_prestaciones.id_prestacion='" . $p->variable->prestacion->model . "'";
+	if (isset($p->variable->paciente)) $sql.= " AND solicitudes.persona_id='" . $p->variable->paciente->model . "'";
+	if (isset($p->variable->resultado)) $sql.= " AND solicitudes_prestaciones.id_prestacion_resultado='" . $p->variable->resultado->model . "'";
+	if (isset($p->variable->anses_negativa)) $sql.= " AND solicitudes.anses_negativa='" . $p->variable->anses_negativa->model . "'";
 	
 	$sql.= " GROUP BY id";
 	
@@ -102,6 +102,10 @@ class class_Estadisticas extends class_Base
 		$resultado->dataSeries_cantidad = $dataSeries_cantidad;
 		$resultado->series = $series;
 	}
+	
+	$p->resultado = $resultado;
+	
+	$_SESSION['estadisticas_listado'] = $p;
 	
 	return $resultado;
   }
