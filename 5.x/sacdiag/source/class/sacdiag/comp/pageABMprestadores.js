@@ -177,43 +177,44 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 			}
 		}
 		
-		this.timerId = timer.start(function() {
+		var p = {};
+		p.id_prestador = rowDataRS.id_prestador;
 		
-			var p = {};
-			p.id_prestador = rowDataRS.id_prestador;
+		var rpcAux = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
+		rpcAux.addListener("completed", function(e){
+			var data = e.getData();
 			
-			this.rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
-			this.rpc.addListener("completed", function(e){
-				var data = e.getData();
-				
-				//alert(qx.lang.Json.stringify(data, null, 2));
-				
-				tableModelPrestacion.setDataAsMapArray(data.result, true);
-				
-				if (id_prestador_prestacion != null) {
-					tblPrestacion.blur();
-					tblPrestacion.buscar("id_prestador_prestacion", id_prestador_prestacion);
-					tblPrestacion.focus();
-				}
-				
-				application.loading.hide();
-			});
-			this.rpc.addListener("failed", function(e){
-				var data = e.getData();
-				
-				if (data.message != "sesion_terminada") alert(qx.lang.Json.stringify(data, null, 2));
+			//alert(qx.lang.Json.stringify(data, null, 2));
+			
+			tableModelPrestacion.setDataAsMapArray(data.result, true);
+			
+			if (id_prestador_prestacion != null) {
+				tblPrestacion.blur();
+				tblPrestacion.buscar("id_prestador_prestacion", id_prestador_prestacion);
+				tblPrestacion.focus();
+			}
+			
+			application.loading.hide();
+		});
+		rpcAux.addListener("failed", function(e){
+			var data = e.getData();
+			
+			if (data.message != "sesion_terminada") alert(qx.lang.Json.stringify(data, null, 2));
 
-				application.loading.hide();
-			});
-			this.rpc.addListener("aborted", function(e){
-				application.loading.hide();
-			});
+			application.loading.hide();
+		});
+		rpcAux.addListener("aborted", function(e){
+			application.loading.hide();
+		});
+		
+		this.timerId = timer.start(function() {
+			this.rpc = rpcAux;
 			
 			this.opaqueCallRef = this.rpc.callAsyncListeners(false, "leer_prestador_prestacion", p);
 		
 		}, null, this, null, 200);
 
-		return this.rpc;
+		return rpcAux;
 	}
 	
 	
@@ -483,25 +484,27 @@ qx.Class.define("sacdiag.comp.pageABMprestadores",
 		if (! lstPrestacion.isSelectionEmpty()) {
 			var model = lstPrestacion.getSelection()[0].getModel();
 			
-			var p = {};
-			p.id_prestador = rowDataRS.id_prestador;
-			p.id_prestacion = model;
-			
-			//alert(qx.lang.Json.stringify(p, null, 2));
-			
-			var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
-			rpc.addListener("completed", function(e){
-				var data = e.getData();
+			if (tblPrestacion.buscar("id_prestacion", model) == null) {
+				var p = {};
+				p.id_prestador = rowDataRS.id_prestador;
+				p.id_prestacion = model;
 				
-				lstPrestacion.resetSelection();
-				cboPrestacion.setValue("");
+				//alert(qx.lang.Json.stringify(p, null, 2));
 				
-				var rpc = functionActualizarPrestacion(data.result);
+				var rpc = new sacdiag.comp.rpc.Rpc("services/", "comp.Parametros");
 				rpc.addListener("completed", function(e){
-					cboPrestacion.focus();
-				})
-			});
-			rpc.callAsyncListeners(true, "agregar_prestador_prestacion", p);
+					var data = e.getData();
+					
+					lstPrestacion.resetSelection();
+					cboPrestacion.setValue("");
+					
+					var rpc = functionActualizarPrestacion(data.result);
+					rpc.addListener("completed", function(e){
+						cboPrestacion.focus();
+					})
+				});
+				rpc.callAsyncListeners(true, "agregar_prestador_prestacion", p);
+			}
 		} else {
 			cboPrestacion.focus();
 		}
