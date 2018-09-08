@@ -74,7 +74,7 @@ class class_Parametros extends class_Base
 		$sql.= ", CONCAT(proveedores.cuit, ' (', razones_sociales.razon_social, ')') AS label";
 		$sql.= ", proveedores.cuit";
 		$sql.= ", razones_sociales.razon_social";
-		$sql.= " FROM (`019`.proveedores INNER JOIN `019`.razones_sociales USING(cod_proveedor)) INNER JOIN taller USING(cod_razon_social)";
+		$sql.= " FROM (proveedores INNER JOIN razones_sociales USING(cod_proveedor)) INNER JOIN taller USING(cod_razon_social)";
 		$sql.= " WHERE proveedores.cuit LIKE '" . $p->texto . "%'";
 		$sql.= " ORDER BY label";
 	} else {
@@ -85,7 +85,7 @@ class class_Parametros extends class_Base
 				$sql.= ", CONCAT(razones_sociales.razon_social, ' (', proveedores.cuit, ')') AS label";
 				$sql.= ", proveedores.cuit";
 				$sql.= ", razones_sociales.razon_social";
-				$sql.= " FROM (`019`.proveedores INNER JOIN `019`.razones_sociales USING(cod_proveedor)) INNER JOIN taller USING(cod_razon_social)";
+				$sql.= " FROM (proveedores INNER JOIN razones_sociales USING(cod_proveedor)) INNER JOIN taller USING(cod_razon_social)";
 			$sql.= ") UNION (";
 				$sql.= "SELECT";
 				$sql.= "  0 AS model";
@@ -111,7 +111,7 @@ class class_Parametros extends class_Base
 		$sql.= ", CONCAT(proveedores.cuit, ' (', razones_sociales.razon_social, ')') AS label";
 		$sql.= ", proveedores.cuit";
 		$sql.= ", razones_sociales.razon_social";
-		$sql.= " FROM `019`.proveedores INNER JOIN `019`.razones_sociales USING(cod_proveedor)";
+		$sql.= " FROM proveedores INNER JOIN razones_sociales USING(cod_proveedor)";
 		$sql.= " WHERE proveedores.cuit LIKE '" . $p->texto . "%'";
 		$sql.= " ORDER BY label";
 	} else {
@@ -120,7 +120,7 @@ class class_Parametros extends class_Base
 		$sql.= ", CONCAT(razones_sociales.razon_social, ' (', proveedores.cuit, ')') AS label";
 		$sql.= ", proveedores.cuit";
 		$sql.= ", razones_sociales.razon_social";
-		$sql.= " FROM `019`.proveedores INNER JOIN `019`.razones_sociales USING(cod_proveedor)";
+		$sql.= " FROM proveedores INNER JOIN razones_sociales USING(cod_proveedor)";
 		$sql.= " WHERE razones_sociales.razon_social LIKE '%" . $p->texto . "%'";
 		$sql.= " ORDER BY label";
 	}
@@ -133,7 +133,7 @@ class class_Parametros extends class_Base
 	$sql = "SELECT";
 	$sql.= "  cod_razon_social";
 	$sql.= ", CONCAT(razones_sociales.razon_social, ' (', proveedores.cuit, ')') AS descrip";
-	$sql.= " FROM (taller LEFT JOIN `019`.razones_sociales USING(cod_razon_social)) LEFT JOIN `019`.proveedores USING(cod_proveedor)";
+	$sql.= " FROM (taller LEFT JOIN razones_sociales USING(cod_razon_social)) LEFT JOIN proveedores USING(cod_proveedor)";
 	$sql.= " ORDER BY descrip";
 	
 	return $this->toJson($sql);
@@ -170,7 +170,7 @@ class class_Parametros extends class_Base
 	while ($row = $rs->fetch_object()) {
 		$sql = "SELECT";
 		$sql.= "  CONCAT(_organismos_areas.organismo_area, ' (', CASE WHEN _organismos_areas.organismo_area_tipo_id='E' THEN _departamentos.departamento ELSE _organismos.organismo END, ')') AS label";
-		$sql.= " FROM (salud1._organismos_areas INNER JOIN salud1._organismos USING(organismo_id)) LEFT JOIN salud1._departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
+		$sql.= " FROM (_organismos_areas INNER JOIN _organismos USING(organismo_id)) LEFT JOIN _departamentos ON _organismos_areas.organismo_areas_id_departamento=_departamentos.codigo_indec";
 		$sql.= " WHERE _organismos_areas.organismo_area_id='" . $row->organismo_area_id . "'";
 		
 		$rsDependencia = $this->mysqli->query($sql);

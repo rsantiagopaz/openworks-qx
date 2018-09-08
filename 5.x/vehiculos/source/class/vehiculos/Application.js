@@ -134,13 +134,11 @@ qx.Class.define("vehiculos.Application",
 	var mnuArchivo = new qx.ui.menu.Menu();
 	var btnAcercaDe = new qx.ui.menu.Button("Acerca de...");
 	btnAcercaDe.addListener("execute", function(){
-		/*
-		var windowAcercaDe = new elpintao.comp.varios.windowAcercaDe();
-		windowAcercaDe.setModal(true);
-		doc.add(windowAcercaDe);
-		windowAcercaDe.center();
-		windowAcercaDe.open();
-		*/
+		var win = new vehiculos.comp.windowAcercaDe();
+		win.setModal(true);
+		doc.add(win);
+		win.center();
+		win.open();
 	});
 	mnuArchivo.add(btnAcercaDe);
 	

@@ -18,8 +18,11 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 	this.setLayout(new qx.ui.layout.Canvas());
 
 	this.addListenerOnce("appear", function(e){
-		this.setCaption("Salida de taller, " + vehiculo.nro_patente + "  " + vehiculo.marca);
-		txtKilo.focus();
+		var timer = qx.util.TimerManager.getInstance();
+		timer.start(function() {
+			this.setCaption("Salida de taller, " + vehiculo.nro_patente + "  " + vehiculo.marca);
+			txtKilo.focus();
+		}, null, this, null, 50);
 	}, this);
 	
 	
@@ -286,15 +289,16 @@ qx.Class.define("vehiculos.comp.windowSalTaller",
 	
 	
 	txtKilo.setTabIndex(1);
-	cboReparacion.setTabIndex(2);
-	txtCosto.setTabIndex(3);
-	txtCantidad.setTabIndex(4);
-	txtObserva.setTabIndex(5);
-	btnAgregar.setTabIndex(6);
-	tblSal.setTabIndex(7);
-	btnAceptar.setTabIndex(8);
-	btnCancelar.setTabIndex(9);
-	btnDiferir.setTabIndex(10);
+	gbx.setTabIndex(2);
+	cboReparacion.setTabIndex(3);
+	txtCosto.setTabIndex(4);
+	txtCantidad.setTabIndex(5);
+	txtObserva.setTabIndex(6);
+	btnAgregar.setTabIndex(7);
+	tblSal.setTabIndex(8);
+	btnAceptar.setTabIndex(9);
+	btnCancelar.setTabIndex(10);
+	btnDiferir.setTabIndex(11);
 	
 	
 	

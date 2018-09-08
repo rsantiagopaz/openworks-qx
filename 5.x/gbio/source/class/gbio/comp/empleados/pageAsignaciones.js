@@ -697,8 +697,8 @@ qx.Class.define("gbio.comp.empleados.pageAsignaciones",
 		var selectionModelRelojes = tblRelojes.getSelectionModel();
 		selectionModelRelojes.addListener("changeSelection", function(e){
 			var bool = (selectionModelRelojes.getSelectedCount() > 0);
-			btnEliminarReloj.setEnabled(bool);
-			mnutblRelojes.memorizar([btnEliminarReloj]);
+			//btnEliminarReloj.setEnabled(bool);
+			//mnutblRelojes.memorizar([btnEliminarReloj]);
 		});
 		
 		tblRelojes.setContextMenu(mnutblRelojes);
