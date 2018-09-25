@@ -10,16 +10,16 @@ qx.Class.define("componente.comp.ui.ramon.menu.Menu",
 	{
 		_arrayObjeto: null,
 		
-		memorizar: function(objeto)
+		memorizar: function(array)
 		{
-			if (!objeto) {
+			if (!array) {
 				this._arrayObjeto = [];
 				this._memorizar(this);
 			} else {
 				var map;
-				for (var i in objeto) {
-					if (map = this._arrayObjeto[objeto[i].toString()]) {
-						map.enabled = objeto[i].getEnabled();
+				for (var i in array) {
+					if (map = this._arrayObjeto[array[i].toString()]) {
+						map.enabled = array[i].getEnabled();
 					}
 				}
 			}

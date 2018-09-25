@@ -7,22 +7,22 @@ qx.Class.define("componente.comp.ui.ramon.list.List",
 		
 		var listenerId;
 		
+		listenerId = this.addListener("changeContextMenu", function(e){
+			this._contextMenu = e.getData();
+		}, this);
+		this.registrarListener(this, listenerId);
+		
 		listenerId = this.addListener("focus", function(e){
 			if (this._contextMenu) this._contextMenu.restablecer();
-		});
+		}, this);
 		this.registrarListener(this, listenerId);
 		
 		listenerId = this.addListener("blur", function(e){
 			if (this._contextMenu) this._contextMenu.desactivar();
-		});
+		}, this);
 		this.registrarListener(this, listenerId);
-
-		listenerId = this.addListener("changeContextMenu", function(e){
-			this._contextMenu = e.getData();
-		});
-		this.registrarListener(this, listenerId);
-
 	},
+	
 	members : 
 	{
 		_contextMenu: null,
