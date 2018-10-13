@@ -65,24 +65,8 @@ qx.Class.define("prueba.Application",
       // Add an event listener
       button1.addListener("execute", function(e) {
       	
-        var rpc = new qx.io.remote.Rpc("services/", "comp.Prueba");
-		rpc.addListener("completed", function(e){
-			var data = e.getData();
-			
-			alert("completed");
-		});
-		rpc.addListener("failed", function(e){
-			var data = e.getData();
-			
-			alert(qx.lang.Json.stringify(data, null, 2));
-		});
-		rpc.addListener("aborted", function(e){
-			var data = e.getData();
-			
-			alert(qx.lang.Json.stringify(data, null, 2));
-		});
+		window.open("services/ZKLibrary/test.php");
 		
-		rpc.callAsyncListeners(false, "leer_datos");
       });
     }
   }
