@@ -18,8 +18,10 @@ qx.Class.define("sical3.comp.windowEspaciosxTituloAfin",
 	this.setLayout(new qx.ui.layout.Canvas());
 
 	this.addListenerOnce("appear", function(e){
-		cboTitulo.focus();
-	});
+		window.setTimeout(function() {
+			cboTitulo.focus();
+		}, 50);
+	}, this);
 	
 	
 	var application = qx.core.Init.getApplication();

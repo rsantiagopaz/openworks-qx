@@ -1,7 +1,7 @@
 qx.Class.define("componente.comp.ui.ramon.image.Loading",
 {
 	extend : qx.ui.basic.Image,
-	construct : function (source)
+	construct : function (source, destino)
 	{
 		this.base(arguments, source);
 		
@@ -10,15 +10,17 @@ qx.Class.define("componente.comp.ui.ramon.image.Loading",
 
 		var application = qx.core.Init.getApplication();
 		
-		var bounds = application.getRoot().getBounds();
+		if (destino == null) destino = application.getRoot();
+		
+		var bounds = destino.getBounds();
 		this.setVisibility("hidden");
 		this.setBackgroundColor("#FFFFFF");
 		this.setDecorator("main");
-		application.getRoot().add(this, {left: parseInt(bounds.width / 2 - 33), top: parseInt(bounds.height / 2 - 33)});
+		destino.add(this, {left: parseInt(bounds.width / 2 - 33), top: parseInt(bounds.height / 2 - 33)});
 		
 		this.addListenerOnce("appear", function(e){
 			this.setZIndex(30000);
-		});
+		}, this);
 	},
 	members : 
 	{

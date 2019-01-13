@@ -64,6 +64,7 @@ qx.Class.define("componente.comp.ui.ramon.abstractrenderer.Grid",
 	        	layout.setColumnWidth(options[i].item.column - 1, null);
 	        	widget = layout.getCellWidget(options[i].item.row, options[i].item.column - 1);
 	        	if (widget != null) this._remove(widget);
+	        	layout.setColumnAlign(options[i].item.column - 1, "right", "middle");
 	        	this._add(label, {row: options[i].item.row, column: options[i].item.column - 1});
 	        } else {
 	        	if (options[i].label.colSpan != null) {
@@ -80,6 +81,7 @@ qx.Class.define("componente.comp.ui.ramon.abstractrenderer.Grid",
 	        	}
 	        	widget = layout.getCellWidget(options[i].label.row, options[i].label.column);
         		if (widget != null) this._remove(widget);
+        		layout.setColumnAlign(options[i].label.column, "right", "middle");
 	        	this._add(label, options[i].label);
 	        }
 	        

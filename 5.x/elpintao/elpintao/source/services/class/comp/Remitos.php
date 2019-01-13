@@ -9,29 +9,29 @@ class class_Remitos extends class_Base
   public function method_alta_modifica_remito_rec($params, $error) {
   	$p = $params[0];
   	
-  	$resultado = $p->id_remito;
+  	$id_remito = $p->id_remito;
   	
   	$this->mysqli->query("START TRANSACTION");
   	
 	if ($p->id_remito == "0") {
-		$sql="INSERT remito_rec SET nro_remito='" . $p->nro_remito . "', tipo=0, id_sucursal_de=" . $p->id_sucursal . ", destino='" . $p->destino . "', fecha=NOW(), id_usuario_transporta=0, estado='R'";
+		$sql="INSERT remito_rec SET nro_remito='" . $p->nro_remito . "', tipo=0, id_sucursal_de=" . $p->id_sucursal . ", id_fabrica=" . $p->id_fabrica . ", destino='" . $p->destino . "', fecha=NOW(), id_usuario_transporta=0, estado='R'";
 		$this->mysqli->query($sql);
-		$resultado = $this->mysqli->insert_id;
+		$id_remito = $this->mysqli->insert_id;
 	} else {
-		$sql="UPDATE remito_rec SET nro_remito='" . $p->nro_remito . "', id_sucursal_de=" . $p->id_sucursal . ", destino='" . $p->destino . "' WHERE id_remito_rec=" . $resultado;
+		$sql="UPDATE remito_rec SET nro_remito='" . $p->nro_remito . "', id_sucursal_de=" . $p->id_sucursal . ", id_fabrica=" . $p->id_fabrica . ", destino='" . $p->destino . "' WHERE id_remito_rec=" . $id_remito;
 		$this->mysqli->query($sql);
 		
-		$sql="DELETE FROM remito_rec_detalle WHERE id_remito_rec=" . $resultado;
+		$sql="DELETE FROM remito_rec_detalle WHERE id_remito_rec=" . $id_remito;
 		$this->mysqli->query($sql);
 	}
 	foreach ($p->detalle as $item) {
-		$sql="INSERT remito_rec_detalle SET id_remito_rec=" . $resultado . ", id_producto_item=" . $item->id_producto_item . ", cantidad=" . $item->cantidad;
+		$sql="INSERT remito_rec_detalle SET id_remito_rec=" . $id_remito . ", id_producto_item=" . $item->id_producto_item . ", cantidad=" . $item->cantidad;
 		$this->mysqli->query($sql);
 	}
 	
 	$this->mysqli->query("COMMIT");
 	
-	return $resultado;
+	return $id_remito;
   }
   
   
@@ -39,29 +39,29 @@ class class_Remitos extends class_Base
   public function method_alta_modifica_remito_emi($params, $error) {
   	$p = $params[0];
   	
-  	$resultado = $p->id_remito;
+  	$id_remito = $p->id_remito;
   	
   	$this->mysqli->query("START TRANSACTION");
   	
 	if ($p->id_remito == "0") {
-		$sql="INSERT remito_emi SET nro_remito='', tipo=2, id_sucursal_para=" . $p->id_sucursal . ", destino='" . $p->destino . "', fecha=NOW(), json='{}', estado='R'";
+		$sql="INSERT remito_emi SET nro_remito='', tipo=2, id_sucursal_para=" . $p->id_sucursal . ", id_fabrica=" . $p->id_fabrica . ", destino='" . $p->destino . "', fecha=NOW(), json='{}', estado='R'";
 		$this->mysqli->query($sql);
-		$resultado = $this->mysqli->insert_id;
+		$id_remito = $this->mysqli->insert_id;
 	} else {
-		$sql="UPDATE remito_emi SET id_sucursal_para=" . $p->id_sucursal . ", destino='" . $p->destino . "' WHERE id_remito_emi=" . $resultado;
+		$sql="UPDATE remito_emi SET id_sucursal_para=" . $p->id_sucursal . ", id_fabrica=" . $p->id_fabrica . ", destino='" . $p->destino . "' WHERE id_remito_emi=" . $id_remito;
 		$this->mysqli->query($sql);
 		
-		$sql="DELETE FROM remito_emi_detalle WHERE id_remito_emi=" . $resultado;
+		$sql="DELETE FROM remito_emi_detalle WHERE id_remito_emi=" . $id_remito;
 		$this->mysqli->query($sql);
 	}
 	foreach ($p->detalle as $item) {
-		$sql="INSERT remito_emi_detalle SET id_remito_emi=" . $resultado . ", id_producto_item=" . $item->id_producto_item . ", cantidad=" . $item->cantidad;
+		$sql="INSERT remito_emi_detalle SET id_remito_emi=" . $id_remito . ", id_producto_item=" . $item->id_producto_item . ", cantidad=" . $item->cantidad;
 		$this->mysqli->query($sql);
 	}
 	
 	$this->mysqli->query("COMMIT");
 	
-	return $resultado;
+	return $id_remito;
   }
   
   
@@ -193,7 +193,7 @@ class class_Remitos extends class_Base
 			$this->mysqli->query($sql);
 			
 			if ($rowRemito_emi->id_sucursal_para != "0") {
-				$sql = "INSERT remito_rec SET nro_remito='" . $nro_remito . "', tipo='" . $rowRemito_emi->tipo . "', id_sucursal_de='" . $this->rowParamet->id_sucursal . "', fecha='" . $fecha . "', id_usuario_autoriza_emi='" . $rowAutoriza->id_usuario . "', id_usuario_transporta='" . $rowTransporta->id_usuario . "', estado='R'";
+				$sql = "INSERT remito_rec SET nro_remito='" . $nro_remito . "', tipo='" . $rowRemito_emi->tipo . "', id_sucursal_de='" . $this->rowParamet->id_sucursal . "', fecha='" . $fecha . "', id_usuario_autoriza_emi='" . $rowAutoriza->id_usuario . "', id_usuario_transporta='" . $rowTransporta->id_usuario . "', id_fabrica=0, estado='R'";
 				$this->transmitir($sql, $rowRemito_emi->id_sucursal_para);
 				$sql = "SET @id_remito_rec = LAST_INSERT_ID()";
 				$this->transmitir($sql, $rowRemito_emi->id_sucursal_para);
@@ -245,10 +245,9 @@ class class_Remitos extends class_Base
   	
 	$resultado = new stdClass;
 	$resultado->remito = array();
-
   	
-	$sql = "SELECT remito_rec.*, sucursal.descrip";
-	$sql.= " FROM remito_rec LEFT JOIN sucursal ON remito_rec.id_sucursal_de = sucursal.id_sucursal";
+	$sql = "SELECT remito_rec.*, sucursal.descrip AS sucursal_descrip, fabrica.descrip AS fabrica_descrip";
+	$sql.= " FROM (remito_rec LEFT JOIN sucursal ON remito_rec.id_sucursal_de = sucursal.id_sucursal) LEFT JOIN fabrica USING(id_fabrica)";
 	$sql.= " WHERE TRUE";
 	
 	if ($p->estado == "Registrado") {
@@ -269,12 +268,26 @@ class class_Remitos extends class_Base
 		$sql.= " AND id_sucursal_de=" . $p->id_sucursal;
 	}
 	
+	if ($p->id_fabrica > "0") {
+		$sql.= " AND remito_rec.id_fabrica=" . $p->id_fabrica;
+	}
+	
 	
 	$sql.= " ORDER BY id_remito_rec DESC";
 	
 	$rsRemito = $this->mysqli->query($sql);
 	while ($rowRemito = $rsRemito->fetch_object()) {
-		$rowRemito->destino_descrip = ($rowRemito->id_sucursal_de != "0") ? $rowRemito->descrip : $rowRemito->destino;
+		if ($rowRemito->id_sucursal_de == "0") {
+			if ($rowRemito->id_fabrica == "0") {
+				$rowRemito->destino_descrip = $rowRemito->destino;
+			} else {
+				$rowRemito->destino_descrip = $rowRemito->fabrica_descrip;
+			}
+		} else {
+			$rowRemito->destino_descrip = $rowRemito->sucursal_descrip;
+		}
+		
+		//$rowRemito->destino_descrip = ($rowRemito->id_sucursal_de != "0") ? $rowRemito->sucursal_descrip : $rowRemito->destino;
 		
 		if (empty($rowRemito->id_usuario_autoriza_rec)) {
 			$rowRemito->autoriza = "";
@@ -309,7 +322,6 @@ class class_Remitos extends class_Base
 	$resultado = new stdClass;
 	$resultado->remito = array();
 	$resultado->calc = array();
-
 	$calc = new stdClass;
 	$aux = new stdClass;
 	$aux->descrip = "Costo";
@@ -321,8 +333,8 @@ class class_Remitos extends class_Base
 	$aux->total = 0;
 	$calc->{"plmasiva"} = $aux;
   	
-	$sql = "SELECT DISTINCTROW remito_emi.*, CASE WHEN id_sucursal_para<>0 THEN sucursal.descrip ELSE remito_emi.destino END AS destino_descrip, CASE remito_emi.estado WHEN 'R' THEN 'Registrado' ELSE 'Autorizado' END AS estado_descrip";
-	$sql.= " FROM (((remito_emi LEFT JOIN sucursal ON remito_emi.id_sucursal_para=sucursal.id_sucursal) INNER JOIN remito_emi_detalle USING (id_remito_emi)) INNER JOIN producto_item USING (id_producto_item)) INNER JOIN producto USING (id_producto)";
+	$sql = "SELECT DISTINCTROW remito_emi.*, CASE WHEN id_sucursal_para<>0 THEN sucursal.descrip WHEN remito_emi.id_fabrica<>0 THEN fabrica.descrip ELSE remito_emi.destino END AS destino_descrip, CASE remito_emi.estado WHEN 'R' THEN 'Registrado' ELSE 'Autorizado' END AS estado_descrip";
+	$sql.= " FROM ((((remito_emi LEFT JOIN sucursal ON remito_emi.id_sucursal_para=sucursal.id_sucursal) LEFT JOIN fabrica ON remito_emi.id_fabrica=fabrica.id_fabrica) INNER JOIN remito_emi_detalle USING (id_remito_emi)) INNER JOIN producto_item USING (id_producto_item)) INNER JOIN producto USING (id_producto)";
 	$sql.= " WHERE TRUE";
 	
 	if ($p->estado == "Registrado") {
@@ -344,9 +356,8 @@ class class_Remitos extends class_Base
 	}
 	
 	if ($p->id_fabrica > "0") {
-		$sql.= " AND producto.id_fabrica=" . $p->id_fabrica;
+		$sql.= " AND remito_emi.id_fabrica=" . $p->id_fabrica;
 	}
-
 	if (! empty($p->buscar)) {
 		$descrip = explode(" ", $p->buscar);
 		foreach ($descrip as $palabra) {
@@ -363,8 +374,7 @@ class class_Remitos extends class_Base
 	}
 	
 	$sql.= " ORDER BY id_remito_emi DESC";
-
-
+	
 	$rsRemito = $this->mysqli->query($sql);
 	while ($rowRemito = $rsRemito->fetch_object()) {
 		if (empty($rowRemito->id_usuario_autoriza_emi)) {
@@ -394,9 +404,6 @@ class class_Remitos extends class_Base
 		
 		$sql = "SELECT remito_emi_detalle.*, fabrica.descrip AS fabrica, fabrica.desc_fabrica, producto.descrip AS producto, producto.*, producto_item.*, color.descrip AS color, unidad.descrip AS unidad FROM ((((remito_emi_detalle INNER JOIN producto_item USING(id_producto_item)) INNER JOIN producto USING(id_producto)) INNER JOIN fabrica USING(id_fabrica)) INNER JOIN color USING (id_color)) INNER JOIN unidad USING (id_unidad) WHERE id_remito_emi='" . $rowRemito->id_remito_emi . "'";
 		
-		if ($p->id_fabrica > "0") {
-			$sql.= " AND producto.id_fabrica=" . $p->id_fabrica;
-		}
 	
 		if (! empty($p->buscar)) {
 			$descrip = explode(" ", $p->buscar);
@@ -509,5 +516,4 @@ class class_Remitos extends class_Base
 	return $this->toJson($sql);
   }
 }
-
 ?>

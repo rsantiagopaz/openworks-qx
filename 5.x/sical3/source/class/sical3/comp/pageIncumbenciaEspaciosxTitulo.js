@@ -10,7 +10,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 	this.setLayout(new qx.ui.layout.Canvas());
 	
 	this.addListenerOnce("appear", function(e){
-		cboTituloD.focus();
+		cboD.focus();
 	});
 	
 	
@@ -78,25 +78,30 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 		tblDest.resetSelection();
 		tblDest.setFocusedCell();
 		
-		if (lstTituloD.isSelectionEmpty()) {
+		if (lstD.isSelectionEmpty()) {
 			tableModelDest.setDataAsMapArray([], true);
 			lengthDest = null;
 			functionSeleccion();
 		} else {
 			var p = {};
-			p.id_titulo = lstTituloD.getModelSelection().getItem(0);
+			p.id_titulo = lstD.getModelSelection().getItem(0);
 			
 			var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 			rpc.addListener("completed", function(e){
 				var data = e.getData();
 				
-				//alert(qx.lang.Json.stringify(data.result, null, 2));
+				alert(qx.lang.Json.stringify(data, null, 2));
 				
 				tableModelDest.setDataAsMapArray(data.result, true);
 				lengthDest = data.result.length;
 				functionSeleccion();
 				
 				if (id_tomo_espacio != null) tblDest.buscar("id_tomo_espacio", id_tomo_espacio);
+			});
+			rpc.addListener("failed", function(e){
+				var data = e.getData();
+				
+				alert(qx.lang.Json.stringify(data, null, 2));
 			});
 			rpc.callAsyncListeners(true, "leer_espacios", p);
 		}
@@ -173,13 +178,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 	
 	composite3.add(new qx.ui.basic.Label("Título:"), {left: 0, top: 0});
 	
-	var cboTituloD = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarTitulo"});
-	cboTituloD.getChildControl("popup").addListener("disappear", functionDest_disappear);
-	var lstTituloD = cboTituloD.getChildControl("list");
-	lstTituloD.addListener("changeSelection", function(e){
-		if (lstTituloD.isSelectionEmpty()) functionDest_disappear();
+	var cboD = new sical3.comp.combobox.ComboBoxAuto({url: "services/", serviceName: "comp.ComisionDeTitulos", methodName: "autocompletarTitulo"});
+	cboD.getChildControl("popup").addListener("disappear", functionDest_disappear);
+	var lstD = cboD.getChildControl("list");
+	lstD.addListener("changeSelection", function(e){
+		if (lstD.isSelectionEmpty()) functionDest_disappear();
 	}, this);
-	composite3.add(cboTituloD, {left: 70, top: 0, right: "25%"});
+	composite3.add(cboD, {left: 70, top: 0, right: "25%"});
 	
 	
 	
@@ -209,12 +214,12 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 										var rowData = tableModelDest.getRowDataAsMap(tblDest.getFocusedRow());
 										
 										var p = {};
-										p.cargo = lstTituloD.getSelection()[0].getUserData("datos");
-										p.titulo = [rowData];
+										p.titulo = lstD.getSelection()[0].getUserData("datos");
+										p.espacio = [rowData];
 										
 										//alert(qx.lang.Json.stringify(p, null, 2));
 										
-										var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaTitulosxCargo");
+										var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 										rpc.addListener("completed", function(e){
 											//var data = e.getData();
 											//alert(qx.lang.Json.stringify(data, null, 2));
@@ -224,9 +229,9 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 										rpc.addListener("failed", function(e){
 											var data = e.getData();
 											//alert(qx.lang.Json.stringify(data, null, 2));
-											if (data.message == "novedad_existente") dialog.Dialog.error("Ya existe una novedad pendiente de ser impactada para el título y cargo seleccionados.");
+											if (data.message == "novedad_existente") dialog.Dialog.error("Ya existe una novedad pendiente de ser impactada para el título y espacio seleccionados.");
 										});
-										rpc.callAsyncListeners(true, "eliminar_titulo", p);
+										rpc.callAsyncListeners(true, "eliminar_espacio", p);
 									}
 								},
 				"context"     : this,
@@ -276,8 +281,8 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 				var rowData = tableModelDest.getRowDataAsMap(focusedRow);
 				
 				var p = {};
-				p.cargo = lstTituloD.getSelection()[0].getUserData("datos");
-				p.titulo = [rowData];
+				p.titulo = lstD.getSelection()[0].getUserData("datos");
+				p.espacio = [rowData];
 				
 				//alert(qx.lang.Json.stringify(p, null, 2));
 				//return
@@ -286,14 +291,14 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 					dialog.Dialog.alert("Se ha generado una novedad que estará pendiente de confirmación.");
 				}
 				
-				var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaTitulosxCargo");
+				var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 				rpc.addListener("completed", function(e){
 					var data = e.getData();
 					
 					p.message = data.result.message;
 					
 					if (data.result.message == "INSERT") {
-						var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaTitulosxCargo");
+						var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 						rpc.addListener("completed", functionCompleted);
 						rpc.callAsyncListeners(true, "escribir_novedad_modificacion", p);
 						
@@ -304,7 +309,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 							"message"     : "Ya existe modificación previa pendiente de ser impactada. Desea continuar con la nueva modificación?",
 							"callback"    : function(e){
 												if (e) {
-													var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaTitulosxCargo");
+													var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 													rpc.addListener("completed", functionCompleted);
 													rpc.callAsyncListeners(true, "escribir_novedad_modificacion", p);
 												} else {
@@ -323,8 +328,8 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 					rowData.id_tipo_titulo = this.data.oldValue;
 					tableModelDest.setRowsAsMapArray([rowData], focusedRow, true);
 					
-					if (data.message == "titulo_ya_asignado") dialog.Dialog.error("El título seleccionado ya ha sido asignado al cargo.");
-					if (data.message == "novedad_existente") dialog.Dialog.error("Ya existe una novedad pendiente de ser impactada para el título y cargo seleccionados.");
+					if (data.message == "espacio_ya_asignado") dialog.Dialog.error("El espacio seleccionado ya ha sido asignado al título.");
+					if (data.message == "novedad_existente") dialog.Dialog.error("Ya existe una novedad pendiente de ser impactada para el título y espacio seleccionados.");
 				}, this);
 				rpc.callAsyncListeners(true, "verificar_novedad_modificacion", p);
 			}
@@ -421,34 +426,34 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 				bandera = false;
 				tblDest.setValid(false);
 				
-				sharedErrorTooltip.setLabel("Debe ingresar cargos categorizados");
+				sharedErrorTooltip.setLabel("Debe ingresar espacios categorizados");
 				sharedErrorTooltip.placeToWidget(tblDest);
 			}
 			
 			if (bandera) {
-				dialog.Dialog.confirm("Desea incluir los cargos seleccionados en el título destino?", function(e){
+				dialog.Dialog.confirm("Desea incluir los espacios seleccionados en el título destino?", function(e){
 					if (e) {
 						var p = {};
-						p.titulo = lstTituloD.getSelection()[0].getUserData("datos");
-						p.cargo = tableModelDest.getDataAsMapArray();
+						p.titulo = lstD.getSelection()[0].getUserData("datos");
+						p.espacio = tableModelDest.getDataAsMapArray();
 						
 						alert(qx.lang.Json.stringify(p, null, 2));
 						return;
 						
-						var rpc = new sical3.comp.rpc.Rpc("services/", "comp.ComisionDeTitulos");
+						var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 						rpc.addListener("completed", function(e){
 							var data = e.getData();
 							
-							lstTituloD.resetSelection();
-							cboTituloD.setValue("");
+							lstD.resetSelection();
+							cboD.setValue("");
 							
 							tableModelDest.setDataAsMapArray([], true);
 							
-							dialog.Dialog.alert("El alta de cargos para el título destino se ha realizado con éxito.", function(e){
-								cboTituloD.focus();
+							dialog.Dialog.alert("El alta de espacios para el título destino se ha realizado con éxito.", function(e){
+								cboD.focus();
 							});
 						});
-						rpc.callAsyncListeners(true, "guardar_cargos", p);
+						rpc.callAsyncListeners(true, "guardar_espacios", p);
 					}
 				});
 			} else {
@@ -573,13 +578,13 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 				} else {
 
 					var p = {};
-					p.titulo = lstTituloD.getSelection()[0].getUserData("datos");
-					p.cargo = [rowData];
+					p.titulo = lstD.getSelection()[0].getUserData("datos");
+					p.espacio = [rowData];
 					
 					alert(qx.lang.Json.stringify(p, null, 2));
 					return
 					
-					var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaCargosxTitulo");
+					var rpc = new sical3.comp.rpc.Rpc("services/", "comp.IncumbenciaEspaciosxTitulo");
 					rpc.addListener("completed", function(e){
 						var data = e.getData();
 						
@@ -608,7 +613,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 				if (lengthDest == 0) {
 					
 				} else {
-					dialog.Dialog.warning("Ya existe el cargo seleccionado en el título seleccionado.", function(e){
+					dialog.Dialog.warning("Ya existe el espacio seleccionado en el título seleccionado.", function(e){
 						cboCargo.focus();
 					});
 				}
@@ -623,7 +628,7 @@ qx.Class.define("sical3.comp.pageIncumbenciaEspaciosxTitulo",
 	
 	
 	
-	cboTituloD.setTabIndex(1);
+	cboD.setTabIndex(1);
 	tblDest.setTabIndex(3);
 	cboEspacio.setTabIndex(4);
 	cboCarrera.setTabIndex(5);
